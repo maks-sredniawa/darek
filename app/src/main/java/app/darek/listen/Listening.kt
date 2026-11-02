@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.SystemClock
 import android.util.Log
 import androidx.core.content.ContextCompat
+import app.darek.speak.ChimePlayer
 import app.darek.speak.PlaybackEnd
 import app.darek.speak.ReplyPlayer
 import app.darek.speak.Voice
@@ -34,7 +35,8 @@ import java.util.concurrent.ConcurrentHashMap
  * while Home is on screen, and phase 2 moves it into the service.
  *
  * Each Command ends the recording before Darek speaks and starts a new one when his Reply is
- * finished, so he never hears himself (ADR-0011).
+ * finished, so he never hears himself (ADR-0011). The chime alone plays with the microphone open,
+ * since it answers a name while the Command is still being said.
  */
 class Listening(
     context: Context,
@@ -102,6 +104,8 @@ class Listening(
             return
         }
         mutableState.update { it.copy(phase = Phase.PREPARING, failed = false) }
+        // A chime that cannot load or play costs the hint, never Listening.
+        val chime = runCatching { ChimePlayer() }.onFailure { Log.e(TAG, "chime failed to load", it) }.getOrNull()
         try {
             coroutineScope {
                 val loaded = withContext(Dispatchers.IO) { model ?: loadModel().also { model = it } }
@@ -113,12 +117,17 @@ class Listening(
                 val grammar = Grammar.json(enabled, persona, ListeningExtras.phrases(persona))
                 mutableState.update { it.copy(phase = Phase.ON) }
                 while (true) {
+                    val nameHeard = NameHeard(persona.word)
                     val answer =
                         Recogniser(loaded)
-                            .heard(grammar)
+                            .heard(grammar, holdAfter = persona.word)
                             .onEach { heard ->
                                 val hearing = heard is Heard.Partial && persona.word in heard.tokens
                                 mutableState.update { it.copy(hearingName = hearing) }
+                                if (nameHeard.isFirst(heard)) {
+                                    Log.i(TAG, "name heard")
+                                    chime?.let { player -> runCatching { player.play(volume()) } }
+                                }
                             }.filterIsInstance<Heard.Final>()
                             .mapNotNull { answerTo(it.tokens, enabled, persona) }
                             .first()
@@ -132,6 +141,8 @@ class Listening(
         } catch (e: Throwable) {
             Log.e(TAG, "listening failed", e)
             mutableState.update { it.copy(failed = true) }
+        } finally {
+            chime?.close()
         }
     }
 

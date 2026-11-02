@@ -33,9 +33,16 @@ sealed interface Heard {
 class Recogniser(
     private val model: Model,
 ) {
-    /** A `null` grammar is free decoding, phase 1's verdict 4 only. */
+    /**
+     * A `null` grammar is free decoding, phase 1's verdict 4 only. While a partial ends on [holdAfter],
+     * the utterance waits longer before it ends, so a user can pause after the name and still say one
+     * Command in one final result (ADR-0009).
+     */
     @RequiresPermission(Manifest.permission.RECORD_AUDIO)
-    fun heard(grammar: String?): Flow<Heard> =
+    fun heard(
+        grammar: String?,
+        holdAfter: String? = null,
+    ): Flow<Heard> =
         flow {
             val record =
                 AudioRecord(
@@ -59,17 +66,30 @@ class Recogniser(
                     record.startRecording()
                     val buffer = ShortArray(CHUNK)
                     var lastPartial = emptyList<String>()
+                    var holding = false
+
+                    fun hold(wanted: Boolean) {
+                        if (wanted == holding) return
+                        holding = wanted
+                        recognizer.setEndpointerDelays(
+                            START_SILENCE_S,
+                            if (wanted) HOLD_SILENCE_S else END_SILENCE_S,
+                            UTTERANCE_MAX_S,
+                        )
+                    }
                     while (true) {
                         currentCoroutineContext().ensureActive()
                         val read = record.read(buffer, 0, buffer.size)
                         check(read >= 0) { "AudioRecord.read returned $read" }
                         if (recognizer.acceptWaveForm(buffer, read)) {
                             lastPartial = emptyList()
+                            hold(false)
                             emit(Heard.Final(field(recognizer.result, "text")))
                         } else {
                             val partial = field(recognizer.partialResult, "partial")
                             if (partial != lastPartial) {
                                 lastPartial = partial
+                                hold(holdAfter != null && partial.lastOrNull() == holdAfter)
                                 emit(Heard.Partial(partial))
                             }
                         }
@@ -97,5 +117,11 @@ class Recogniser(
     companion object {
         const val SAMPLE_RATE = 16_000
         private const val CHUNK = SAMPLE_RATE / 10
+
+        // START, END and MAX are Kaldi's and the bundled model.conf's own values, restored after a hold.
+        private const val START_SILENCE_S = 5f
+        private const val END_SILENCE_S = 0.5f
+        private const val HOLD_SILENCE_S = 3.5f
+        private const val UTTERANCE_MAX_S = 20f
     }
 }

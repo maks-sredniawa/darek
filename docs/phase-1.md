@@ -306,7 +306,12 @@ no enabled Command gets *„Stary, nie mam żadnej fuchy."* while no Command the
 up is enabled, and one of eight *„nie rozumiem"* answers once one is. The built-in *powiedz coś* (and
 the debug build's roast) answer but do not count as set up. A result without *darek* gets nothing, so
 talk that never names him is never answered. While a partial result holds *darek*, Home shows *Darek
-cię słyszy…* in place of *Darek słucha*. `CommandMatchTest` pins which results answer. In this
+cię słyszy…* in place of *Darek słucha*, and the first such partial of an utterance sounds a short
+chime (`speak/Chime.kt`, the owner's ask and choice of sound, 2026-11-02), with the microphone still
+open because the Command is still being said. While a partial ends on the name the utterance waits
+3.5 s of silence instead of 0.5 s (the owner's number), so a user can wait for the chime and still say
+one Command in one final result, and the name alone is answered that much later. Only Home does
+either: the probe keeps the model's own endpoint, so R1, R2 and R8 do not read a pause. `CommandMatchTest` pins which results answer. In this
 phase's release nothing can be set up yet, so his name alone always gets the no-fucha answer until
 phase 3. A room that says *„Darek mówił, że…"* hears that answer; phase 2 re-reads it before he
 listens in a pocket. In the debug build, `-PreleaseShapedDebug` included, Home's grammar also carries the roast's words,
@@ -508,4 +513,5 @@ The copy, in English, translated once at the merge:
 | R7 | The Gate call on the owner's phone, with the owner's go-ahead: Reply, ~2 s, dial; then once with *"anuluj"* said as soon as the Reply ends, no dial; then once with the Home key in the window, no dial | the screen, `adb shell dumpsys telecom` call list | |
 | R8 | The owner's phone in a parked car, engine running, Commands at arm's length | `adb logcat -s DarekProbe` | |
 | R9 | The release AAB declares `RECORD_AUDIO` and not `CALL_PHONE`; the debug APK declares both | `python3 scripts/aab-permissions.py` on `bundleRelease`; `aapt2 dump permissions` on the debug APK | |
+| R11 | The chime: *"Hej Daria, powiedz coś"* with no pause, and with a pause after the name, on Home | `adb logcat -s DarekListen` while the owner speaks | **Test phone, Daria, 2026-11-02:** no pause, 10 of 10 fired, on the first sound (two rising notes). Heard at last on the third build: `CONTENT_TYPE_SONIFICATION` moved it off the assistant stream onto a muted media stream, read in `dumpsys media.audio_policy`. With a pause, at a 2 s hold: 1 of 3 fired, the others final `[daria, tomka]` and `[daria, maria]`, and what was said in them was not recorded. **Owed:** ten tries with a pause, at 3.5 s, on the sound that ships |
 | R10 | Download and installed size for arm64-v8a before B and with it: the voice's model and ONNX Runtime 1.28.0's 28.6 MB `libonnxruntime.so`, stored uncompressed (ADR-0014) | `bundletool build-apks` on `bundleRelease`, then `bundletool get-size total --dimensions=ABI` | |
