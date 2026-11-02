@@ -32,7 +32,8 @@ was extracted from and the first app built from it settled on exactly this split
 - [x] **Phase D** ([`phase-D.md`](phase-D.md)) — Daria (ADR-0016), after 0.4.0 and before phase 2: the Persona in Settings,
   *gosia* bundled, the name and its Decoys per Persona with the correction, the built-in Commands'
   phrases without the name and every line in both genders, the UI strings that name the Persona as
-  pairs. Readings: her voice on the phone, her name and Decoys against real voices
+  pairs. Readings: her voice on the test phone, her name and Decoys on the owner's voice; the rest is
+  owed before she can call ([`DOD.md`](DOD.md))
 - [ ] **Phase 2** — Listening: the microphone service, its notification, the start paths (switch,
   notification after boot, Quick Settings tile), pausing during the Reply and the call, MIUI setup,
   a night's battery reading (ADR-0010). An updated microphone disclosure, shown once before the
@@ -45,7 +46,10 @@ was extracted from and the first app built from it settled on exactly this split
   phase 3 is decided in `phase-F.md`
 - [ ] **Phase 3** — Safe for a stranger: the user's Numbers for the built-in Commands, which brings
   `CALL_PHONE` and the call into the release, the user's own Reply text for each Command
-  (ADR-0014), and the first-run path. It freezes `CALL_PHONE` and the
+  (ADR-0014), and the first-run path. Before a Command that calls can fire under Daria, her name and
+  Decoys are read with `GATE` in the grammar, on the shipping grammar, against real voices, to
+  [phase 1's bar](phase-1.md#the-question-in-the-form-that-can-be-measured)
+  ([`DOD.md`](DOD.md)); if phase F brings calling first, it owes this. It freezes `CALL_PHONE` and the
   `microphone` service type. *The door is already open*: closed testing started with phase 0's
   Alpha 0.2.0 (2026-10-31), so the microphone disclosure moved to phase 1, where `RECORD_AUDIO`
   arrives
