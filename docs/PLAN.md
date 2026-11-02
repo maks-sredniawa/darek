@@ -36,7 +36,9 @@ was extracted from and the first app built from it settled on exactly this split
   owed before she can call ([`DOD.md`](DOD.md))
 - [ ] **Phase 2** — Listening: the microphone service, its notification, the start paths (switch,
   notification after boot, Quick Settings tile), pausing during the Reply and the call, MIUI setup,
-  a night's battery reading (ADR-0010). An updated microphone disclosure, shown once before the
+  a night's battery reading (ADR-0010). A negative reading of *„No?"* on the shipping grammar: the
+  near-miss script and 2 minutes of radio or conversation that do not name the Persona, counting
+  `name heard` lines (ADR-0009). An updated microphone disclosure, shown once before the
   first service start whether or not `RECORD_AUDIO` is already granted: phase 1's promised
   listening only with Home on screen
 - [ ] **Phase F** — Fuchy (ADR-0015): Commands stored as fuchy, Darek's own bundled; `INTERNET`
