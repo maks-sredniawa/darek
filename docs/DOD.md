@@ -148,9 +148,6 @@ Re-declarations a change owes Play, written down the day the change merges and t
 Console matches. A new permission, foreground service or data type is a Console change that waits in
 *Publishing overview* for *Send for review* with the upload that needs it. Empty most of the time.
 
-- [ ] **Add `maks-forge-testers@googlegroups.com` to Darek's closed track (Alpha)** in the Console:
-      every closed track gets both groups (`RELEASING.md`, *Testers*), and Alpha was set up with
-      `testers-community@googlegroups.com` alone.
 - [ ] **In the release that ships phase 1's checkpoint B** (`phase-1.md`, *Documents this phase
       amends*): the listing's test-build paragraph in both languages, the screenshots with *Słuchaj*,
       the privacy policy's microphone bullet and its *Text-to-speech* paragraph (Darek's own voice,
@@ -184,6 +181,12 @@ Persona the hold after the name (ADR-0009) has never been read against a Command
 
 A known gap, with no reading to take: *„Co tam, mordo?"* and *„Dziś 22°C…"* still sound odd in her
 voice at every setting tried (D2). A better voice or a line of her own fixes it.
+
+## Before the opt-in link goes out
+
+- [ ] **Add `maks-forge-testers@googlegroups.com` to Darek's closed track (Alpha)** in the Console:
+      every closed track gets both groups (`RELEASING.md`, *Testers*), and Alpha was set up with
+      `testers-community@googlegroups.com` alone.
 
 ## After the closed test
 
