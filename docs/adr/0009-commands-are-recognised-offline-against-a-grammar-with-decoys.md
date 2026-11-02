@@ -104,4 +104,4 @@ launch without signal. Rejected with ADR-0008.
   that calls gets the hold at all is the owner's call on that reading.
 - A partial result that passes through the name now gets *„No?"* and can start the hold, though
   it still fires nothing, so talk that only sounds like the name gets a spoken answer. The 0/64 above counted
-  final results and does not measure this; phase 1's R11 owes it.
+  final results and does not measure this; phase 2 owes it, before Darek listens in a pocket.
