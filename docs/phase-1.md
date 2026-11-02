@@ -194,10 +194,15 @@ count is given:
 ### The verdict, 2026-11-02
 
 **No clean verdict: the owner stopped the reading** as too much testing, so R1 is partial and R2 was
-not taken. What R1 read sits nearest verdicts 2 and 3: two false fires on *„powiedz coś"*, and no fire
-in the groups that look like 3 m. No Decoys were added, and the listing gains no distance gap, because
-it is unread whether those tries paused after the name. The readings owed before a Command that calls
-can fire ([`DOD.md`](DOD.md)) still stand.
+not taken. The 0.5 m bar is undecided for *„otwórz bramę"*, the Command that calls: it read 8 of 9,
+under 9 in 10, with no tenth try, and a miss there is verdict 4. *„powiedz coś"* read 12 of 12. If the
+bar holds, what R1 read sits nearest verdicts 2 and 3: two false fires on *„powiedz coś"*, and no fire
+in the groups that look like 3 m.
+
+No Decoys were added: the owner stopped testing, and verdict 2's Decoy step needs a re-read that will
+not be taken now, so those two false fires stay open. The listing gains no distance gap, because it is
+unread whether the tries in those groups paused after the name. The readings owed before a Command
+that calls can fire ([`DOD.md`](DOD.md)) still stand.
 
 ## 2. The model, the recogniser and the match
 
@@ -400,9 +405,25 @@ The copy, in English, translated once at the merge:
 
 - **`CommandMatchTest`**: a table written by hand from ADR-0009's rule, because the host reading's
   token strings were not kept. Section 1's script for both Commands, as the model would emit it:
-  each Command, the embedded lines, every near-miss (*darek powiedz mi coś*, *powiedz coś darek*,
-  *marek powiedz coś*, *jarek otwórz bramę*, …), an `[unk]` between words, and leading and trailing
-  words. R1's logged token strings join it once taken. It fails toward a **false fire**.
+  each Command, the embedded lines, every near-miss (*powiedz coś darek*, *marek powiedz coś*,
+  *jarek otwórz bramę*, …), an `[unk]` between words, and leading and trailing words. It fails toward
+  a **false fire**.
+
+  *„Darek, powiedz mi coś"* is the exception. The table's `darek powiedz mi coś` stays quiet, but the
+  model does not emit it, because `mi` is not in the grammar: in R1 it emitted `darek powiedz coś`,
+  which fires.
+
+  R1's token strings are still owed to the table. Every distinct string in its log, kept here because
+  the log is not:
+  - `SAY_SOMETHING`: `darek powiedz coś`, `darek powiedz coś darek otwórz bramę`,
+    `darek powiedz coś otwórz bramę`, `marii darię powiedz marii darek powiedz coś`. The last is the
+    noise false fire: the match rule fires on those tokens as written, so its row pins that rule, and
+    the false fire stays open with the verdict.
+  - `GATE`: `darek otwórz bramę`.
+  - Nothing: `darek`, `powiedz coś`, `otwórz bramę`, `marek`, `marek otwórz bramę`,
+    `jarek otwórz bramę`, `powiedz coś darek`, `darek brama`, `darek brama otwórz`, `darka`,
+    `marii darek marii`, `marii darek powiedz marii darek`, `powiedz darek darii`, `stop marii`,
+    `janek darek darka stop`.
 - **`CancelWindowTest`**:
   - A partial result with *anuluj* 1.9 s after the Reply is finished cancels.
   - One at 2.1 s is too late and the dial stands.
@@ -514,7 +535,7 @@ The copy, in English, translated once at the merge:
 
 | # | Reading | Command | Result |
 | --- | --- | --- | --- |
-| R1 | The gate script (section 1) on the test phone, debug build, probe | `adb logcat -s DarekProbe` while the owner reads the script | **Test phone, the owner's voice, Reading mode, `-PreleaseShapedDebug`, 2026-11-02: incomplete, and the owner stopped it, as too much testing.** One run with no batch marks, so the groups are inferred from their order. *„powiedz coś"*: 12 of 12 fired, then 10 tries that did not, each split into the finals `darek` and `powiedz coś`. *„otwórz bramę"*: 8 of 9 fired, the other `marek otwórz bramę`, then 6 split the same way. The split groups look like the 3 m tries, but whether the owner paused after the name was never answered, and the probe has no hold. The radio group ran together, as in `darek powiedz coś darek otwórz bramę`, which fires only the first Command, so it has no score. Embedded: both fired. Near-misses: 6 of 7 quiet, and **„Darek, powiedz mi coś" fired** (`darek powiedz coś`). Noise: about 35 s in place of 4 minutes, with **one false fire**, `marii darię powiedz marii darek powiedz coś` |
+| R1 | The gate script (section 1) on the test phone, debug build, probe | `adb logcat -s DarekProbe` while the owner reads the script | **Test phone, the owner's voice, Reading mode, `-PreleaseShapedDebug`, 2026-11-02: incomplete, and the owner stopped it, as too much testing.** One run with no batch marks, so the groups are inferred from their order. *„powiedz coś"*: 12 of 12 fired, then 9 tries that did not, each split into the finals `darek` and `powiedz coś`. *„otwórz bramę"*: 8 of 9 fired, the other `marek otwórz bramę`, then 6 split the same way. The split groups look like the 3 m tries, but whether the owner paused after the name was never answered, and the probe has no hold. The radio group ran together, as in `darek powiedz coś darek otwórz bramę`, which fires only the first Command, so it has no score. Embedded: both fired. Near-misses: 6 of 7 quiet, and **„Darek, powiedz mi coś" fired** (`darek powiedz coś`). Noise: about 35 s in place of 4 minutes, with **one false fire**, `marii darię powiedz marii darek powiedz coś` |
 | R2 | The same on the owner's phone | as R1, `-s 132bc856` | Not taken: the owner stopped voice testing, 2026-11-02 |
 | R3 | Darek's voice on each phone: model load time, synthesis time for each fixed Reply, what finished each Reply, and the owner's ear on the voice | the `DarekVoice` log lines from V's *say this* field | **Test phone, int8, 2026-11-01:** load 3.5–3.7 s cold; *„Co tam, mordo?"* 1.3 s of speech in 0.6 s, longer sentences at ~0.45× real time (5.5 s in 2.5 s); every Reply ended on the marker. The owner heard it, and asked for formal clock times, now in. **Owner's phone, int8, 2026-11-01:** load 1.9 s; ~0.25× real time (8.5 s of speech in 2.0 s); all four samples ended on the marker. **Owner's phone, int8 against full, 2026-11-01:** the owner heard "a big difference" and chose the full model. **Test phone, full model, 2026-11-01:** load 2.4 s cold; *„Co tam, mordo?"* 1.2 s of speech in 0.27 s, longer sentences at ~0.18–0.2× real time (8.6 s in 1.6 s); all seven samples ended on the marker. The full model is faster than int8 on this phone as well as better. **Done:** the int8-against-full comparison is settled, and the full model ships (ADR-0014) |
 | R4 | End to end on `-PreleaseShapedDebug`: *Słuchaj* → *"Hej Darek, powiedz coś"* → *„Co tam, mordo?"* heard and shown, and finished by the marker, on both phones | `./gradlew installDebug -PreleaseShapedDebug`, then the screen, `screencap` and `adb logcat -s DarekVoice` | Not taken: the owner stopped voice testing, 2026-11-02 |
