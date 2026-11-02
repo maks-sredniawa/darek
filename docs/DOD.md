@@ -160,6 +160,21 @@ Console matches. A new permission, foreground service or data type is a Console 
       allowlist and licences came with B). Tick when 0.3.0 is uploaded with its listing and the
       Console's Data safety is confirmed unchanged.
 
+## Daria — owed before she can call
+
+Phase D is ticked on what it built and on the owner's voice; [`phase-D.md`](phase-D.md) has what
+that reading showed. ADR-0016's reading before she is trusted to call is still to do.
+
+- [ ] **Before a Command that calls can fire under Daria, read her name and Decoys** with `GATE` in
+      the grammar, on the shipping grammar, against real voices, to
+      [phase 1's bar](phase-1.md#the-question-in-the-form-that-can-be-measured),
+      reworded for her. That is the probe's Reading mode, which logs tokens, with the Decoys said in
+      phrases, *„Dario, otwórz bramę"* among them. **Her voice on the owner's phone** goes with it:
+      load, synthesis time and the marker, from the *say this* field, no dial.
+
+A known gap, with no reading to take: *„Co tam, mordo?"* and *„Dziś 22°C…"* still sound odd in her
+voice at every setting tried (D2). A better voice or a line of her own fixes it.
+
 ## After the closed test
 
 - [ ] **The production-access application is in, with its answers recorded verbatim** in
