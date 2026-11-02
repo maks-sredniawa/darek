@@ -71,11 +71,11 @@ class Recogniser(
                     fun hold(wanted: Boolean) {
                         if (wanted == holding) return
                         holding = wanted
-                        recognizer.setEndpointerDelays(
-                            START_SILENCE_S,
-                            if (wanted) HOLD_SILENCE_S else END_SILENCE_S,
-                            UTTERANCE_MAX_S,
-                        )
+                        if (wanted) {
+                            recognizer.setEndpointerDelays(START_SILENCE_S, HOLD_SILENCE_S, UTTERANCE_MAX_S)
+                        } else {
+                            recognizer.setEndpointerMode(MODEL_ENDPOINTER_MODE)
+                        }
                     }
                     while (true) {
                         currentCoroutineContext().ensureActive()
@@ -118,10 +118,10 @@ class Recogniser(
         const val SAMPLE_RATE = 16_000
         private const val CHUNK = SAMPLE_RATE / 10
 
-        // START, END and MAX are Kaldi's and the bundled model.conf's own values, restored after a hold.
+        // setEndpointerDelays takes rules 1 and 5 too: these are Kaldi's, which model.conf leaves alone.
         private const val START_SILENCE_S = 5f
-        private const val END_SILENCE_S = 0.5f
-        private const val HOLD_SILENCE_S = 3.5f
         private const val UTTERANCE_MAX_S = 20f
+        private const val HOLD_SILENCE_S = 3.5f
+        private const val MODEL_ENDPOINTER_MODE = 0
     }
 }

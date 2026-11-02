@@ -36,7 +36,7 @@ object Chime {
     private fun rise(x: Double) = if (x >= 1) 1.0 else (1 - cos(PI * x)) / 2
 }
 
-/** The [Chime] kept loaded on a low-latency track, because building a track when it is needed adds to the delay. */
+/** The [Chime] kept loaded on a track, because building one when it is needed adds to the delay. */
 class ChimePlayer : AutoCloseable {
     private val track =
         AudioTrack
@@ -56,14 +56,19 @@ class ChimePlayer : AutoCloseable {
                     .setChannelMask(AudioFormat.CHANNEL_OUT_MONO)
                     .build(),
             ).setTransferMode(AudioTrack.MODE_STATIC)
-            .setPerformanceMode(AudioTrack.PERFORMANCE_MODE_LOW_LATENCY)
             .setBufferSizeInBytes(Chime.samples.size * 2)
             .build()
-            .also { it.write(Chime.samples, 0, Chime.samples.size) }
+            .also {
+                val written = it.write(Chime.samples, 0, Chime.samples.size)
+                if (written != Chime.samples.size) {
+                    it.release()
+                    error("wrote $written of ${Chime.samples.size} samples")
+                }
+            }
 
     fun play(volume: Float) {
         track.stop()
-        track.reloadStaticData()
+        check(track.reloadStaticData() == AudioTrack.SUCCESS) { "reloadStaticData failed" }
         track.setVolume(volume)
         track.play()
     }
