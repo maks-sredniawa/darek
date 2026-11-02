@@ -29,7 +29,7 @@ was extracted from and the first app built from it settled on exactly this split
   microphone disclosure; the Gate call
   with its cancel window in the debug build only (ADR-0011). Readings: real voices at a distance and
   in a car, the offline Polish voice, the dial on the owner's phone
-- [ ] **Phase D** — Daria (ADR-0016), after 0.4.0 and before phase 2: the Persona in Settings,
+- [x] **Phase D** ([`phase-D.md`](phase-D.md)) — Daria (ADR-0016), after 0.4.0 and before phase 2: the Persona in Settings,
   *gosia* bundled, the name and its Decoys per Persona with the correction, the built-in Commands'
   phrases without the name and every line in both genders, the UI strings that name the Persona as
   pairs. Readings: her voice on the phone, her name and Decoys against real voices

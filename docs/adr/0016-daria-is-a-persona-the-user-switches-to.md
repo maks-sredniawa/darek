@@ -43,7 +43,9 @@ Read on the host on 2026-11-01:
   mówisz z Darią."*, Darek says *„Daria? Tu Darek, stary."*.
 - **Daria's voice is `pl_PL-gosia-medium` as Piper publishes it**, bundled in the app at full
   quality and fetched at build time from the same pinned Hugging Face commit as Darek's, SHA-256
-  checked. Only the chosen Persona's voice is loaded.
+  checked. Only the chosen Persona's voice is loaded. At her config's settings (noise 0.667,
+  timing noise 0.8) she lisps; she speaks at 0.4 and 0.5, the best of the settings the owner
+  compared by ear on 2026-11-01 (`docs/phase-D.md`).
 - **Switching the Persona while Listening restarts it.** Stopping cancels a pending call, as any
   stop does (ADR-0011); the old voice is released, and the new start builds the grammar for the new
   name and loads the new voice. Lines rendered ahead are kept per Persona, so a line spelled the
