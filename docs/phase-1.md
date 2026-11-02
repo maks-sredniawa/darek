@@ -302,7 +302,7 @@ and the shown Reply is seen. With the phone in a pocket it is neither heard nor 
 Command that calls may dial on a failed voice there is left open for phase 2 (ADR-0011).
 
 **His name without a Command** (the owner's ask, 2026-11-01): a final result that holds *darek* and
-no enabled Command gets *„Stary, musisz mnie najpierw skonfigurować."* while no Command the user sets
+no enabled Command gets *„Stary, nie mam żadnej fuchy."* while no Command the user sets
 up is enabled, and one of eight *„nie rozumiem"* answers once one is. The built-in *powiedz coś* (and
 the debug build's roast) answer but do not count as set up. A result without *darek* gets nothing, so
 talk that never names him is never answered. While a partial result holds *darek*, Home shows *Darek

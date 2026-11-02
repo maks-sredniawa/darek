@@ -45,7 +45,7 @@ sealed interface Reaction {
     data object Corrected : Reaction
 }
 
-val NOT_CONFIGURED = Line("Stary, musisz mnie najpierw skonfigurować.")
+val NOT_CONFIGURED = Line("Stary, nie mam żadnej fuchy.")
 
 /** Picked at random, never the same twice in a row. */
 val NOT_UNDERSTOOD =
