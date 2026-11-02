@@ -1,6 +1,6 @@
 package app.darek.listen
 
-/** Picks the first partial of an utterance that holds [name]: partials repeat and flicker, and each utterance chimes once. */
+/** Picks the first partial of an utterance that holds [name]: partials repeat and flicker, and each utterance is answered once. */
 class NameHeard(
     private val name: String,
 ) {

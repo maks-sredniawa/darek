@@ -54,7 +54,7 @@ confidence 1.00. That is the failure this ADR exists to prevent.
   (*"Darek powiedział: otwórz bramę"* → `darek [unk] otwórz bramę`), a partial or reordered one
   (*"darek bramę otwórz"*) and partial results never fire.
 - **While a partial result ends on the name, the utterance waits longer before it ends** (the owner's
-  ask, 2026-11-02, on Home only, not the probe), so a user can say the name, wait for the chime
+  ask, 2026-11-02, on Home only, not the probe), so a user can say the name, wait for *„No?"*
   ([ADR-0011](0011-the-gate-call-is-placed-through-telecom-after-the-reply.md)) and still say the
   Command in one final result. Rule 2's trailing silence goes from `model.conf`'s 0.5 s to 3.5 s, the
   owner's number. Vosk derives rules 3 and 4 from it, so the hold is 4.0 s or 4.5 s, against the
@@ -91,7 +91,7 @@ launch without signal. Rejected with ADR-0008.
   review; an unapproved one's Decoys and vocabulary meet nothing but Darek's install checks, the
   vocabulary check and ADR-0015's clash rules, which also catch a Decoy or a Command word that
   would take another fucha's Command.
-- Recognition pauses while Darek speaks, so he does not answer himself; the chime alone plays into
+- Recognition pauses while Darek speaks, so he does not answer himself; only *„No?"*, the answer to the name, plays into
   the open microphone (ADR-0011).
 - **The hold weakens what adjacency protects.** Without it, the name and 0.5 s of silence ended the
   utterance, so a name and a Command said apart could not share a final result. With it, *"Darek"*, up
@@ -102,6 +102,6 @@ launch without signal. Rejected with ADR-0008.
   reading is owed before a Command that calls can fire in a release, under either Persona**
   ([`DOD.md`](../DOD.md)): the name, a 1 to 3 s gap, the Command in a second voice. Whether a Command
   that calls gets the hold at all is the owner's call on that reading.
-- A partial result that passes through the name now sounds the chime and can start the hold, though
-  it still fires nothing, so talk that only sounds like the name is audible. The 0/64 above counted
+- A partial result that passes through the name now gets *„No?"* and can start the hold, though
+  it still fires nothing, so talk that only sounds like the name gets a spoken answer. The 0/64 above counted
   final results and does not measure this; phase 1's R11 owes it.
