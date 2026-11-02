@@ -277,14 +277,14 @@ Poznaj Darię: w Ustawieniach, w sekcji Kto odpowiada, możesz teraz przełączy
 
 ### 0.6.0 — Darek has no gigs yet
 
-**English** — 143/500:
+**English** — 133/500:
 
 ```
-Call Darek by name with nothing he can do and he now tells you plainly: "Stary, nie mam żadnej fuchy", he has no gigs yet. Daria says the same.
+Call Darek by name without a Command he knows and he now says "Stary, nie mam żadnej fuchy": he has no gigs yet. Daria says the same.
 ```
 
-**Polish** — 129/500:
+**Polish** — 115/500:
 
 ```
-Gdy zawołasz Darka po imieniu, a nie ma nic do zrobienia, powie teraz wprost: „Stary, nie mam żadnej fuchy”. Daria powie to samo.
+Zawołaj Darka po imieniu bez komendy, którą zna, a powie teraz: „Stary, nie mam żadnej fuchy”. Daria powie to samo.
 ```

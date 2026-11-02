@@ -159,8 +159,9 @@ is the code-from-the-internet question this ADR closes.
 - ADR-0009's catalogue becomes the bundled fuchy, and a phrase can come from outside the app. The
   vocabulary check moves to install time and to `darek-fuchy`'s CI, where it also helps the owner's
   review.
-- *Configured* (`reactionTo` in `listen/CommandMatch.kt`) still means an enabled Command that
-  calls, from whichever fucha.
+- *Configured* (`reactionTo` in `listen/CommandMatch.kt`) means an enabled Command that calls, from
+  whichever fucha. That test and the answer it picks are re-decided in phase F, the owner's call:
+  for someone who installed only a reply-only fucha, *„Stary, nie mam żadnej fuchy."* would be false.
 - A leaked signing key lets anyone badge anything; the fix is a Darek release with a new public key.
 - The phase that builds fuchy comes after phase 2 (`docs/PLAN.md`). The `darek-fuchy` repo, its
   rules and the builder on the site are a project of their own.

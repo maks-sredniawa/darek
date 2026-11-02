@@ -15,10 +15,10 @@ fun commandIn(
 
 /**
  * What one final result makes the Persona do: fire a Command; when it heard its own name and nothing
- * it knows, say it does not understand, or, while no Command the user sets up is enabled, ask to be
- * set up; failing that, correct a user who used the other Persona's name (ADR-0016); or stay silent,
- * so talk that names neither never gets an answer. The built-in Command that only replies does not
- * count as set up (the owner's call, 2026-11-01).
+ * it knows, say it does not understand, or, while no Command the user sets up is enabled, say it has
+ * no fucha; failing that, correct a user who used the other Persona's name (ADR-0016); or stay
+ * silent, so talk that names neither never gets an answer. The built-in Command that only replies
+ * does not count as set up (the owner's call, 2026-11-01).
  */
 fun reactionTo(
     tokens: List<String>,
