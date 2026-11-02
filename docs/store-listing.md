@@ -302,3 +302,17 @@ When Darek or Daria hears the name, you now hear a short sound.
 ```
 Gdy Darek lub Daria usłyszy swoje imię, usłyszysz teraz krótki dźwięk.
 ```
+
+### 0.8.0 — Darek and Daria answer their names
+
+**English** — 77/500:
+
+```
+When Darek or Daria hears the name, they now answer "No?" instead of a sound.
+```
+
+**Polish** — 76/500:
+
+```
+Gdy Darek lub Daria usłyszy swoje imię, odpowie teraz „No?” zamiast dźwięku.
+```

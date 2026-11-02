@@ -184,9 +184,9 @@ voice at every setting tried (D2). A better voice or a line of her own fixes it.
 
 ## Before the opt-in link goes out
 
-- [ ] **Add `maks-forge-testers@googlegroups.com` to Darek's closed track (Alpha)** in the Console:
+- [x] **Add `maks-forge-testers@googlegroups.com` to Darek's closed track (Alpha)** in the Console:
       every closed track gets both groups (`RELEASING.md`, *Testers*), and Alpha was set up with
-      `testers-community@googlegroups.com` alone.
+      `testers-community@googlegroups.com` alone. Saved and sent for review 2026-11-02.
 
 ## After the closed test
 

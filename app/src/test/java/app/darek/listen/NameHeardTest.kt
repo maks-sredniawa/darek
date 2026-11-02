@@ -12,7 +12,7 @@ class NameHeardTest {
     }
 
     @Test
-    fun repeated_partials_chime_once() {
+    fun repeated_partials_answer_once() {
         assertEquals(
             listOf(false, true, false),
             firsts(partial("hej"), partial("hej", "daria"), partial("hej", "daria", "powiedz")),
@@ -20,7 +20,7 @@ class NameHeardTest {
     }
 
     @Test
-    fun a_partial_that_loses_the_name_and_regains_it_does_not_chime_again() {
+    fun a_partial_that_loses_the_name_and_regains_it_does_not_answer_again() {
         assertEquals(
             listOf(true, false, false),
             firsts(partial("daria"), partial("dario"), partial("daria")),
@@ -28,7 +28,7 @@ class NameHeardTest {
     }
 
     @Test
-    fun the_next_utterance_chimes_again() {
+    fun the_next_utterance_answers_again() {
         assertEquals(
             listOf(true, false, true),
             firsts(partial("daria"), Heard.Final(listOf("daria")), partial("daria")),
@@ -36,7 +36,7 @@ class NameHeardTest {
     }
 
     @Test
-    fun the_other_name_does_not_chime() {
+    fun the_other_name_does_not_answer() {
         assertEquals(listOf(false), firsts(partial("hej", "darek")))
     }
 }

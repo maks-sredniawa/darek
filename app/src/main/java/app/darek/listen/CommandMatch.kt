@@ -47,6 +47,8 @@ sealed interface Reaction {
 
 val NOT_CONFIGURED = Line("Stary, nie mam żadnej fuchy.")
 
+val NAME_HEARD = Line("No?")
+
 /** Picked at random, never the same twice in a row. */
 val NOT_UNDERSTOOD =
     listOf(

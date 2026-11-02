@@ -6,7 +6,7 @@ import android.content.pm.PackageManager
 import android.os.SystemClock
 import android.util.Log
 import androidx.core.content.ContextCompat
-import app.darek.speak.ChimePlayer
+import app.darek.speak.LoadedLine
 import app.darek.speak.PlaybackEnd
 import app.darek.speak.ReplyPlayer
 import app.darek.speak.Voice
@@ -35,8 +35,8 @@ import java.util.concurrent.ConcurrentHashMap
  * while Home is on screen, and phase 2 moves it into the service.
  *
  * Each Command ends the recording before Darek speaks and starts a new one when his Reply is
- * finished, so he never hears a Reply. The chime alone plays with the microphone open, since it
- * sounds while the Command is still being said (ADR-0011).
+ * finished, so he never hears a Reply. Only *„No?"*, the answer to his name, plays with the microphone
+ * open, since it comes while the Command is still being said (ADR-0011).
  */
 class Listening(
     context: Context,
@@ -104,12 +104,19 @@ class Listening(
             return
         }
         mutableState.update { it.copy(phase = Phase.PREPARING, failed = false) }
-        // A chime that cannot load or play costs the hint, never Listening.
-        val chime = runCatching { ChimePlayer() }.onFailure { Log.e(TAG, "chime failed to load", it) }.getOrNull()
+        var nameAnswer: LoadedLine? = null
         try {
             coroutineScope {
                 val loaded = withContext(Dispatchers.IO) { model ?: loadModel().also { model = it } }
                 withContext(Dispatchers.Default) { prepareVoice(persona) }
+                withContext(Dispatchers.Default) { renderAhead(persona, listOf(NAME_HEARD)) }
+                // An answer that cannot load or play costs the hint, never Listening.
+                nameAnswer =
+                    rendered[persona to NAME_HEARD.by(persona)]?.let { samples ->
+                        runCatching { LoadedLine(samples) }
+                            .onFailure { Log.e(TAG, "name answer failed to load", it) }
+                            .getOrNull()
+                    }
                 if (enabled.any { it.calls }) {
                     withContext(Dispatchers.Default) { renderAhead(persona, NOT_UNDERSTOOD.take(1)) }
                     launch(Dispatchers.Default) { renderAhead(persona, NOT_UNDERSTOOD.drop(1)) }
@@ -124,7 +131,7 @@ class Listening(
                             .onEach { heard ->
                                 val hearing = heard is Heard.Partial && persona.word in heard.tokens
                                 mutableState.update { it.copy(hearingName = hearing) }
-                                if (nameHeard.isFirst(heard)) sound(chime)
+                                if (nameHeard.isFirst(heard)) answerName(nameAnswer)
                             }.filterIsInstance<Heard.Final>()
                             .mapNotNull { answerTo(it.tokens, enabled, persona) }
                             .first()
@@ -139,24 +146,24 @@ class Listening(
             Log.e(TAG, "listening failed", e)
             mutableState.update { it.copy(failed = true) }
         } finally {
-            chime?.close()
+            nameAnswer?.close()
         }
     }
 
-    private fun sound(chime: ChimePlayer?) {
+    private fun answerName(line: LoadedLine?) {
         val outcome =
             when {
-                chime == null -> "none"
+                line == null -> "none"
                 else ->
-                    runCatching { chime.play(volume()) }.fold(
+                    runCatching { line.play(volume()) }.fold(
                         onSuccess = { "played" },
                         onFailure = {
-                            Log.e(TAG, "chime failed to play", it)
+                            Log.e(TAG, "name answer failed to play", it)
                             "failed"
                         },
                     )
             }
-        Log.i(TAG, "name heard chime=$outcome")
+        Log.i(TAG, "name heard answer=$outcome")
     }
 
     private fun answerTo(
