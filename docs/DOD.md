@@ -178,10 +178,12 @@ Persona the hold after the name (ADR-0009) has never been read against a Command
       which has no SIM, so a fire is a `reaction=GATE` line in `DarekListen` and no call. The bar is
       [phase 1's](phase-1.md#the-question-in-the-form-that-can-be-measured): nothing fires. Whether a
       Command that calls gets the hold at all is the owner's call on this reading.
-- [ ] **Before a Command that calls can fire, finish R1** ([`phase-1.md`](phase-1.md), *The verdict*),
-      which the owner stopped on 2026-11-02. *„Otwórz bramę"* at 0.5 m read 8 of 9, so its bar is
-      undecided; the 3 m and radio groups have no usable score; and two false fires on *„powiedz coś"*
-      are open, *„Darek, powiedz mi coś"* and one in noise, with no Decoys added or re-read.
+- [ ] **Before a Command that calls can fire, finish R1 and take R2** ([`phase-1.md`](phase-1.md),
+      *The verdict*). The owner stopped R1 on 2026-11-02. *„Otwórz bramę"* at 0.5 m read 8 of 9, so its
+      bar is undecided; the 3 m and radio groups have no usable score; the noise group ran about 35 s
+      of the script's 4 minutes; and two false fires on *„powiedz coś"* are open, *„Darek, powiedz mi
+      coś"* and one in noise, with no Decoys added or re-read. R2 stays open too: it was not taken, its
+      phone is the only one that can dial, and verdict 1's bar is both phones.
 
 A known gap, with no reading to take: *„Co tam, mordo?"* and *„Dziś 22°C…"* still sound odd in her
 voice at every setting tried (D2). A better voice or a line of her own fixes it.

@@ -49,11 +49,12 @@ was extracted from and the first app built from it settled on exactly this split
   phase 3 is decided in `phase-F.md`
 - [ ] **Phase 3** — Safe for a stranger: the user's Numbers for the built-in Commands, which brings
   `CALL_PHONE` and the call into the release, the user's own Reply text for each Command
-  (ADR-0014), and the first-run path. Before a Command that calls can fire under Daria, her name and
-  Decoys are read with `GATE` in the grammar, on the shipping grammar, against real voices, to
-  [phase 1's bar](phase-1.md#the-question-in-the-form-that-can-be-measured), and under either Persona
+  (ADR-0014), and the first-run path. Before a Command that calls can fire, phase 1's R1 is finished
+  and its R2 taken; under Daria, her name and Decoys are read with `GATE` in the grammar, on the
+  shipping grammar, against real voices, to
+  [phase 1's bar](phase-1.md#the-question-in-the-form-that-can-be-measured); and under either Persona
   the hold after the name is read against a Command in a second voice (ADR-0009, [`DOD.md`](DOD.md));
-  if phase F brings calling first, it owes these. It freezes `CALL_PHONE` and the
+  if phase F brings calling first, it owes all three. It freezes `CALL_PHONE` and the
   `microphone` service type. *The door is already open*: closed testing started with phase 0's
   Alpha 0.2.0 (2026-10-31), so the microphone disclosure moved to phase 1, where `RECORD_AUDIO`
   arrives
