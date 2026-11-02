@@ -161,7 +161,8 @@ is the code-from-the-internet question this ADR closes.
   review.
 - *Configured* (`reactionTo` in `listen/CommandMatch.kt`) means an enabled Command that calls, from
   whichever fucha. That test and the answer it picks are re-decided in phase F, the owner's call:
-  for someone who installed only a reply-only fucha, *„Stary, nie mam żadnej fuchy."* would be false.
+  for anyone whose enabled fuchy only reply, Darek's own *powiedz coś* on a fresh install included,
+  *„Stary, nie mam żadnej fuchy."* would be false.
 - A leaked signing key lets anyone badge anything; the fix is a Darek release with a new public key.
 - The phase that builds fuchy comes after phase 2 (`docs/PLAN.md`). The `darek-fuchy` repo, its
   rules and the builder on the site are a project of their own.
