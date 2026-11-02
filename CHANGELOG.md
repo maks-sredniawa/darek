@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.0](https://github.com/maksforge/darek/compare/v0.7.0...v0.8.0) (2026-11-02)
+
+
+### Features
+
+* answer the name with „No?" in place of the sound ([7486cb6](https://github.com/maksforge/darek/commit/7486cb63f2811526c3672b518ec92d299b8347d7))
+
 ## [0.7.0](https://github.com/maksforge/darek/compare/v0.6.0...v0.7.0) (2026-11-02)
 
 
