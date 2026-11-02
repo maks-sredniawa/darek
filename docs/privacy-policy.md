@@ -5,7 +5,7 @@ title: Privacy Policy
 
 # Privacy Policy
 
-_Effective date: 1 November 2026_
+_Effective date: 2 November 2026_
 
 Darek is a Polish voice assistant for Android. While you have him listening, he waits for one of a
 few fixed spoken Commands, such as *"Darek, otwórz bramę"*, answers out loud, and then calls the
@@ -32,7 +32,10 @@ out.
   notification, says that Darek is listening. The sound is processed **on your phone, frame by frame**, by an offline speech
   recogniser that comes inside the app, and the only thing kept is the text of a Command it
   recognised, in memory, long enough to act on it. **Audio is never recorded, never stored and never
-  sent anywhere.** Listening pauses while Darek speaks and while his call is in progress.
+  sent anywhere.** Listening pauses while Darek speaks a reply and while his call is in progress. The
+  one line he says with the microphone open is *„No?"* (Polish for "yes?"), his answer to hearing his
+  name while you may still be saying a Command. It is processed like any other sound and, like it,
+  never leaves your phone.
 - **Phone calls, only to the numbers you enter.** Darek comes with no phone numbers and never reads
   your contacts or your call log. The number you type in for a Command is kept on your phone and used
   for one thing: placing the call that Command asks for, after Darek has said his reply and given you

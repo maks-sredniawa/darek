@@ -169,7 +169,8 @@ The answer rests on one fact per route data could take:
    the microphone frame by frame; only the text of a matched Command is kept, in memory, and audio is
    never stored or sent (ADR-0008, ADR-0009). `RECORD_AUDIO` is in the artifact from 0.3.0; re-read
    2026-11-01 against Play's definitions above: still no data collected, so the Console answer stands
-   unchanged.
+   unchanged. From 2026-11-02 the policy also says that *„No?"*, the answer to the name, plays with the
+   microphone open (ADR-0011). It is processed like any other sound, so no answer here moves.
 3. **The Numbers stay on the device.** The user types each one in; it is kept in DataStore and used
    only to place that Command's call. **Auto Backup is still "no data collected"**: the platform moves
    the user's backup to the user's own Google account, and the developer never sees it. That is
