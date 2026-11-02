@@ -52,7 +52,7 @@ The line that appears under the name in search results, and the most-read text i
 Say "Darek, otwórz bramę" and he calls your gate opener. Offline, in Polish.
 ```
 
-### Full description — 3013/4000
+### Full description — 3020/4000
 
 **No health or safety claims**, here or on any page the listing links to — Play's enforcement reads a
 linked page as part of the listing. Say what the app cannot do instead.
@@ -74,7 +74,7 @@ release that ships the call (phase 3) deletes it, in both languages.
 ```
 Darek is a Polish voice assistant for your gate. Say "Darek, otwórz bramę" and he answers out loud and calls your gate's GSM opener, so you do not have to reach for your phone. Recognition, speech and the call all happen on your phone, with no internet at all.
 
-This test build answers one Command, "Hej Darek, powiedz coś", while the app is open on screen. Say his name with anything else, "Darek, otwórz bramę" included, and he answers "musisz mnie najpierw skonfigurować". Setting him up, Listening with the screen off and the call arrive in the next test builds.
+This test build answers one Command, "Hej Darek, powiedz coś", while the app is open on screen. Say his name with anything else, "Darek, otwórz bramę" included, and he answers "nie mam żadnej fuchy" (he has no gigs yet). Setting him up, Listening with the screen off and the call arrive in the next test builds.
 
 HOW IT WORKS
 
@@ -127,12 +127,12 @@ Darek
 Powiedz „Darek, otwórz bramę”, a on odpowie i zadzwoni do bramy. Bez internetu.
 ```
 
-### Full description — 3096/4000
+### Full description — 3082/4000
 
 ```
 Darek to głosowy asystent do twojej bramy. Powiedz „Darek, otwórz bramę”, a on odpowie na głos i zadzwoni do sterownika GSM bramy, więc nie musisz sięgać po telefon. Rozpoznawanie mowy, odpowiedź i połączenie odbywają się w telefonie, zupełnie bez internetu.
 
-Ta wersja testowa odpowiada na jedną komendę, „Hej Darek, powiedz coś”, gdy aplikacja jest otwarta na ekranie. Gdy usłyszy swoje imię z czymkolwiek innym, także „Darek, otwórz bramę”, odpowie „musisz mnie najpierw skonfigurować”. Konfiguracja, słuchanie przy wyłączonym ekranie i dzwonienie pojawią się w kolejnych wersjach testowych.
+Ta wersja testowa odpowiada na jedną komendę, „Hej Darek, powiedz coś”, gdy aplikacja jest otwarta na ekranie. Gdy usłyszy swoje imię z czymkolwiek innym, także „Darek, otwórz bramę”, odpowie „nie mam żadnej fuchy”. Konfiguracja, słuchanie przy wyłączonym ekranie i dzwonienie pojawią się w kolejnych wersjach testowych.
 
 JAK TO DZIAŁA
 
@@ -273,4 +273,18 @@ Meet Daria: in Settings, under Who answers, you can now switch to her. Call her 
 
 ```
 Poznaj Darię: w Ustawieniach, w sekcji Kto odpowiada, możesz teraz przełączyć się na nią. Wołaj ją po imieniu, „Hej Daria, powiedz coś”, a odpowie własnym, kobiecym głosem. Darek zostaje domyślny. Wszystko nadal dzieje się na telefonie, bez internetu.
+```
+
+### 0.6.0 — Darek has no gigs yet
+
+**English** — 143/500:
+
+```
+Call Darek by name with nothing he can do and he now tells you plainly: "Stary, nie mam żadnej fuchy", he has no gigs yet. Daria says the same.
+```
+
+**Polish** — 129/500:
+
+```
+Gdy zawołasz Darka po imieniu, a nie ma nic do zrobienia, powie teraz wprost: „Stary, nie mam żadnej fuchy”. Daria powie to samo.
 ```
