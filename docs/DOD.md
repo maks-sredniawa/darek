@@ -160,10 +160,11 @@ Console matches. A new permission, foreground service or data type is a Console 
       allowlist and licences came with B). Tick when 0.3.0 is uploaded with its listing and the
       Console's Data safety is confirmed unchanged.
 
-## Daria — owed before she can call
+## Owed before a Command that calls can fire
 
 Phase D is ticked on what it built and on the owner's voice; [`phase-D.md`](phase-D.md) has what
-that reading showed. ADR-0016's reading before she is trusted to call is still to do.
+that reading showed. ADR-0016's reading before she is trusted to call is still to do, and under either
+Persona the hold after the name (ADR-0009) has never been read against a Command that calls.
 
 - [ ] **Before a Command that calls can fire under Daria, read her name and Decoys** with `GATE` in
       the grammar, on the shipping grammar, against real voices, to
@@ -171,6 +172,12 @@ that reading showed. ADR-0016's reading before she is trusted to call is still t
       reworded for her. That is the probe's Reading mode, which logs tokens, with the Decoys said in
       phrases, *„Dario, otwórz bramę"* among them. **Her voice on the owner's phone** goes with it:
       load, synthesis time and the marker, from the *say this* field, no dial.
+- [ ] **Before a Command that calls can fire under either Persona, read the hold on what it weakens**
+      (ADR-0009): on Home, the only place with the hold, with `GATE` in the shipping grammar, the
+      Persona's name, a 1 to 3 s gap, then *„otwórz bramę"* in a second voice. On the test phone,
+      which has no SIM, so a fire is a `reaction=GATE` line in `DarekListen` and no call. The bar is
+      [phase 1's](phase-1.md#the-question-in-the-form-that-can-be-measured): nothing fires. Whether a
+      Command that calls gets the hold at all is the owner's call on this reading.
 
 A known gap, with no reading to take: *„Co tam, mordo?"* and *„Dziś 22°C…"* still sound odd in her
 voice at every setting tried (D2). A better voice or a line of her own fixes it.
