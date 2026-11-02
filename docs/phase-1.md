@@ -221,7 +221,7 @@ count is given:
   `Flow`.
 - It has no idea of screens. Phase 2 moves it, unchanged, into the service.
 - It stops reading audio while Darek speaks and resumes when the Reply is finished (section 3,
-  ADR-0011), so he never hears himself.
+  ADR-0011), so he never hears a Reply. The chime alone plays with the microphone open (ADR-0011).
 
 **The grammar** is built from the catalogue (section 3) by `listen/Grammar.kt`, which writes it as a
 JSON array with kotlinx.serialization: every word of every enabled Command, the cancel words, the
@@ -304,18 +304,24 @@ Command that calls may dial on a failed voice there is left open for phase 2 (AD
 **His name without a Command** (the owner's ask, 2026-11-01): a final result that holds *darek* and
 no enabled Command gets *„Stary, nie mam żadnej fuchy."* while no Command the user sets
 up is enabled, and one of eight *„nie rozumiem"* answers once one is. The built-in *powiedz coś* (and
-the debug build's roast) answer but do not count as set up. A result without *darek* gets nothing, so
-talk that never names him is never answered. While a partial result holds *darek*, Home shows *Darek
+the debug build's roast) answer but do not count as set up. A final result without *darek* gets no
+Reply, so talk that never names him is never answered. It can still sound the chime, which is no answer
+but which a room hears: partials flicker, so talk whose partial only passes through the name (*Maria*,
+*Dario*, *Marek*) chimes and holds even though its final result gets nothing, and R11 owes how often.
+While a partial result holds *darek*, Home shows *Darek
 cię słyszy…* in place of *Darek słucha*, and the first such partial of an utterance sounds a short
 chime (`speak/Chime.kt`, the owner's ask and choice of sound, 2026-11-02), with the microphone still
 open because the Command is still being said. While a partial ends on the name the utterance waits
-3.5 s of silence instead of 0.5 s (the owner's number), so a user can wait for the chime and still say
-one Command in one final result, and the name alone is answered that much later. Only Home does
+3.5 s of silence instead of 0.5 s (the owner's number, at the shortest rule: Vosk makes the longer two
+4.0 s and 4.5 s), so a user can wait for the chime and still say
+one Command in one final result, and the name alone is answered that much later. ADR-0009 records what
+the hold weakens. Only Home does
 either: the probe keeps the model's own endpoint, so R1, R2 and R8 do not read a pause. `CommandMatchTest` pins which results answer. In this
 phase's release nothing can be set up yet, so his name alone always gets the no-fucha answer until
-phase 3. A room that says *„Darek mówił, że…"* hears that answer; phase 2 re-reads it before he
+phase 3. A room that says *„Darek mówił, że…"* hears that answer, and talk that only sounds like the
+name can sound the chime; phase 2 re-reads both before he
 listens in a pocket. In the debug build, `-PreleaseShapedDebug` included, Home's grammar also carries the roast's words,
-so a Home reading that must match the release (R4, and phase 2's re-read of *„Darek mówił…"*) is
+so a Home reading that must match the release (R4, R11, and phase 2's re-reads) is
 taken on a release build or read with that in mind; R1, R2 and R8 use the probe's Reading mode,
 whose grammar is the shipping one.
 
@@ -513,5 +519,5 @@ The copy, in English, translated once at the merge:
 | R7 | The Gate call on the owner's phone, with the owner's go-ahead: Reply, ~2 s, dial; then once with *"anuluj"* said as soon as the Reply ends, no dial; then once with the Home key in the window, no dial | the screen, `adb shell dumpsys telecom` call list | |
 | R8 | The owner's phone in a parked car, engine running, Commands at arm's length | `adb logcat -s DarekProbe` | |
 | R9 | The release AAB declares `RECORD_AUDIO` and not `CALL_PHONE`; the debug APK declares both | `python3 scripts/aab-permissions.py` on `bundleRelease`; `aapt2 dump permissions` on the debug APK | |
-| R11 | The chime: *"Hej Daria, powiedz coś"* with no pause, and with a pause after the name, on Home | `adb logcat -s DarekListen` while the owner speaks | **Test phone, Daria, 2026-11-02:** no pause, 10 of 10 fired, on the first sound (two rising notes). Heard at last on the third build: `CONTENT_TYPE_SONIFICATION` moved it off the assistant stream onto a muted media stream, read in `dumpsys media.audio_policy`. With a pause, at a 2 s hold: 1 of 3 fired, the others final `[daria, tomka]` and `[daria, maria]`, and what was said in them was not recorded. **Owed:** ten tries with a pause, at 3.5 s, on the sound that ships |
+| R11 | The chime and the hold on Home: *"Hej Daria, powiedz coś"* with no pause and with a pause after the name, then talk that does not name her | `adb logcat -s DarekListen` while the owner speaks: `name heard chime=played`, `failed` or `none`, then the `reaction=` line; and the owner's ear, since this row's builds have fired while muted | **Test phone, Daria, 2026-11-02:** no pause, 10 of 10 fired, on the first sound (two rising notes). Heard at last on the third build: `CONTENT_TYPE_SONIFICATION` moved it off the assistant stream onto a muted media stream, read in `dumpsys media.audio_policy`. With a pause, at a 2 s hold: 1 of 3 fired, the others final `[daria, tomka]` and `[daria, maria]`, and what was said in them was not recorded. `tomka` is only in debug's `Roast.kt`, so those tries ran on debug Home's grammar, not the release's. **Owed, on a release build, on the hum that ships:** ten tries with no pause, since the hum overlaps the Command's start; ten with a pause at 3.5 s with the chime on, and ten with it off in a local build that never plays it, since the hum in the open microphone may be what breaks the pause; and a negative reading on the same grammar, the near-miss script and 2 minutes of radio or conversation that do not name her, counting `name heard` lines, because ADR-0009's 0/64 counted final results only. The 0.7.0 notes promise only the sound until this reads the pause |
 | R10 | Download and installed size for arm64-v8a before B and with it: the voice's model and ONNX Runtime 1.28.0's 28.6 MB `libonnxruntime.so`, stored uncompressed (ADR-0014) | `bundletool build-apks` on `bundleRelease`, then `bundletool get-size total --dimensions=ABI` | |

@@ -291,14 +291,14 @@ Zawołaj Darka po imieniu bez komendy, którą zna, a powie teraz: „Stary, nie
 
 ### 0.7.0 — A sound when the name is heard
 
-**English** — 123/500:
+**English** — 63/500:
 
 ```
-When Darek or Daria hears the name, you now hear a short sound, and you can pause there: wait for it, then say the Command.
+When Darek or Daria hears the name, you now hear a short sound.
 ```
 
-**Polish** — 141/500:
+**Polish** — 70/500:
 
 ```
-Gdy Darek lub Daria usłyszy swoje imię, usłyszysz teraz krótki dźwięk i możesz się tam zatrzymać: poczekaj na niego, a potem powiedz komendę.
+Gdy Darek lub Daria usłyszy swoje imię, usłyszysz teraz krótki dźwięk.
 ```

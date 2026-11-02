@@ -43,10 +43,15 @@ premium-rate fraud, and `CALL_PHONE` is otherwise unrestricted.
   that is what Play's malware policy asks for. A false match therefore costs a Reply the user hears
   or sees and can cancel, not a silent dial.
 - **Recognition is paused while he speaks and from the dial until the call ends**, so he cannot hear
-  himself or the call; it runs through the cancel window. The end of the call is read from
+  a Reply or the call; it runs through the cancel window. The end of the call is read from
   `AudioManager`'s mode (`OnModeChangedListener` on API 31+, `getMode()` below). Because `placeCall`
   is asynchronous, phase 2 resumes recognition only once the mode has left `MODE_NORMAL` and come
   back, or after a timeout. No `READ_PHONE_STATE`.
+- **The chime is the one sound played with the microphone open.** It sounds when a partial result
+  first holds the name ([ADR-0009](0009-commands-are-recognised-offline-against-a-grammar-with-decoys.md)),
+  while the Command is still being said, so pausing recognition for it would cost the Command's first
+  words. It is a hint that the name was heard, not a Reply: it acknowledges no Command and is no part
+  of the consent above. What it costs recognition is phase 1's R11 to read.
 - If dialling fails, he says so (*"Nie udało się zadzwonić"*) rather than staying silent.
 
 ## Alternatives
