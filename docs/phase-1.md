@@ -307,9 +307,9 @@ up is enabled, and one of eight *„nie rozumiem"* answers once one is. The buil
 the debug build's roast) answer but do not count as set up. A result without *darek* gets nothing, so
 talk that never names him is never answered. While a partial result holds *darek*, Home shows *Darek
 cię słyszy…* in place of *Darek słucha*. `CommandMatchTest` pins which results answer. In this
-phase's release nothing can be set up yet, so his name alone always asks for it until phase 3. A room
-that says *„Darek mówił, że…"* hears that answer; phase 2 re-reads it before he listens in a pocket.
-In the debug build, `-PreleaseShapedDebug` included, Home's grammar also carries the roast's words,
+phase's release nothing can be set up yet, so his name alone always gets the no-fucha answer until
+phase 3. A room that says *„Darek mówił, że…"* hears that answer; phase 2 re-reads it before he
+listens in a pocket. In the debug build, `-PreleaseShapedDebug` included, Home's grammar also carries the roast's words,
 so a Home reading that must match the release (R4, and phase 2's re-read of *„Darek mówił…"*) is
 taken on a release build or read with that in mind; R1, R2 and R8 use the probe's Reading mode,
 whose grammar is the shipping one.
