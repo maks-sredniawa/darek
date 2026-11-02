@@ -35,8 +35,8 @@ import java.util.concurrent.ConcurrentHashMap
  * while Home is on screen, and phase 2 moves it into the service.
  *
  * Each Command ends the recording before Darek speaks and starts a new one when his Reply is
- * finished, so he never hears himself (ADR-0011). The chime alone plays with the microphone open,
- * since it answers a name while the Command is still being said.
+ * finished, so he never hears a Reply. The chime alone plays with the microphone open, since it
+ * sounds while the Command is still being said (ADR-0011).
  */
 class Listening(
     context: Context,
@@ -124,10 +124,7 @@ class Listening(
                             .onEach { heard ->
                                 val hearing = heard is Heard.Partial && persona.word in heard.tokens
                                 mutableState.update { it.copy(hearingName = hearing) }
-                                if (nameHeard.isFirst(heard)) {
-                                    Log.i(TAG, "name heard")
-                                    chime?.let { player -> runCatching { player.play(volume()) } }
-                                }
+                                if (nameHeard.isFirst(heard)) sound(chime)
                             }.filterIsInstance<Heard.Final>()
                             .mapNotNull { answerTo(it.tokens, enabled, persona) }
                             .first()
@@ -144,6 +141,22 @@ class Listening(
         } finally {
             chime?.close()
         }
+    }
+
+    private fun sound(chime: ChimePlayer?) {
+        val outcome =
+            when {
+                chime == null -> "none"
+                else ->
+                    runCatching { chime.play(volume()) }.fold(
+                        onSuccess = { "played" },
+                        onFailure = {
+                            Log.e(TAG, "chime failed to play", it)
+                            "failed"
+                        },
+                    )
+            }
+        Log.i(TAG, "name heard chime=$outcome")
     }
 
     private fun answerTo(
