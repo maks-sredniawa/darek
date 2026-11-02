@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/maksforge/darek/compare/v0.5.0...v0.6.0) (2026-11-02)
+
+
+### Features
+
+* say "nie mam żadnej fuchy" when no Command is set up ([de1fdde](https://github.com/maksforge/darek/commit/de1fdde9b765d24c23aa8a69538735e2405bb8d7))
+
 ## [0.5.0](https://github.com/maksforge/darek/compare/v0.4.0...v0.5.0) (2026-11-01)
 
 
