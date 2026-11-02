@@ -402,8 +402,9 @@ production track not being open to the account yet, and says nothing about the s
 - **Internal testing:** the Play email list **`only-me-Tester`** (hyphens, as the Console spells it),
   the owner alone. It is attached to Darek's internal track, saved 2026-10-31; Urgent, Gloam and
   Kozica use the same list.
-- **Closed testing:** the Google Group **`testers-community@googlegroups.com`**, always. Darek's
-  closed track (Alpha) uses it.
+- **Closed testing:** both Google Groups, **`testers-community@googlegroups.com`** and
+  **`maks-forge-testers@googlegroups.com`**, always, with no per-app groups or email lists. Darek's
+  closed track (Alpha) is recorded with the first only; `DOD.md` owes the second.
 
 ### What the first submission for review asks that no workflow answers
 
