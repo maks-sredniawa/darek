@@ -66,7 +66,7 @@ renders no markup. The block below is what `play-metadata.py` uploads, so the ou
    internet permission" only while `aab-permissions.py` forbids `INTERNET`; what it stores.
 4. `WHAT IT CANNOT DO` — the honest limits, and what a phone or the platform can stop.
 5. `PERMISSIONS` — one line each, in the user's words.
-6. A last line pointing at the source: `github.com/maksforge/darek`.
+6. A last line pointing at the source: `github.com/maks-sredniawa/darek`.
 
 The second paragraph says what the current test build can do. Each test build rewrites it, and the
 release that ships the call (phase 3) deletes it, in both languages.
@@ -107,7 +107,7 @@ PERMISSIONS
 - Notifications. Shows that Darek is listening, with a button to stop him.
 - Foreground service. Keeps Listening running while the app is closed.
 
-Source available, built in the open: github.com/maksforge/darek
+Source available, built in the open: github.com/maks-sredniawa/darek
 ```
 
 ## Polish (default listing language, pl-PL — ADR-0012)
@@ -165,7 +165,7 @@ UPRAWNIENIA
 - Powiadomienia. Pokazują, że Darek słucha, z przyciskiem, który go zatrzymuje.
 - Usługa na pierwszym planie. Utrzymuje słuchanie, gdy aplikacja jest zamknięta.
 
-Kod źródłowy jest publicznie dostępny: github.com/maksforge/darek
+Kod źródłowy jest publicznie dostępny: github.com/maks-sredniawa/darek
 ```
 
 ## Release notes (Play's "What's new", 500 chars per locale)
