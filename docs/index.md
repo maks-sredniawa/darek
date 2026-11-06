@@ -40,4 +40,4 @@ processed on the phone as it is heard and is never stored or sent. The details a
 
 ## The source
 
-Built in the open at **[maksforge/darek](https://github.com/maksforge/darek)**.
+Built in the open at **[maks-sredniawa/darek](https://github.com/maks-sredniawa/darek)**.

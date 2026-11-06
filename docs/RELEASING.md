@@ -564,7 +564,7 @@ so do this by hand, first:
    **Pull requests: read and write**. (`Metadata: read-only` is added automatically; leave it.)
    The token's *name* is an account-unique label of your choosing and has nothing to do with the
    secret name — reuse across repos is impossible, so name it for the repo it serves.
-2. `gh secret set RELEASE_PLEASE_TOKEN --repo maksforge/darek` and paste the value.
+2. `gh secret set RELEASE_PLEASE_TOKEN --repo maks-sredniawa/darek` and paste the value.
 
 Without it `release-please.yml` fails in about seven seconds with `Input required and not supplied:
 token`, and no release PR is ever opened.

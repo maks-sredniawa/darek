@@ -312,7 +312,7 @@ reviewer can ask about, and the answer:
 
 **No payment link on any surface the release controls**, and that reaches one level out, to the pages
 the listing links to. ⚠ The listing's *Website*, `maksforge.com/darek/`, is drawn by
-`maksforge/pages-theme`, whose layout carries a *Support* link and a *Buy me a coffee* link to
+`maks-sredniawa/pages-theme`, whose layout carries a *Support* link and a *Buy me a coffee* link to
 `buymeacoffee.com/maksforge` on every page, the privacy policy's included. The siblings went live with the
 same theme; if a reviewer cites it, the theme is where the fix goes.
 
