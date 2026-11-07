@@ -245,9 +245,9 @@ The **prominent disclosure** right before the `RECORD_AUDIO` request shipped wit
 ## Privacy policy
 
 **`https://maksforge.com/darek/privacy-policy`**, saved 2026-10-31 — the extensionless form; the
-`.html` form serves the same page, and the siblings used it. Served from `docs/` by Pages, so it
-updates on a merge to `main` with no release, which is why it has to be right before the app it
-describes ships rather than after. Until this commit, the live page was the unfilled
+`.html` form redirects to it, and the siblings used it. Served from `docs/` by maksforge.com, so it
+updates within about 15 minutes of a merge to `main` with no release, which is why it has to be right
+before the app it describes ships rather than after. Until this commit, the live page was the unfilled
 template; nothing was sent for review in between.
 
 ## Store settings (not App content, recorded here because it is asked for the same reason)
