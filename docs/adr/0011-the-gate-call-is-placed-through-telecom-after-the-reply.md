@@ -36,7 +36,8 @@ premium-rate fraud, and `CALL_PHONE` is otherwise unrestricted.
   the notification's *Anuluj* action cancels; only then does he dial. Cancel words act on
   **partial** results: one containing *"stop"* or *"anuluj"* cancels at once, because a final result comes only
   after a pause and could land after the dial. They are heard only from the end of the Reply:
-  recognition is paused while he speaks, so an *"anuluj"* said over the Reply is not heard.
+  recognition is paused while he speaks, so an *"anuluj"* said over the Reply is not heard. The
+  2 s count from the moment recording resumes, so the recorder's start-up does not come out of them.
 - **If Listening stops before the dial**, by the user or, in phase 1, by Darek's screen leaving the
   foreground, the dial is cancelled: nobody could cancel it by voice any more.
 - **Consent** is the Number the user typed for that Command and the user's own start of Listening:

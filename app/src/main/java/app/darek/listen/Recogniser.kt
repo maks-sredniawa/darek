@@ -42,6 +42,7 @@ class Recogniser(
     fun heard(
         grammar: String?,
         holdAfter: String? = null,
+        onRecording: () -> Unit = {},
     ): Flow<Heard> =
         flow {
             val record =
@@ -64,6 +65,7 @@ class Recogniser(
                 val rate = SAMPLE_RATE.toFloat()
                 (grammar?.let { Recognizer(model, rate, it) } ?: Recognizer(model, rate)).use { recognizer ->
                     record.startRecording()
+                    onRecording()
                     val buffer = ShortArray(CHUNK)
                     var lastPartial = emptyList<String>()
                     var holding = false

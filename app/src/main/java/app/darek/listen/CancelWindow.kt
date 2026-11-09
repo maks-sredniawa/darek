@@ -8,11 +8,11 @@ class CancelWindow {
     enum class Decision { WAIT, DIAL, CANCELLED, STOPPED }
 
     private var decision = Decision.WAIT
-    private var replyFinishedAt: Long? = null
+    private var recordingStartedAt: Long? = null
 
     @Synchronized
-    fun replyFinished(nowMs: Long): Decision {
-        if (decision == Decision.WAIT && replyFinishedAt == null) replyFinishedAt = nowMs
+    fun recordingStarted(nowMs: Long): Decision {
+        if (decision == Decision.WAIT && recordingStartedAt == null) recordingStartedAt = nowMs
         return decision
     }
 
@@ -35,11 +35,11 @@ class CancelWindow {
         nowMs: Long,
         cancelWord: Boolean,
     ): Decision {
-        val finishedAt = replyFinishedAt
-        if (decision == Decision.WAIT && finishedAt != null) {
+        val startedAt = recordingStartedAt
+        if (decision == Decision.WAIT && startedAt != null) {
             decision =
                 when {
-                    nowMs - finishedAt > LENGTH_MS -> Decision.DIAL
+                    nowMs - startedAt > LENGTH_MS -> Decision.DIAL
                     cancelWord -> Decision.CANCELLED
                     else -> Decision.WAIT
                 }
