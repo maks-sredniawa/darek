@@ -105,7 +105,9 @@ class Listening(
     fun switchTo(persona: Persona) = runs.change { it.copy(persona = persona) }
 
     fun stop() {
-        cancelWindow?.listeningStopped()
+        if (cancelWindow?.listeningStopped() == CancelWindow.Decision.STOPPED) {
+            Log.i(TAG, "cancel window=${CancelWindow.Decision.STOPPED}")
+        }
         runs.stop()
     }
 
@@ -232,9 +234,15 @@ class Listening(
         val decision =
             try {
                 Log.i(VOICE_TAG, "reply reaction=${answer.label} end=${speak(persona, answer.text)}")
-                window.replyFinished(SystemClock.elapsedRealtime())
+                val replyEnded = SystemClock.elapsedRealtime()
                 merge(
-                    Recogniser(model).heard(grammar).map { window.heard(it.tokens, SystemClock.elapsedRealtime()) },
+                    Recogniser(model)
+                        .heard(grammar, onRecording = {
+                            val now = SystemClock.elapsedRealtime()
+                            window.recordingStarted(now)
+                            Log.i(TAG, "cancel window open startup=${now - replyEnded}ms")
+                        })
+                        .map { window.heard(it.tokens, SystemClock.elapsedRealtime()) },
                     flow {
                         while (true) {
                             delay(WINDOW_TICK_MS)
