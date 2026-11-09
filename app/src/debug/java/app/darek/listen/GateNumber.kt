@@ -3,7 +3,6 @@ package app.darek.listen
 import android.content.Context
 import androidx.core.content.edit
 
-/** The debug build's Number for the Gate call; the release has none until phase 3. */
 object GateNumber {
     private const val FILE = "debug_gate"
     private const val KEY = "number"
