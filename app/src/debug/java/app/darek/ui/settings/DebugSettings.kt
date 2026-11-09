@@ -25,10 +25,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.core.content.ContextCompat
@@ -157,9 +158,9 @@ fun DebugSettings() {
 @Composable
 private fun GateNumberField() {
     val context = LocalContext.current
-    val focus = LocalFocusManager.current
+    val keyboard = LocalSoftwareKeyboardController.current
     var saved by remember { mutableStateOf(GateNumber.get(context).orEmpty()) }
-    var number by remember { mutableStateOf(saved) }
+    var number by rememberSaveable { mutableStateOf(saved) }
     var canCall by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) ==
@@ -175,7 +176,7 @@ private fun GateNumberField() {
         Button(onClick = {
             GateNumber.set(context, number)
             saved = number.trim()
-            focus.clearFocus()
+            keyboard?.hide()
             if (saved.isNotEmpty() && !canCall) askToCall.launch(Manifest.permission.CALL_PHONE)
         }) { Text(stringResource(R.string.debug_gate_save)) }
         Text(
