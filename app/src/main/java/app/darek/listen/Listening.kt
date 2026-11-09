@@ -1,10 +1,14 @@
 package app.darek.listen
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.SystemClock
+import android.telecom.TelecomManager
 import android.util.Log
+import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
 import app.darek.speak.LoadedLine
 import app.darek.speak.PlaybackEnd
@@ -13,15 +17,20 @@ import app.darek.speak.Voice
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -65,6 +74,8 @@ class Listening(
 
     @Volatile private var lastNotUnderstood: Line? = null
 
+    @Volatile private var cancelWindow: CancelWindow? = null
+
     private data class Wanted(
         val enabled: Set<Command>,
         val persona: Persona,
@@ -78,6 +89,7 @@ class Listening(
     private data class Answer(
         val label: String,
         val text: String,
+        val calls: Boolean = false,
     )
 
     /** Started again under another Persona, a running Listening restarts (ADR-0016). */
@@ -92,7 +104,10 @@ class Listening(
     /** A running Listening restarts under [persona]; a stopped one stays stopped (ADR-0016). */
     fun switchTo(persona: Persona) = runs.change { it.copy(persona = persona) }
 
-    fun stop() = runs.stop()
+    fun stop() {
+        cancelWindow?.listeningStopped()
+        runs.stop()
+    }
 
     private suspend fun listen(
         enabled: Set<Command>,
@@ -118,7 +133,9 @@ class Listening(
                             .getOrNull()
                     }
                 if (enabled.any { it.calls }) {
-                    withContext(Dispatchers.Default) { renderAhead(persona, NOT_UNDERSTOOD.take(1)) }
+                    withContext(Dispatchers.Default) {
+                        renderAhead(persona, NOT_UNDERSTOOD.take(1) + CALL_CANCELLED + CALL_FAILED)
+                    }
                     launch(Dispatchers.Default) { renderAhead(persona, NOT_UNDERSTOOD.drop(1)) }
                 }
                 val grammar = Grammar.json(enabled, persona, ListeningExtras.phrases(persona))
@@ -137,7 +154,13 @@ class Listening(
                             .first()
                     Log.i(TAG, "reaction=${answer.label}")
                     mutableState.update { it.copy(hearingName = false, lastReply = answer.text) }
-                    Log.i(VOICE_TAG, "reply reaction=${answer.label} end=${speak(persona, answer.text)}")
+                    if (!answer.calls) {
+                        Log.i(VOICE_TAG, "reply reaction=${answer.label} end=${speak(persona, answer.text)}")
+                    } else if (callPlaced(loaded, grammar, persona, answer)) {
+                        // The in-call screen stops Home, so Listening ends with every dial (ADR-0011).
+                        coroutineContext.cancelChildren()
+                        return@coroutineScope
+                    }
                 }
             }
         } catch (e: CancellationException) {
@@ -173,7 +196,8 @@ class Listening(
     ): Answer? =
         when (val reaction = reactionTo(tokens, enabled, persona)) {
             null -> null
-            is Reaction.Fires -> Answer(reaction.command.name, reaction.command.reply.by(persona))
+            is Reaction.Fires ->
+                Answer(reaction.command.name, reaction.command.reply.by(persona), reaction.command.calls)
             Reaction.Corrected -> Answer("CORRECTED", persona.correction)
             Reaction.NotUnderstood, Reaction.NotConfigured ->
                 ListeningExtras.reply(appContext, tokens, persona)?.let { Answer("EXTRA", it) }
@@ -195,6 +219,64 @@ class Listening(
             .random()
             .also { lastNotUnderstood = it }
             .by(persona)
+    }
+
+    @RequiresPermission(Manifest.permission.RECORD_AUDIO)
+    private suspend fun callPlaced(
+        model: Model,
+        grammar: String,
+        persona: Persona,
+        answer: Answer,
+    ): Boolean {
+        val window = CancelWindow().also { cancelWindow = it }
+        val decision =
+            try {
+                Log.i(VOICE_TAG, "reply reaction=${answer.label} end=${speak(persona, answer.text)}")
+                window.replyFinished(SystemClock.elapsedRealtime())
+                merge(
+                    Recogniser(model).heard(grammar).map { window.heard(it.tokens, SystemClock.elapsedRealtime()) },
+                    flow {
+                        while (true) {
+                            delay(WINDOW_TICK_MS)
+                            emit(window.tick(SystemClock.elapsedRealtime()))
+                        }
+                    },
+                ).first { it != CancelWindow.Decision.WAIT }
+            } finally {
+                cancelWindow = null
+            }
+        Log.i(TAG, "cancel window=$decision")
+        return when (decision) {
+            CancelWindow.Decision.DIAL -> {
+                currentCoroutineContext().ensureActive()
+                dial().also { placed -> if (!placed) say(persona, CALL_FAILED) }
+            }
+            CancelWindow.Decision.CANCELLED -> {
+                say(persona, CALL_CANCELLED)
+                false
+            }
+            CancelWindow.Decision.STOPPED, CancelWindow.Decision.WAIT -> false
+        }
+    }
+
+    // CALL_PHONE is in the debug manifest only: a release has no Number, and a denied grant is a failed dial.
+    @SuppressLint("MissingPermission")
+    private fun dial(): Boolean {
+        val number = GateNumber.get(appContext) ?: return false
+        return runCatching {
+            appContext
+                .getSystemService(TelecomManager::class.java)
+                .placeCall(Uri.fromParts("tel", number, null), null)
+        }.onFailure { Log.e(TAG, "dial failed", it) }.isSuccess
+    }
+
+    private suspend fun say(
+        persona: Persona,
+        line: Line,
+    ) {
+        val text = line.by(persona)
+        mutableState.update { it.copy(lastReply = text) }
+        Log.i(VOICE_TAG, "reply end=${speak(persona, text)}")
     }
 
     private suspend fun speak(
@@ -261,5 +343,6 @@ class Listening(
         const val TAG = "DarekListen"
         const val MODEL_TAG = "DarekModel"
         const val VOICE_TAG = "DarekVoice"
+        const val WINDOW_TICK_MS = 50L
     }
 }

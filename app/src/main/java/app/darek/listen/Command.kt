@@ -17,3 +17,5 @@ enum class Command(
 
     fun words(persona: Persona): List<String> = listOf(persona.word) + phraseWords
 }
+
+fun enabledCommands(number: String?): Set<Command> = Command.entries.filter { !it.calls || number != null }.toSet()
