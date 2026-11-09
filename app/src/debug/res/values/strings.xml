@@ -36,6 +36,7 @@
     <string name="debug_gate" translatable="false">Gate call</string>
     <string name="debug_gate_number" translatable="false">Number</string>
     <string name="debug_gate_save" translatable="false">Save</string>
+    <string name="debug_gate_unsaved" translatable="false">Not saved yet.</string>
     <string name="debug_gate_off" translatable="false">No Number: „otwórz bramę” is off.</string>
     <string name="debug_gate_on" translatable="false">„Otwórz bramę” really calls this Number.</string>
     <string name="debug_gate_no_permission" translatable="false">Phone permission not granted: the dial will fail.</string>
