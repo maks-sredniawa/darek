@@ -53,7 +53,9 @@ premium-rate fraud, and `CALL_PHONE` is otherwise unrestricted.
   words. It replaced a hum and two notes, by the owner's ear (2026-11-02), and unlike them it is
   speech. It is a hint that the name was heard, not a Reply: it acknowledges no Command and is no part
   of the consent above. What it costs recognition has no count: the owner tried it and called it good (phase 1's R11).
-- If dialling fails, he says so (*"Nie udało się zadzwonić"*) rather than staying silent.
+- If `placeCall` refuses the dial, he says so (*"Nie udało się zadzwonić"*) rather than staying silent.
+  A failure after it returns (airplane mode, no SIM, no service) is the system's own in-call error;
+  phase 2's wait for the audio mode is what could detect it.
 
 ## Alternatives
 
