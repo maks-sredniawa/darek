@@ -119,10 +119,13 @@ with a build to prove it.
 
 ## Environment notes
 
+- **For now, test on the emulators** (the `emulator-test` skill). The physical phones below are not
+  easy to reach, so expect `adb devices` to list neither and don't wait on one. Only what an emulator
+  cannot show (a real microphone, a real call, HyperOS) needs a phone, and that waits for the owner.
 - **Two phones, so name one.** Gradle and adb both reach every attached device; set
   `ANDROID_SERIAL` (both honour it) or pass `adb -s <serial>`.
   - **The test phone**, `mnbm7hw8ivdqzx9l`: a wiped, debloated Redmi Note 8 Pro, Android 11 (API
-    30), MIUI 12.5, Polish, on USB for good, in airplane mode with no SIM. Location stays on: turning
+    30), MIUI 12.5, Polish, in airplane mode with no SIM. Location stays on: turning
     it off raises a Play services popup. It has **no screen lock** since 2026-10-22,
     but MIUI still shows a swipe keyguard, and `screencap` captures that instead of the app;
     `svc power stayon usb` keeps it awake on USB, `adb shell input keyevent KEYCODE_WAKEUP` wakes it
@@ -130,7 +133,7 @@ with a build to prove it.
     `connectedAndroidTest` runs on it with no prompt.
     **It has no SIM, so it cannot place the gate call**: the voice-to-reply half of Darek can be read
     on it, the dial needs the owner's phone.
-    **This PC's internet runs through it**: its USB tether outranks the PC's Ethernet (route
+    **While it is attached, this PC's internet runs through it**: its USB tether outranks the PC's Ethernet (route
     metric 100 against 101), so its Wi-Fi stays on; switching it off takes the PC offline.
   - **The owner's phone**, `132bc856`: a Redmi Note 14 Pro 5G, API 36, HyperOS. Drive it without
     asking whenever adb reaches it (the owner's standing permission since 2026-10-20), but it is in
