@@ -121,7 +121,8 @@ with a build to prove it.
 
 - **For now, test on the emulators** (the `emulator-test` skill). The physical phones below are not
   easy to reach, so expect `adb devices` to list neither and don't wait on one. Only what an emulator
-  cannot show (a real microphone, a real call, HyperOS) needs a phone, and that waits for the owner.
+  cannot show (a real microphone, a real call, a Xiaomi ROM (MIUI, HyperOS)) needs a phone, and that
+  waits for the owner.
 - **Two phones, so name one.** Gradle and adb both reach every attached device; set
   `ANDROID_SERIAL` (both honour it) or pass `adb -s <serial>`.
   - **The test phone**, `mnbm7hw8ivdqzx9l`: a wiped, debloated Redmi Note 8 Pro, Android 11 (API
