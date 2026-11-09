@@ -65,6 +65,7 @@ class Recogniser(
                 val rate = SAMPLE_RATE.toFloat()
                 (grammar?.let { Recognizer(model, rate, it) } ?: Recognizer(model, rate)).use { recognizer ->
                     record.startRecording()
+                    check(record.recordingState == AudioRecord.RECORDSTATE_RECORDING) { "AudioRecord did not start" }
                     onRecording()
                     val buffer = ShortArray(CHUNK)
                     var lastPartial = emptyList<String>()
