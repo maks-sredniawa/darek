@@ -4,7 +4,6 @@ import app.darek.listen.CancelWindow.Decision
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-/** Each case fails toward a dial the user cancelled, or one nobody could have cancelled. */
 class CancelWindowTest {
     private val finishedAt = 10_000L
     private val window = CancelWindow()
