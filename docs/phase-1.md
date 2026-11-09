@@ -392,7 +392,8 @@ The copy, in English, translated once at the merge:
   6. If not, `TelecomManager.placeCall(tel:<number>)`. Its in-call screen stops Home, so in this
      phase Listening switches off with every dial and *Słuchaj* is off when the user comes back.
      ADR-0011's wait for the audio mode to return is phase 2's, where Listening outlives the screen.
-  7. If the call fails, Darek says *„Nie udało się zadzwonić."*.
+  7. If `placeCall` refuses synchronously (a missing Number or a refused `CALL_PHONE`), Darek says
+     *„Nie udało się zadzwonić."*. A failure after it returns is in *Known gaps*.
 - **The cancel window is a pure state machine**, `listen/CancelWindow.kt`, driven by events (Reply
   finished, partial result, Listening stopped, tick) and a clock. It answers one question: dial or
   not. It is the safety value of this phase: getting it wrong opens a gate the user said no to.
@@ -506,6 +507,10 @@ The copy, in English, translated once at the merge:
 - **The call exists only in the debug build** until phase 3 lets a user type a Number.
 - ***Słuchaj* is off after every dial.** The in-call screen stops Home. Phase 2's service outlives
   it.
+- **Darek says *„Nie udało się zadzwonić"* only when `placeCall` refuses synchronously** (a missing
+  Number or a refused `CALL_PHONE`). A failure after it returns (airplane mode, no SIM, no service)
+  is left to the system's own in-call error. Phase 2's wait for the audio mode could detect it
+  (ADR-0011).
 - **An *"anuluj"* said over the Reply is not heard.** Recognition is paused while Darek speaks, so
   the user cancels after it (ADR-0011).
 - **~145 MB on the phone after the first *Słuchaj*.** It is the APK's copy plus the unpacked model.
