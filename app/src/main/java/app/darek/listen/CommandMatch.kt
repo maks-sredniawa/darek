@@ -49,6 +49,10 @@ val NOT_CONFIGURED = Line("Stary, nie mam żadnej fuchy.")
 
 val NAME_HEARD = Line("No?")
 
+val CALL_CANCELLED = Line("Anulowane.")
+
+val CALL_FAILED = Line("Nie udało się zadzwonić.")
+
 /** Picked at random, never the same twice in a row. */
 val NOT_UNDERSTOOD =
     listOf(

@@ -8,9 +8,10 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import app.darek.MainApplication
 import app.darek.data.AppPreferences
-import app.darek.listen.Command
+import app.darek.listen.GateNumber
 import app.darek.listen.Listening
 import app.darek.listen.Persona
+import app.darek.listen.enabledCommands
 import app.darek.tip.TipJar
 import app.darek.tip.tipAskDue
 import kotlinx.coroutines.flow.SharingStarted
@@ -39,6 +40,7 @@ class HomeViewModel(
     private val tipJar: TipJar,
     private val listening: Listening,
     private val installedAt: Instant,
+    private val gateNumber: () -> String?,
 ) : ViewModel() {
     val state: StateFlow<HomeUiState> =
         combine(
@@ -59,11 +61,8 @@ class HomeViewModel(
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())
 
-    /** In phase 1 only the Commands that reply can act; one that calls has no Number until phase 3. */
-    private val enabled = Command.entries.filterNot { it.calls }.toSet()
-
     fun listen() {
-        viewModelScope.launch { listening.start(enabled, preferences.persona.first()) }
+        viewModelScope.launch { listening.start(enabledCommands(gateNumber()), preferences.persona.first()) }
     }
 
     fun stopListening() = listening.stop()
@@ -114,6 +113,7 @@ class HomeViewModel(
                         app.container.tipJar,
                         app.container.listening,
                         app.container.installedAt,
+                        { GateNumber.get(app) },
                     )
                 }
             }

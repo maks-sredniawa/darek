@@ -25,7 +25,7 @@
     <string name="debug_probe" translatable="false">Recogniser probe</string>
     <string name="debug_probe_open" translatable="false">Open the probe</string>
     <string name="debug_probe_likeness" translatable="false">Match likeness: %1$d%%</string>
-    <string name="debug_probe_likeness_note" translatable="false">How alike each heard word must be to the Command\'s. 100% is exact. „darek" and „otwórz bramę" are always exact.</string>
+    <string name="debug_probe_likeness_note" translatable="false">How alike each heard word must be to the Command\'s. 100% is exact. „darek” and „otwórz bramę” are always exact.</string>
     <string name="debug_probe_start" translatable="false">Start</string>
     <string name="debug_probe_stop" translatable="false">Stop</string>
     <string name="debug_probe_free" translatable="false">Free decoding</string>
@@ -33,4 +33,10 @@
     <string name="debug_probe_preparing" translatable="false">Unpacking and loading the model…</string>
     <string name="debug_probe_partial" translatable="false">Hearing: %1$s</string>
     <string name="debug_voice_scales_reset" translatable="false">Voice\'s own settings</string>
+    <string name="debug_gate" translatable="false">Gate call</string>
+    <string name="debug_gate_number" translatable="false">Number</string>
+    <string name="debug_gate_save" translatable="false">Save</string>
+    <string name="debug_gate_off" translatable="false">No Number: „otwórz bramę” is off.</string>
+    <string name="debug_gate_on" translatable="false">„Otwórz bramę” really calls this Number.</string>
+    <string name="debug_gate_no_permission" translatable="false">Phone permission not granted: the dial will fail.</string>
 </resources>

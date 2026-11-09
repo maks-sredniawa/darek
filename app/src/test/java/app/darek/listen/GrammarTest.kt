@@ -39,6 +39,20 @@ class GrammarTest {
     }
 
     @Test
+    fun without_a_number_the_gate_is_not_enabled_and_not_in_the_grammar() {
+        val enabled = enabledCommands(number = null)
+        assertEquals(setOf(Command.SAY_SOMETHING), enabled)
+        assertFalse(phrases(Grammar.json(enabled, Persona.DAREK)).any { "bramę" in it })
+    }
+
+    @Test
+    fun with_a_number_the_gate_is_enabled_and_in_the_grammar() {
+        val enabled = enabledCommands(number = "123456789")
+        assertEquals(setOf(Command.SAY_SOMETHING, Command.GATE), enabled)
+        assertTrue("darek otwórz bramę" in phrases(Grammar.json(enabled, Persona.DAREK)))
+    }
+
+    @Test
     fun the_decoys_and_unk_are_always_in() {
         listOf(callOff, callOn).map(::phrases).forEach { phrases ->
             assertTrue(phrases.containsAll(Grammar.decoys(Persona.DAREK)))

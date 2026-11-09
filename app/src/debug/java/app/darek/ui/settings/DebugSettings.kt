@@ -1,14 +1,19 @@
 package app.darek.ui.settings
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.SystemClock
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -24,8 +29,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.core.content.ContextCompat
 import app.darek.MainApplication
 import app.darek.R
+import app.darek.listen.GateNumber
 import app.darek.listen.LooseMatch
 import app.darek.listen.Persona
 import app.darek.speak.ReplyPlayer
@@ -136,6 +144,53 @@ fun DebugSettings() {
         )
         Text(
             stringResource(R.string.debug_probe_likeness_note),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+
+    SectionHeader(stringResource(R.string.debug_gate))
+    GateNumberField()
+}
+
+@Composable
+private fun GateNumberField() {
+    val context = LocalContext.current
+    var number by remember { mutableStateOf(GateNumber.get(context).orEmpty()) }
+    var saved by remember { mutableStateOf(GateNumber.get(context) != null) }
+    var canCall by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) ==
+                PackageManager.PERMISSION_GRANTED,
+        )
+    }
+    val askToCall =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { canCall = it }
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.base).padding(bottom = Spacing.base),
+        verticalArrangement = Arrangement.spacedBy(Spacing.tight),
+    ) {
+        Button(onClick = {
+            GateNumber.set(context, number)
+            saved = number.isNotBlank()
+            if (saved && !canCall) askToCall.launch(Manifest.permission.CALL_PHONE)
+        }) { Text(stringResource(R.string.debug_gate_save)) }
+        OutlinedTextField(
+            value = number,
+            onValueChange = { number = it },
+            label = { Text(stringResource(R.string.debug_gate_number)) },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Text(
+            stringResource(
+                when {
+                    !saved -> R.string.debug_gate_off
+                    canCall -> R.string.debug_gate_on
+                    else -> R.string.debug_gate_no_permission
+                },
+            ),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
