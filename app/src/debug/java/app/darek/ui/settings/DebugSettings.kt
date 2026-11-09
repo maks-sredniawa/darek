@@ -178,14 +178,6 @@ private fun GateNumberField() {
             focus.clearFocus()
             if (saved.isNotEmpty() && !canCall) askToCall.launch(Manifest.permission.CALL_PHONE)
         }) { Text(stringResource(R.string.debug_gate_save)) }
-        OutlinedTextField(
-            value = number,
-            onValueChange = { number = it },
-            label = { Text(stringResource(R.string.debug_gate_number)) },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            modifier = Modifier.fillMaxWidth(),
-        )
         Text(
             stringResource(
                 when {
@@ -197,6 +189,14 @@ private fun GateNumberField() {
             ),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        OutlinedTextField(
+            value = number,
+            onValueChange = { number = it },
+            label = { Text(stringResource(R.string.debug_gate_number)) },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
