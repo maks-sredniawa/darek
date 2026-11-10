@@ -1,8 +1,11 @@
 package app.darek.listen
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -39,6 +42,9 @@ class LatestRun<T : Any>(
             }
         }
     }
+
+    /** True from [run] until the run is stopped or ends by itself. */
+    val requested: Flow<Boolean> = wanted.map { it != null }.distinctUntilChanged()
 
     /** Asked for while it is already running, a value keeps its run. */
     fun run(value: T) = wanted.update { if (it?.value == value) it else Request(value) }

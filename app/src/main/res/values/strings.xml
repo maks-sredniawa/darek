@@ -22,6 +22,7 @@
     <string name="home_listen">Listen</string>
     <string name="home_listening">Darek is listening</string>
     <string name="home_listening_daria">Daria is listening</string>
+    <string name="listening_channel">Listening</string>
     <string name="home_hearing">Darek hears you…</string>
     <string name="home_hearing_daria">Daria hears you…</string>
     <string name="home_stop">Stop</string>

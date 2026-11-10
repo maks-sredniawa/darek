@@ -8,16 +8,14 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import app.darek.MainApplication
 import app.darek.data.AppPreferences
-import app.darek.listen.GateNumber
 import app.darek.listen.Listening
+import app.darek.listen.ListeningService
 import app.darek.listen.Persona
-import app.darek.listen.enabledCommands
 import app.darek.tip.TipJar
 import app.darek.tip.tipAskDue
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -40,7 +38,7 @@ class HomeViewModel(
     private val tipJar: TipJar,
     private val listening: Listening,
     private val installedAt: Instant,
-    private val gateNumber: () -> String?,
+    private val startListening: () -> Unit,
 ) : ViewModel() {
     val state: StateFlow<HomeUiState> =
         combine(
@@ -61,9 +59,7 @@ class HomeViewModel(
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())
 
-    fun listen() {
-        viewModelScope.launch { listening.start(enabledCommands(gateNumber()), preferences.persona.first()) }
-    }
+    fun listen() = startListening()
 
     fun stopListening() = listening.stop()
 
@@ -90,7 +86,6 @@ class HomeViewModel(
     }
 
     init {
-        viewModelScope.launch { preferences.persona.distinctUntilChanged().collect { listening.switchTo(it) } }
         // Prices are asked for only once the ask could be due, which saves a product query on every
         // other visit. The binding itself happens on every foreground anyway, to settle tips.
         viewModelScope.launch {
@@ -113,7 +108,7 @@ class HomeViewModel(
                         app.container.tipJar,
                         app.container.listening,
                         app.container.installedAt,
-                        { GateNumber.get(app) },
+                        { ListeningService.start(app) },
                     )
                 }
             }
