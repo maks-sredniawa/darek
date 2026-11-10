@@ -30,7 +30,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,7 +38,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.core.app.ActivityCompat
@@ -51,14 +49,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import app.darek.R
 import app.darek.listen.Listening
 import app.darek.listen.Persona
+import app.darek.listen.listeningRes
 import app.darek.theme.Spacing
 import app.darek.ui.appViewModelExtras
 import app.darek.ui.common.startActivitySafely
 
-/**
- * Darek's one screen: *Słuchaj* and the last Reply. In phase 1 the microphone belongs to the visible
- * screen, so Listening stops when Home leaves the screen and keeps the screen on while it runs.
- */
+/** Darek's one screen: *Słuchaj* and the last Reply. Listening outlives it, in [app.darek.listen.ListeningService]. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -92,22 +88,6 @@ fun HomeScreen(
         if (granted) deniedNow = false
         viewModel.onMicGrantRead(granted)
     }
-    // Listening lives in AppContainer, so a rotation or a theme switch can leave it running across
-    // the Activity's recreation. Nav3 entries have no lifecycle, so leaving for another screen is
-    // only seen as Home's disposal.
-    val stopUnlessRecreating = {
-        if (activity?.isChangingConfigurations != true) viewModel.stopListening()
-    }
-    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { stopUnlessRecreating() }
-    DisposableEffect(Unit) { onDispose { stopUnlessRecreating() } }
-
-    val view = LocalView.current
-    val listening = state.listening != Listening.Phase.OFF
-    DisposableEffect(listening) {
-        view.keepScreenOn = listening
-        onDispose { view.keepScreenOn = false }
-    }
-
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -271,11 +251,6 @@ private fun Context.openAppSettings() {
 
 // Two resources per line, not one with the name as an argument: Polish declines the name and its
 // verbs agree with it (ADR-0016).
-private fun Persona.listeningRes(): Int =
-    when (this) {
-        Persona.DAREK -> R.string.home_listening
-        Persona.DARIA -> R.string.home_listening_daria
-    }
 
 private fun Persona.hearingRes(): Int =
     when (this) {

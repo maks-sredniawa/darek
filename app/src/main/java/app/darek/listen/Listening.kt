@@ -22,6 +22,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,8 +41,8 @@ import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Listening (`CONTEXT.md`): the microphone open and the enabled Commands able to fire. Held by
- * `AppContainer`, so the model and the voice stay loaded between starts; in phase 1 it runs only
- * while Home is on screen, and phase 2 moves it into the service.
+ * `AppContainer`, so the model and the voice stay loaded between starts; [ListeningService] keeps it
+ * running with the screen off (ADR-0010).
  *
  * Each Command ends the recording before Darek speaks and starts a new one when his Reply is
  * finished, so he never hears a Reply. Only *„No?"*, the answer to his name, plays with the microphone
@@ -91,6 +92,9 @@ class Listening(
         val text: String,
         val calls: Boolean = false,
     )
+
+    /** True from [start] until Listening is stopped or ends by itself, as after a dial. */
+    val running: Flow<Boolean> get() = runs.requested
 
     /** Started again under another Persona, a running Listening restarts (ADR-0016). */
     fun start(
@@ -159,7 +163,7 @@ class Listening(
                     if (!answer.calls) {
                         Log.i(VOICE_TAG, "reply reaction=${answer.label} end=${speak(persona, answer.text)}")
                     } else if (callPlaced(loaded, grammar, persona, answer)) {
-                        // The in-call screen stops Home, so Listening ends with every dial (ADR-0011).
+                        // Every dial ends Listening (ADR-0011).
                         coroutineContext.cancelChildren()
                         return@coroutineScope
                     }

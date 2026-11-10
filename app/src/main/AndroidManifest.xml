@@ -14,6 +14,11 @@
     <!-- Słuchaj (ADR-0009, ADR-0010): asked for on its first tap, after the disclosure. -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
+    <!-- Listening with the screen off, and its notification (ADR-0010). -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <!--
         Package visibility (API 30+) for the one OEM screen the app offers to open: Xiaomi's
         autostart manager, which on HyperOS decides whether background work runs at all. Without
@@ -81,6 +86,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name=".listen.ListeningService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
 
         <!--
             Not a service anybody starts — `android:enabled="false"` means it can never run. It is a

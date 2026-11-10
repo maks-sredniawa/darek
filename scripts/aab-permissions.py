@@ -94,6 +94,10 @@ EXPECTED = {
     # Słuchaj (ADR-0009): asked for on its first tap, after the disclosure. It implies
     # android.hardware.microphone as required, accepted: a phone without one cannot use Darek.
     "android.permission.RECORD_AUDIO": "Słuchaj — the recogniser, on the phone only (ADR-0009)",
+    # Listening with the screen off: the `microphone` foreground service (ADR-0010).
+    "android.permission.FOREGROUND_SERVICE": "Listening's foreground service (ADR-0010)",
+    "android.permission.FOREGROUND_SERVICE_MICROPHONE": "Listening's service type, `microphone` (ADR-0010)",
+    "android.permission.POST_NOTIFICATIONS": "Listening's notification, asked at its first start (ADR-0010)",
 }
 
 # Permissions that must never appear. Absence is what the Data safety answers
