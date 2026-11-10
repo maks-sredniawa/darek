@@ -34,14 +34,15 @@ was extracted from and the first app built from it settled on exactly this split
   phrases without the name and every line in both genders, the UI strings that name the Persona as
   pairs. Readings: her voice on the test phone, her name and Decoys on the owner's voice; the rest is
   owed before she can call ([`DOD.md`](DOD.md))
-- [ ] **Phase 2** — Listening: the microphone service, its notification, the start paths (switch,
-  notification after boot, Quick Settings tile), pausing during the Reply and the call, MIUI setup,
-  a night's battery reading (ADR-0010). A negative reading of *„No?"* on the shipping grammar,
-  counting `name heard` lines (ADR-0009): the near-miss script's lines that do not say the Persona's
-  name (*Marek…*, *Jarek…*, *Otwórz bramę*, and each Persona's own equivalents) and 2 minutes of
-  radio or conversation that do not either. An updated microphone disclosure, shown once before the
-  first service start whether or not `RECORD_AUDIO` is already granted: phase 1's promised
-  listening only with Home on screen
+- [ ] **Phase 2** ([`phase-2.md`](phase-2.md)) — Listening: the microphone service, its
+  notification, the start paths (switch, notification after boot, Quick Settings tile), pausing
+  during the Reply and the call, MIUI setup, a night's battery reading (ADR-0010). *„Hej"* in front
+  of the name for every answer that is not a Command, and a negative reading of it on the shipping
+  grammar (ADR-0009): the near-miss script's lines and 2 minutes of Polish speech get no answer. An
+  updated microphone disclosure, shown once before the first service start whether or not
+  `RECORD_AUDIO` is already granted: phase 1's promised listening only with Home on screen.
+  2026-11-10: planned; built and read on the emulators, Xiaomi's readings owed until a phone is
+  attached
 - [ ] **Phase F** — Fuchy (ADR-0015): Commands stored as fuchy, Darek's own bundled; `INTERNET`
   (ADR-0008); the native fuchy page, install from it or from a file through Darek's picker, the
   signature check and badge, permissions per fucha and for all, updates, *„Zgłoś fuchę"*. The
