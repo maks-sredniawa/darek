@@ -20,3 +20,4 @@ description: A Polish voice assistant that opens your gate with a phone call, of
 maksforge:
   icon: /assets/icons/darek.webp
   status: building
+  kind: Android app
