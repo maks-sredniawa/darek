@@ -35,7 +35,7 @@
 
     <string name="settings_title">Ustawienia</string>
     <string name="settings_persona">Kto odpowiada</string>
-    <string name="settings_persona_hint">Imię, którym wołasz, i głos, który odpowiada. Na drugie imię usłyszysz poprawkę.</string>
+    <string name="settings_persona_hint">Imię, którym wołasz, i głos, który odpowiada. Powiedz Hej i drugie imię, a usłyszysz poprawkę.</string>
     <string name="settings_appearance">Wygląd</string>
     <string name="settings_theme_system">Systemowy</string>
     <string name="settings_theme_light">Jasny</string>
