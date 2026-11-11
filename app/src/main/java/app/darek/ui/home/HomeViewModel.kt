@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import app.darek.MainApplication
 import app.darek.data.AppPreferences
+import app.darek.listen.Hearing
 import app.darek.listen.Listening
 import app.darek.listen.ListeningService
 import app.darek.listen.Persona
@@ -28,6 +29,7 @@ data class HomeUiState(
     val lastReply: String? = null,
     val listenFailed: Boolean = false,
     val hearingName: Boolean = false,
+    val hearing: Hearing = Hearing.HEARS,
     val persona: Persona = Persona.DAREK,
     /** The system will not show its dialog again, so Home sends the user to the app's settings. */
     val micDeniedForGood: Boolean = false,
@@ -54,6 +56,7 @@ class HomeViewModel(
                 lastReply = heard.lastReply,
                 listenFailed = heard.failed,
                 hearingName = heard.hearingName,
+                hearing = heard.hearing,
                 persona = persona,
                 micDeniedForGood = deniedUnder == installedAt,
             )

@@ -44,6 +44,7 @@ class Recogniser(
         grammar: String?,
         holdAfter: String? = null,
         onRecording: () -> Unit = {},
+        onHears: (Boolean) -> Unit = {},
     ): Flow<Heard> =
         flow {
             val record =
@@ -72,6 +73,8 @@ class Recogniser(
                     var lastPartial = emptyList<String>()
                     var steadyMs = 0L
                     var holding = false
+                    val zeros = ZeroRun(SAMPLE_RATE * SILENCED_S)
+                    var hears = true
 
                     fun hold(wanted: Boolean) {
                         if (wanted == holding) return
@@ -86,6 +89,11 @@ class Recogniser(
                         currentCoroutineContext().ensureActive()
                         val read = record.read(buffer, 0, buffer.size)
                         check(read >= 0) { "AudioRecord.read returned $read" }
+                        val silenced = zeros.feed(buffer, read)
+                        if (silenced == hears) {
+                            hears = !silenced
+                            onHears(hears)
+                        }
                         if (recognizer.acceptWaveForm(buffer, read)) {
                             lastPartial = emptyList()
                             steadyMs = 0
@@ -133,5 +141,6 @@ class Recogniser(
         private const val UTTERANCE_MAX_S = 20f
         private const val HOLD_SILENCE_S = 3.5f
         private const val MODEL_ENDPOINTER_MODE = 0
+        private const val SILENCED_S = 1
     }
 }

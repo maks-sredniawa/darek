@@ -24,8 +24,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -58,19 +60,20 @@ class ListeningService : Service() {
                 strings = inAppLanguage()
                 preferences.persona.first()
             }
-        if (!goForeground(persona)) {
+        val enabled = enabledCommands(GateNumber.get(this))
+        if (!goForeground(persona, enabled)) {
             stopSelf()
             return START_NOT_STICKY
         }
         run?.cancel()
         run =
             scope.launch {
-                listening.start(enabledCommands(GateNumber.get(this@ListeningService)), persona)
+                listening.start(enabled, persona)
+                launch { preferences.persona.distinctUntilChanged().collect { listening.switchTo(it) } }
                 launch {
-                    preferences.persona.distinctUntilChanged().collect {
-                        listening.switchTo(it)
-                        renotify(it)
-                    }
+                    combine(preferences.persona, listening.state.map { it.hearing }, ::Pair)
+                        .distinctUntilChanged()
+                        .collect { (persona, hearing) -> renotify(persona, enabled, hearing) }
                 }
                 listening.running.first { !it }
                 stopSelf()
@@ -84,13 +87,16 @@ class ListeningService : Service() {
         super.onDestroy()
     }
 
-    private fun goForeground(persona: Persona): Boolean {
+    private fun goForeground(
+        persona: Persona,
+        enabled: Set<Command>,
+    ): Boolean {
         createChannel()
         return try {
             ServiceCompat.startForeground(
                 this,
                 NOTIFICATION_ID,
-                notification(persona),
+                notification(persona, enabled, Hearing.HEARS),
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE,
             )
             true
@@ -100,14 +106,18 @@ class ListeningService : Service() {
         }
     }
 
-    private fun renotify(persona: Persona) {
+    private fun renotify(
+        persona: Persona,
+        enabled: Set<Command>,
+        hearing: Hearing,
+    ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
             PackageManager.PERMISSION_GRANTED
         ) {
             return
         }
-        NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, notification(persona))
+        NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, notification(persona, enabled, hearing))
     }
 
     private fun createChannel() {
@@ -120,7 +130,11 @@ class ListeningService : Service() {
         )
     }
 
-    private fun notification(persona: Persona): Notification {
+    private fun notification(
+        persona: Persona,
+        enabled: Set<Command>,
+        hearing: Hearing,
+    ): Notification {
         val open =
             PendingIntent.getActivity(
                 this,
@@ -139,6 +153,7 @@ class ListeningService : Service() {
             .Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(strings.getString(persona.listeningRes()))
+            .setContentText(stateText(persona, enabled, hearing))
             .setContentIntent(open)
             .addAction(0, strings.getString(R.string.home_stop), stop)
             .setOngoing(true)
@@ -147,6 +162,29 @@ class ListeningService : Service() {
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .build()
     }
+
+    private fun stateText(
+        persona: Persona,
+        enabled: Set<Command>,
+        hearing: Hearing,
+    ): String =
+        when (hearing) {
+            Hearing.HEARS ->
+                strings.getString(
+                    R.string.listening_say,
+                    (
+                        if (Command.GATE in
+                            enabled
+                        ) {
+                            Command.GATE
+                        } else {
+                            Command.SAY_SOMETHING
+                        }
+                    ).spoken(persona),
+                )
+            Hearing.PAUSED_FOR_CALL -> strings.getString(R.string.listening_paused_call)
+            Hearing.CANNOT_HEAR -> strings.getString(R.string.listening_cannot_hear)
+        }
 
     companion object {
         private const val TAG = "DarekListen"
