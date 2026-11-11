@@ -4,7 +4,7 @@ import kotlinx.serialization.json.Json
 
 /**
  * The recogniser's grammar (ADR-0009): each enabled Command as a phrase and word by word, *„hej"*
- * and the hail, the Decoys, the cancel words while a Command that calls is enabled, and `[unk]`.
+ * and the hail, the Decoys alone and in front of each Command's phrase, the cancel words while a Command that calls is enabled, and `[unk]`.
  *
  * kotlinx.serialization writes `coś` as UTF-8; Vosk takes a `ś` escape for an unknown word and
  * drops it, and the Command could never fire.
@@ -19,6 +19,16 @@ object Grammar {
 
     fun decoys(persona: Persona): List<String> = NAME_DECOYS + persona.other.word + COMMAND_WORD_DECOYS
 
+    /**
+     * Each name Decoy in front of each enabled Command's phrase. A lone Decoy word loses to a whole
+     * Command phrase: *„Dario, otwórz bramę"* decoded as *„daria otwórz bramę"* until it had a whole
+     * phrase of its own to land on (ADR-0009).
+     */
+    fun decoyPhrases(
+        enabled: Set<Command>,
+        persona: Persona,
+    ): List<String> = (NAME_DECOYS + persona.other.word).flatMap { name -> enabled.map { "$name ${it.phrase}" } }
+
     fun phrases(
         enabled: Set<Command>,
         persona: Persona,
@@ -32,6 +42,7 @@ object Grammar {
             add("$HEJ ${persona.word}")
             add(HEJ)
             addAll(decoys(persona))
+            addAll(decoyPhrases(enabled, persona))
             if (enabled.any { it.calls }) addAll(CANCEL_WORDS)
             add(UNKNOWN)
         }.distinct()
