@@ -112,7 +112,14 @@ client. Yet the emulator's sound card logged *„pcm_readi was late delivering f
 silence"* about 1,800 times in each failing try, against 2 with the app on screen. So the
 injected audio never reached the guest. Opening the injection stream before the swipe did not change
 it. The same Android rules pass on `pixel-api37`, whose audio HAL is newer. The reading on Android 16
-is owed to the owner's phone (API 36, HyperOS), with the Xiaomi readings.
+is owed to the owner's phone (API 36, HyperOS), with the Xiaomi readings. The owner took this as
+verdict 1 on 2026-11-11, and B is built on it.
+
+**The release waits for D** (the owner, 2026-11-11). Checkpoints A to D merge to `main` one by one,
+but release-please's 0.9.0 PR stays unmerged until D is in: A puts `FOREGROUND_SERVICE_MICROPHONE`
+in the build, and Play's foreground-service declaration with its video is filed once, for the
+finished flow. On Android 13+ the notification is hidden until D asks for `POST_NOTIFICATIONS`. The
+0.9.0 notes are rewritten for A to D before that PR merges.
 
 ## 2. The service
 

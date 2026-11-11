@@ -226,9 +226,9 @@ window before the dial. Would change: any permission from that group, or an SMS-
 
 ## Foreground service permissions
 
-**Not asked yet.** Nothing in the artifact declares or merges `FOREGROUND_SERVICE`. The declaration
-arrives with phase 2's build, which adds the Listening service of type `microphone` (ADR-0010). The
-answers to give then:
+**Owed with 0.9.0.** From phase 2's checkpoint A the artifact declares `FOREGROUND_SERVICE` and
+`FOREGROUND_SERVICE_MICROPHONE` for the Listening service (ADR-0010). The declaration is filed once
+checkpoint D is in, with the release that ships it ([`DOD.md`](DOD.md)). The answers to give then:
 
 - **Use case:** voice commands for an assistant, started by the user; nothing is saved.
 - **What the user sees:** after turning Listening on, a notification that Darek is listening, with
