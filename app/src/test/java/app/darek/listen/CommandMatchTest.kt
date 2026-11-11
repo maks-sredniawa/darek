@@ -75,22 +75,54 @@ class CommandMatchTest {
     }
 
     @Test
-    fun his_name_without_a_command_asks_to_be_set_up_until_a_command_that_calls_is_on() {
+    fun hailed_without_a_command_he_asks_to_be_set_up_until_a_command_that_calls_is_on() {
         val sayOnly = listOf(Command.SAY_SOMETHING)
         val setUp = Command.entries
         assertEquals(
             Reaction.Fires(Command.SAY_SOMETHING),
             reactionTo(tokensOf("darek powiedz coś"), sayOnly, Persona.DAREK),
         )
-        listOf("darek", "darek [unk]", "[unk] darek", "darek powiedz", "darek powiedz [unk] coś", "darek otwórz bramę")
-            .forEach { assertEquals(it, Reaction.NotConfigured, reactionTo(tokensOf(it), sayOnly, Persona.DAREK)) }
-        listOf("darek", "darek powiedz [unk] coś", "darek otwórz")
+        listOf(
+            "hej darek",
+            "hej darek [unk]",
+            "[unk] hej darek",
+            "hej darek powiedz",
+            "hej darek powiedz [unk] coś",
+            "hej darek otwórz bramę",
+        ).forEach { assertEquals(it, Reaction.NotConfigured, reactionTo(tokensOf(it), sayOnly, Persona.DAREK)) }
+        listOf("hej darek", "hej darek powiedz [unk] coś", "hej darek otwórz")
             .forEach { assertEquals(it, Reaction.NotUnderstood, reactionTo(tokensOf(it), setUp, Persona.DAREK)) }
-        listOf("marek powiedz coś", "darka", "darku powiedz coś", "powiedz coś", "[unk]", "")
+        listOf("marek powiedz coś", "darka", "darku powiedz coś", "powiedz coś", "[unk]", "", "hej marek")
             .forEach {
                 assertEquals(it, null, reactionTo(tokensOf(it), sayOnly, Persona.DAREK))
                 assertEquals(it, null, reactionTo(tokensOf(it), setUp, Persona.DAREK))
             }
+    }
+
+    @Test
+    fun the_name_without_hej_right_before_it_gets_no_answer() {
+        listOf(
+            "darek",
+            "darek [unk]",
+            "[unk] darek",
+            "darek idziesz",
+            "darek powiedz",
+            "darek powiedz [unk] coś",
+            "darek otwórz",
+            "hej [unk] darek",
+            "darek hej",
+            "hej",
+        ).forEach { text ->
+            listOf(listOf(Command.SAY_SOMETHING), Command.entries).forEach { enabled ->
+                assertEquals(text, null, reactionTo(tokensOf(text), enabled, Persona.DAREK))
+            }
+        }
+    }
+
+    @Test
+    fun a_command_fires_with_or_without_hej() {
+        assertEquals(Reaction.Fires(Command.GATE), reactionTo(tokensOf("darek otwórz bramę"), all, Persona.DAREK))
+        assertEquals(Reaction.Fires(Command.GATE), reactionTo(tokensOf("hej darek otwórz bramę"), all, Persona.DAREK))
     }
 
     @Test
@@ -103,17 +135,25 @@ class CommandMatchTest {
     }
 
     @Test
-    fun the_other_persona_s_name_gets_the_correction_after_the_own_name_s_answers() {
+    fun the_other_persona_hailed_gets_the_correction_after_the_own_name_s_answers() {
         val sayOnly = listOf(Command.SAY_SOMETHING)
         val setUp = Command.entries
-        listOf("darek", "hej darek", "darek powiedz coś", "darek otwórz bramę").forEach {
+        listOf("hej darek", "hej darek powiedz coś", "hej darek otwórz bramę").forEach {
             assertEquals(it, Reaction.Corrected, reactionTo(tokensOf(it), sayOnly, Persona.DARIA))
             assertEquals(it, Reaction.Corrected, reactionTo(tokensOf(it), setUp, Persona.DARIA))
         }
-        assertEquals(Reaction.Corrected, reactionTo(tokensOf("daria powiedz coś"), sayOnly, Persona.DAREK))
-        assertEquals(Reaction.NotConfigured, reactionTo(tokensOf("daria darek"), sayOnly, Persona.DARIA))
-        assertEquals(Reaction.NotUnderstood, reactionTo(tokensOf("darek daria"), setUp, Persona.DAREK))
-        listOf("dario otwórz bramę", "darku", "marek").forEach {
+        assertEquals(Reaction.Corrected, reactionTo(tokensOf("hej daria powiedz coś"), sayOnly, Persona.DAREK))
+        assertEquals(Reaction.NotConfigured, reactionTo(tokensOf("hej daria hej darek"), sayOnly, Persona.DARIA))
+        assertEquals(Reaction.NotUnderstood, reactionTo(tokensOf("hej darek hej daria"), setUp, Persona.DAREK))
+        listOf(
+            "darek",
+            "darek powiedz coś",
+            "darek otwórz bramę",
+            "dario otwórz bramę",
+            "hej dario",
+            "darku",
+            "marek",
+        ).forEach {
             assertEquals(it, null, reactionTo(tokensOf(it), setUp, Persona.DARIA))
         }
     }

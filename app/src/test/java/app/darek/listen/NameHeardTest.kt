@@ -23,7 +23,7 @@ class NameHeardTest {
     fun a_partial_that_loses_the_name_and_regains_it_does_not_answer_again() {
         assertEquals(
             listOf(true, false, false),
-            firsts(partial("daria"), partial("dario"), partial("daria")),
+            firsts(partial("hej", "daria"), partial("hej", "dario"), partial("hej", "daria")),
         )
     }
 
@@ -31,7 +31,20 @@ class NameHeardTest {
     fun the_next_utterance_answers_again() {
         assertEquals(
             listOf(true, false, true),
-            firsts(partial("daria"), Heard.Final(listOf("daria")), partial("daria")),
+            firsts(partial("hej", "daria"), Heard.Final(listOf("hej", "daria")), partial("hej", "daria")),
+        )
+    }
+
+    @Test
+    fun the_name_without_hej_right_before_it_does_not_answer() {
+        assertEquals(
+            listOf(false, false, false, false),
+            firsts(
+                partial("daria"),
+                partial("daria", "idziesz"),
+                partial("hej", "[unk]", "daria"),
+                partial("daria", "hej"),
+            ),
         )
     }
 

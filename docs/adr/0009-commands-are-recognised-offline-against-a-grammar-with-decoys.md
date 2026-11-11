@@ -38,7 +38,7 @@ confidence 1.00. That is the failure this ADR exists to prevent.
   arrives in a fucha, every word of it is checked against the model's vocabulary when it is
   installed, because Vosk drops grammar words its model does not know, and the name Decoys below
   apply to every Command whichever fucha it came from.
-- **The grammar is the Commands, the cancel words (*"stop"*, *"anuluj"*, which carry no name,
+- **The grammar is the Commands, *„hej"* with the hail *„hej darek"*, the cancel words (*"stop"*, *"anuluj"*, which carry no name,
   [ADR-0011](0011-the-gate-call-is-placed-through-telecom-after-the-reply.md)) and Decoys**: names and
   words close to the Commands' (*marek, jarek, janek, darka, darku, dawid, otwórz, zamknij, brama*)
   and `[unk]`, so near-misses have somewhere to land. The name is the chosen Persona's, and the
@@ -53,6 +53,12 @@ confidence 1.00. That is the failure this ADR exists to prevent.
   so *"darek otwórz bramę proszę"* and a Command joined to surrounding noise fire. A split Command
   (*"Darek powiedział: otwórz bramę"* → `darek [unk] otwórz bramę`), a partial or reordered one
   (*"darek bramę otwórz"*) and partial results never fire.
+- **Every answer that is not a Command needs *„hej"* directly before the name** (the owner,
+  2026-11-10, for Listening in a pocket): *„No?"*, „nie rozumiem", the not-configured line and
+  ADR-0016's correction. *„Darek"* from a TV or a friend, *„Darek, idziesz?"* included, gets silence;
+  *„Hej Darek"* gets *„No?"*. A Command needs no *„hej"*, and *„Hej Darek, otwórz bramę"* fires
+  like *„Darek, otwórz bramę"*. The bundled model knows *„hej"* (read on the host with Vosk,
+  2026-11-10).
 - **While a partial result ends on the name, the utterance waits longer before it ends** (the owner's
   ask, 2026-11-02, on Home only, not the probe), so a user can say the name, wait for *„No?"*
   ([ADR-0011](0011-the-gate-call-is-placed-through-telecom-after-the-reply.md)) and still say the
@@ -102,6 +108,7 @@ launch without signal. Rejected with ADR-0008.
   reading is owed before a Command that calls can fire in a release, under either Persona**
   ([`DOD.md`](../DOD.md)): the name, a 1 to 3 s gap, the Command in a second voice. Whether a Command
   that calls gets the hold at all is the owner's call on that reading.
-- A partial result that passes through the name now gets *„No?"* and can start the hold, though
-  it still fires nothing, so talk that only sounds like the name gets a spoken answer. The 0/64 above counted
-  final results and does not measure this; phase 2 owes it, before Darek listens in a pocket.
+- A partial result that hails the name gets *„No?"* and can start the hold, though it still fires
+  nothing, so talk that only sounds like *„hej darek"* gets a spoken answer. The 0/64 above counted
+  final results and does not measure this; phase 2's false-answer reading does
+  ([`phase-2.md`](../phase-2.md), *Readings*).
