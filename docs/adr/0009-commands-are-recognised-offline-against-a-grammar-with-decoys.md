@@ -43,7 +43,12 @@ confidence 1.00. That is the failure this ADR exists to prevent.
   words close to the Commands' (*marek, jarek, janek, darka, darku, dawid, otwórz, zamknij, brama*)
   and `[unk]`, so near-misses have somewhere to land. The name is the chosen Persona's, and the
   name Decoys, the same under either, include the other Persona's name
-  ([ADR-0016](0016-daria-is-a-persona-the-user-switches-to.md) lists them). A Command that cannot
+  ([ADR-0016](0016-daria-is-a-persona-the-user-switches-to.md) lists them). **Each name Decoy also
+  stands as a whole phrase in front of each enabled Command's words** (*„dario otwórz bramę"*): a lone
+  Decoy word lost to the whole Command phrase, and *„Dario, otwórz bramę"* in Darek's voice decoded
+  as *„daria otwórz bramę"* at every alignment on the host, and fired the gate on the emulator
+  (phase 2's false-answer reading, 2026-11-11). With the phrase Decoys it lands on *dario* every
+  time, and every real Command still decodes. A Command that cannot
   act (one that calls, with no Number) is left out, and the cancel words are in only while a Command
   that calls is enabled. **Its JSON carries Polish letters as UTF-8**: Vosk does not decode `\u`
   escapes, takes `co\u015b` as an unknown word and drops it, so the Command could never fire (read
@@ -108,7 +113,11 @@ launch without signal. Rejected with ADR-0008.
   reading is owed before a Command that calls can fire in a release, under either Persona**
   ([`DOD.md`](../DOD.md)): the name, a 1 to 3 s gap, the Command in a second voice. Whether a Command
   that calls gets the hold at all is the owner's call on that reading.
-- A partial result that hails the name gets *„No?"* and can start the hold, though it still fires
-  nothing, so talk that only sounds like *„hej darek"* gets a spoken answer. The 0/64 above counted
-  final results and does not measure this; phase 2's false-answer reading does
-  ([`phase-2.md`](../phase-2.md), *Readings*).
+- A partial result that hails the name gets *„No?"* once it has held unchanged for 400 ms of audio,
+  and can start the hold, though it still fires nothing. Answering the first partial that hailed was
+  not enough: on 2026-11-11's false-answer reading ([`phase-2.md`](../phase-2.md), *Readings*),
+  *„Hej, Marek!"* in Daria's voice passed through *„hej darek"* on its way to *„hej marek"* and got
+  *„No?"*, though *marek* is a Decoy. On the host such flickers never held still for 300 ms and real
+  hails always held for 500; 400 ms is the owner's pick (2026-11-11), and *„No?"* comes that much
+  later. Talk that holds still on something like *„hej darek"* still gets a spoken answer; the 0/64
+  above counted final results and does not measure this, the false-answer reading does.
