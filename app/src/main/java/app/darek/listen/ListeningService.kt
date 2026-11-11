@@ -19,6 +19,8 @@ import androidx.core.content.ContextCompat
 import app.darek.MainActivity
 import app.darek.MainApplication
 import app.darek.R
+import app.darek.ui.settings.inAppLanguage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -30,11 +32,11 @@ import kotlinx.coroutines.runBlocking
 /**
  * Listening as a foreground service of type `microphone` (ADR-0010): it keeps the container's
  * [Listening] alive with the screen off and the app swiped away, and ends itself when Listening ends.
- * Started only from a user action, since Android 14+ refuses a background start.
  */
 class ListeningService : Service() {
     private val scope = MainScope()
     private var run: Job? = null
+    private var strings: Context = this
 
     private val listening get() = (application as MainApplication).container.listening
     private val preferences get() = (application as MainApplication).container.preferences
@@ -50,8 +52,12 @@ class ListeningService : Service() {
             listening.stop()
             return START_NOT_STICKY
         }
-        // startForeground must come before this call returns; the store is already in memory.
-        val persona = runBlocking { preferences.persona.first() }
+        // startForeground must come before this call returns; both reads are small files.
+        val persona =
+            runBlocking(Dispatchers.IO) {
+                strings = inAppLanguage()
+                preferences.persona.first()
+            }
         if (!goForeground(persona)) {
             stopSelf()
             return START_NOT_STICKY
@@ -78,13 +84,7 @@ class ListeningService : Service() {
         super.onDestroy()
     }
 
-    /** False when the system refuses: on Android 14+ a `microphone` service needs `RECORD_AUDIO` held. */
     private fun goForeground(persona: Persona): Boolean {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) !=
-            PackageManager.PERMISSION_GRANTED
-        ) {
-            return false
-        }
         createChannel()
         return try {
             ServiceCompat.startForeground(
@@ -114,7 +114,7 @@ class ListeningService : Service() {
         NotificationManagerCompat.from(this).createNotificationChannel(
             NotificationChannelCompat
                 .Builder(CHANNEL_ID, NotificationManagerCompat.IMPORTANCE_LOW)
-                .setName(getString(R.string.listening_channel))
+                .setName(strings.getString(R.string.listening_channel))
                 .setShowBadge(false)
                 .build(),
         )
@@ -138,9 +138,9 @@ class ListeningService : Service() {
         return NotificationCompat
             .Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(getString(persona.listeningRes()))
+            .setContentTitle(strings.getString(persona.listeningRes()))
             .setContentIntent(open)
-            .addAction(0, getString(R.string.home_stop), stop)
+            .addAction(0, strings.getString(R.string.home_stop), stop)
             .setOngoing(true)
             .setSilent(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
@@ -154,9 +154,19 @@ class ListeningService : Service() {
         private const val NOTIFICATION_ID = 1
         private const val ACTION_STOP = "app.darek.listen.STOP"
 
-        /** Called only from a user action on a visible screen, the start Android 14+ allows. */
         fun start(context: Context) {
-            ContextCompat.startForegroundService(context, Intent(context, ListeningService::class.java))
+            // Android 14+ refuses startForeground for a `microphone` service without RECORD_AUDIO,
+            // and a started service that never reaches it crashes the process.
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) !=
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                return
+            }
+            try {
+                ContextCompat.startForegroundService(context, Intent(context, ListeningService::class.java))
+            } catch (e: IllegalStateException) {
+                Log.e(TAG, "foreground start refused", e)
+            }
         }
     }
 }
