@@ -22,6 +22,7 @@ sealed interface Heard {
 
     data class Partial(
         override val tokens: List<String>,
+        val steadyMs: Long = 0,
     ) : Heard
 
     data class Final(
@@ -69,6 +70,7 @@ class Recogniser(
                     onRecording()
                     val buffer = ShortArray(CHUNK)
                     var lastPartial = emptyList<String>()
+                    var steadyMs = 0L
                     var holding = false
 
                     fun hold(wanted: Boolean) {
@@ -86,14 +88,19 @@ class Recogniser(
                         check(read >= 0) { "AudioRecord.read returned $read" }
                         if (recognizer.acceptWaveForm(buffer, read)) {
                             lastPartial = emptyList()
+                            steadyMs = 0
                             hold(false)
                             emit(Heard.Final(field(recognizer.result, "text")))
                         } else {
                             val partial = field(recognizer.partialResult, "partial")
                             if (partial != lastPartial) {
                                 lastPartial = partial
+                                steadyMs = 0
                                 hold(holdAfter != null && partial.lastOrNull() == holdAfter)
                                 emit(Heard.Partial(partial))
+                            } else if (partial.isNotEmpty()) {
+                                steadyMs += read * 1000L / SAMPLE_RATE
+                                emit(Heard.Partial(partial, steadyMs))
                             }
                         }
                     }

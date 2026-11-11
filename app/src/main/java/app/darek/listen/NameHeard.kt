@@ -1,6 +1,9 @@
 package app.darek.listen
 
-/** Picks the first partial of an utterance that hails [name]: partials repeat and flicker, and each utterance is answered once. */
+/**
+ * Picks the partial that hails [name] once it has held unchanged for [STEADY_MS] of audio: a passing
+ * flicker of the hail, as „hej marek" settles, is not answered, and each utterance is answered once.
+ */
 class NameHeard(
     private val name: String,
 ) {
@@ -13,9 +16,13 @@ class NameHeard(
                 false
             }
             is Heard.Partial -> {
-                val first = !heard && result.tokens.hails(name)
+                val first = !heard && result.steadyMs >= STEADY_MS && result.tokens.hails(name)
                 heard = heard || first
                 first
             }
         }
+
+    companion object {
+        const val STEADY_MS = 400L
+    }
 }
