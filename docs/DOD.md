@@ -159,8 +159,18 @@ Console matches. A new permission, foreground service or data type is a Console 
       The repo half is done 2026-11-01 (listing, policy, `play-app-content.md`, screenshots; the
       allowlist and licences came with B). Tick when 0.3.0 is uploaded with its listing and the
       Console's Data safety is confirmed unchanged.
+- [ ] **In 0.9.0, phase 2's release, which waits for checkpoint D** ([`phase-2.md`](phase-2.md)):
+      the foreground-service declaration for `microphone`, with its video of a user starting
+      Listening, answered from `play-app-content.md`'s *Foreground service permissions*; the
+      Data safety re-read; the 0.9.0 notes rewritten for checkpoints A to D. `FOREGROUND_SERVICE`,
+      `FOREGROUND_SERVICE_MICROPHONE` and `POST_NOTIFICATIONS` are in the build from checkpoint A,
+      so no release PR merges between A and D.
 
 ## Owed before a Command that calls can fire
+
+**Android 16 and Xiaomi, owed to the owner's phone** ([`phase-2.md`](phase-2.md), *The verdict*):
+the gate reading on Android 16, which its emulator could not take, and whether HyperOS kills the
+Listening service. Phase 2 stays unticked until they are read.
 
 Phase D is ticked on what it built and on the owner's voice; [`phase-D.md`](phase-D.md) has what
 that reading showed. ADR-0016's reading before she is trusted to call is still to do, and under either
