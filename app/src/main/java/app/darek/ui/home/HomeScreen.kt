@@ -251,7 +251,6 @@ private fun Context.openAppSettings() {
 
 // Two resources per line, not one with the name as an argument: Polish declines the name and its
 // verbs agree with it (ADR-0016).
-
 private fun Persona.hearingRes(): Int =
     when (this) {
         Persona.DAREK -> R.string.home_hearing

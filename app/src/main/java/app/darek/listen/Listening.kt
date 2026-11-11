@@ -163,7 +163,7 @@ class Listening(
                     if (!answer.calls) {
                         Log.i(VOICE_TAG, "reply reaction=${answer.label} end=${speak(persona, answer.text)}")
                     } else if (callPlaced(loaded, grammar, persona, answer)) {
-                        // Every dial ends Listening (ADR-0011).
+                        // Every dial still ends Listening; phase-2.md, section 3, lifts that.
                         coroutineContext.cancelChildren()
                         return@coroutineScope
                     }
