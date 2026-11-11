@@ -5,7 +5,7 @@ package app.darek.listen
  * (ADR-0016). Words are lower-case, as the recogniser emits them.
  */
 enum class Command(
-    phrase: String,
+    val phrase: String,
     val reply: Line,
     val calls: Boolean,
 ) {

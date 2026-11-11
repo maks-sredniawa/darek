@@ -68,7 +68,10 @@ class GrammarTest {
         val daria = phrases(Grammar.json(Command.entries.toSet(), Persona.DARIA))
         assertTrue("daria powiedz coś" in daria)
         assertTrue("daria otwórz bramę" in daria)
-        assertFalse(daria.any { it.startsWith("darek ") })
+        assertEquals(
+            Grammar.decoyPhrases(Command.entries.toSet(), Persona.DARIA).filter { it.startsWith("darek ") },
+            daria.filter { it.startsWith("darek ") },
+        )
         assertTrue("darek" in daria)
         assertTrue("daria" in phrases(callOff))
     }
@@ -95,5 +98,18 @@ class GrammarTest {
         assertEquals(adr0016 + "daria", Grammar.decoys(Persona.DAREK).toSet())
         assertEquals(adr0016 + "darek", Grammar.decoys(Persona.DARIA).toSet())
         Persona.entries.forEach { assertEquals(Grammar.decoys(it).distinct(), Grammar.decoys(it)) }
+    }
+
+    @Test
+    fun every_name_decoy_has_a_whole_phrase_for_each_enabled_command_and_none_for_the_others() {
+        val off = phrases(callOff)
+        val on = phrases(Grammar.json(Command.entries.toSet(), Persona.DARIA))
+        assertTrue("dario powiedz coś" in off)
+        assertFalse(off.any { it.endsWith("otwórz bramę") && !it.startsWith("darek") })
+        (Grammar.NAME_DECOYS + "darek").forEach { name ->
+            assertTrue(name, "$name otwórz bramę" in on)
+            assertTrue(name, "$name powiedz coś" in on)
+        }
+        assertFalse("daria otwórz bramę" in Grammar.decoyPhrases(Command.entries.toSet(), Persona.DARIA))
     }
 }
