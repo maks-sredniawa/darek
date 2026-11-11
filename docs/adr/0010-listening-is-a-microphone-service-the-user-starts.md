@@ -58,4 +58,6 @@ Each is either refused on current Android or a Play policy violation.
 - The notification stays while listening: the platform's price and the honest signal that the
   microphone is open. On Android 14+ the user can swipe it away while the service keeps running;
   Darek does not repost it, and Listening stays visible in the app and on the tile.
+- In the background as on screen, only a Command or a hail with *„hej"* gets an answer (ADR-0009):
+  the name alone, from a TV or a pocket, gets silence.
 - Battery cost is real and has to be measured over a night on the test phone before the door.

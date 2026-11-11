@@ -13,7 +13,7 @@ fun commandIn(
         enabled.firstOrNull { command -> tokens.hasAt(start, command.words(persona)) }
     }
 
-/** Said directly before a name, it asks for an answer that is not a Command (phase-2.md, section 4). */
+/** The word every answer but a Command needs before the name (ADR-0009). */
 const val HEJ = "hej"
 
 fun List<String>.hails(name: String): Boolean = indices.any { this[it] == HEJ && getOrNull(it + 1) == name }

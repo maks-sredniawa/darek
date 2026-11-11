@@ -19,11 +19,7 @@ object Grammar {
 
     fun decoys(persona: Persona): List<String> = NAME_DECOYS + persona.other.word + COMMAND_WORD_DECOYS
 
-    /**
-     * Each name Decoy in front of each enabled Command's phrase. A lone Decoy word loses to a whole
-     * Command phrase: *„Dario, otwórz bramę"* decoded as *„daria otwórz bramę"* until it had a whole
-     * phrase of its own to land on (ADR-0009).
-     */
+    /** Each name Decoy in front of each enabled Command's phrase (ADR-0009). */
     fun decoyPhrases(
         enabled: Set<Command>,
         persona: Persona,

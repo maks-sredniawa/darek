@@ -49,7 +49,7 @@
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_persona">Who answers</string>
-    <string name="settings_persona_hint">The name you call and the voice that answers. The other name gets a correction.</string>
+    <string name="settings_persona_hint">The name you call and the voice that answers. Say Hej and the other name to get a correction.</string>
     <string name="persona_darek" translatable="false">Darek</string>
     <string name="persona_daria" translatable="false">Daria</string>
     <string name="settings_appearance">Appearance</string>
