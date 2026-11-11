@@ -29,16 +29,13 @@ class ManifestWiringTest {
 
     private companion object {
         // INTERNET never (ADR-0008); the rest is what the template's reminders and WorkManager
-        // declared or merged. Phase 2 brings POST_NOTIFICATIONS and FOREGROUND_SERVICE back with the
-        // Listening service, and this list and aab-permissions.py move with them.
+        // declared or merged. This list moves with aab-permissions.py.
         val NOT_REQUESTED =
             setOf(
                 "android.permission.INTERNET",
-                "android.permission.POST_NOTIFICATIONS",
                 "android.permission.RECEIVE_BOOT_COMPLETED",
                 "android.permission.SCHEDULE_EXACT_ALARM",
                 "android.permission.WAKE_LOCK",
-                "android.permission.FOREGROUND_SERVICE",
             )
     }
 }
