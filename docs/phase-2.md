@@ -241,8 +241,8 @@ owner, 2026-11-10).
 **False answers** (on the emulators). With *„Hej"* required, talk that names the Persona without it
 gets no answer, and near-misses fire nothing. Injected audio: the near-miss script's lines (*Marek…*,
 *Jarek…*, *Otwórz bramę*, *„Darek, idziesz?"*, Daria's equivalents) synthesised on the host with the
-bundled voices, so nothing leaves the machine, and 2 minutes of Polish speech from a CC-licensed
-recording. Bar, fixed before the reading (the owner, 2026-11-10): zero spoken answers and zero
+bundled voices, so nothing leaves the machine, and 2 minutes of Polish speech from a public-domain
+recording (LibriVox, *Lalka* vol. 2 ch. 1). Bar, fixed before the reading (the owner, 2026-11-10): zero spoken answers and zero
 Commands fired on the script; at most one spoken answer in the 2 minutes. A failure makes the
 failing word a Decoy and the reading is taken again. Real voices at a distance stay phase 3's.
 
@@ -257,3 +257,6 @@ difference, fixed before the reading (the owner, 2026-11-10):
 
 | # | Reading | Command | Result |
 | --- | --- | --- | --- |
+| 1 | False answers, Darek, before the fixes | `pixel-api37`, one gRPC `injectAudio` stream: the script in both voices, the radio, then *„Hej, Darek!"* twice as a control | **Fail.** *„Hej, Marek!"* in Daria's voice got *„No?"*: a partial flickered through *„hej darek"* on its way to *„hej marek"*, though *marek* is a Decoy. Radio 0; the control answered twice |
+| 2 | False answers, both Personas, with *„No?"* after 400 ms of a still hail | the same, Daria's script under Daria | **Fail.** *„Darku, otwórz bramę"* fired the gate under Darek and *„Dario, otwórz bramę"* under Daria; each dial ended Listening, so the rest was unread. On the host *„Dario…"* in Darek's voice decoded as *„daria otwórz bramę"* at 9 of 9 alignments: a lone Decoy word lost to the whole Command phrase |
+| 3 | False answers, both Personas, with phrase Decoys too (ADR-0009) | the same | **Pass.** Script: 0 spoken answers, 0 Commands under either Persona. Radio: 0. Control: 2 of 2 under each, *„No?"* 1.6 s (Darek) and 1.9 s (Daria) after the hail began. One run each. *Darku* fired in reading 2 but never on the host, likely the emulator's audio varying (not proven); real voices at a distance stay phase 3's |
