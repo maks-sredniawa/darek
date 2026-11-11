@@ -316,3 +316,17 @@ When Darek or Daria hears the name, they now answer "No?" (Polish for "yes?") in
 ```
 Gdy Darek lub Daria usłyszy swoje imię, odpowie teraz „No?” zamiast dźwięku.
 ```
+
+### 0.9.0 — Listening with the screen off
+
+**English** — 128/500:
+
+```
+Darek and Daria now keep listening with the screen off or the app closed. While they listen, a notification shows it, with Stop.
+```
+
+**Polish** — 146/500:
+
+```
+Darek i Daria słuchają teraz także przy wyłączonym ekranie i zamkniętej aplikacji. Gdy słuchają, widać to w powiadomieniu z przyciskiem Zatrzymaj.
+```
