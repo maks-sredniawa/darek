@@ -166,11 +166,13 @@ Console matches. A new permission, foreground service or data type is a Console 
       `FOREGROUND_SERVICE_MICROPHONE` and `POST_NOTIFICATIONS` are in the build from checkpoint A,
       so no release PR merges between A and D.
 
-## Owed before a Command that calls can fire
+## Owed to the owner's phone
 
-**Android 16 and Xiaomi, owed to the owner's phone** ([`phase-2.md`](phase-2.md), *The verdict*):
-the gate reading on Android 16, which its emulator could not take, and whether HyperOS kills the
-Listening service. Phase 2 stays unticked until they are read.
+- [ ] **Phase 2 on Android 16 and HyperOS** ([`phase-2.md`](phase-2.md), *The verdict*): the gate
+      reading, which Android 16's emulator could not take, whether HyperOS kills the Listening
+      service, autostart, and a night's battery. Phase 2 stays unticked until they are read.
+
+## Owed before a Command that calls can fire
 
 Phase D is ticked on what it built and on the owner's voice; [`phase-D.md`](phase-D.md) has what
 that reading showed. ADR-0016's reading before she is trusted to call is still to do, and under either
