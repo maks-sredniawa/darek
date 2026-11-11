@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.media.AudioManager
 import android.net.Uri
 import android.os.SystemClock
 import android.telecom.TelecomManager
@@ -17,7 +18,6 @@ import app.darek.speak.Voice
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
@@ -61,9 +62,11 @@ class Listening(
         val failed: Boolean = false,
         /** A partial result holds the Persona's name: it shows it is hearing before the Command is finished. */
         val hearingName: Boolean = false,
+        val hearing: Hearing = Hearing.HEARS,
     )
 
     private val appContext = context.applicationContext
+    private val audio = appContext.getSystemService(AudioManager::class.java)
     private val mutableState = MutableStateFlow(State())
     val state: StateFlow<State> = mutableState.asStateFlow()
 
@@ -84,7 +87,7 @@ class Listening(
 
     private val runs =
         LatestRun<Wanted>(scope, { listen(it.enabled, it.persona) }) {
-            mutableState.update { it.copy(phase = Phase.OFF, hearingName = false) }
+            mutableState.update { it.copy(phase = Phase.OFF, hearingName = false, hearing = Hearing.HEARS) }
         }
 
     private data class Answer(
@@ -93,7 +96,7 @@ class Listening(
         val calls: Boolean = false,
     )
 
-    /** True from [start] until Listening is stopped or ends by itself, as after a dial. */
+    /** True from [start] until Listening is stopped or fails. */
     val running: Flow<Boolean> get() = runs.requested
 
     /** Started again under another Persona, a running Listening restarts (ADR-0016). */
@@ -147,25 +150,27 @@ class Listening(
                 val grammar = Grammar.json(enabled, persona, ListeningExtras.phrases(persona))
                 mutableState.update { it.copy(phase = Phase.ON) }
                 while (true) {
+                    pauseWhileInCall()
                     val nameHeard = NameHeard(persona.word)
                     val answer =
-                        Recogniser(loaded)
-                            .heard(grammar, holdAfter = persona.word)
-                            .onEach { heard ->
-                                val hearing = heard is Heard.Partial && persona.word in heard.tokens
-                                mutableState.update { it.copy(hearingName = hearing) }
-                                if (nameHeard.isFirst(heard)) answerName(nameAnswer)
-                            }.filterIsInstance<Heard.Final>()
-                            .mapNotNull { answerTo(it.tokens, enabled, persona) }
-                            .first()
+                        merge(
+                            Recogniser(loaded)
+                                .heard(grammar, holdAfter = persona.word, onHears = ::hears)
+                                .onEach { heard ->
+                                    val hearing = heard is Heard.Partial && persona.word in heard.tokens
+                                    mutableState.update { it.copy(hearingName = hearing) }
+                                    if (nameHeard.isFirst(heard)) answerName(nameAnswer)
+                                }.filterIsInstance<Heard.Final>()
+                                .mapNotNull { answerTo(it.tokens, enabled, persona) },
+                            callStarted(),
+                        ).first()
+                    if (answer == null) continue
                     Log.i(TAG, "reaction=${answer.label}")
                     mutableState.update { it.copy(hearingName = false, lastReply = answer.text) }
-                    if (!answer.calls) {
+                    if (answer.calls) {
+                        callPlaced(loaded, grammar, persona, answer)
+                    } else {
                         Log.i(VOICE_TAG, "reply reaction=${answer.label} end=${speak(persona, answer.text)}")
-                    } else if (callPlaced(loaded, grammar, persona, answer)) {
-                        // Every dial still ends Listening; phase-2.md, section 3, lifts that.
-                        coroutineContext.cancelChildren()
-                        return@coroutineScope
                     }
                 }
             }
@@ -176,6 +181,38 @@ class Listening(
             mutableState.update { it.copy(failed = true) }
         } finally {
             nameAnswer?.close()
+        }
+    }
+
+    private fun inCall(): Boolean = inCall(audio.mode)
+
+    /** The microphone is freed for the call and taken back when the call ends (phase-2.md, section 3). */
+    private suspend fun pauseWhileInCall() {
+        if (inCall()) {
+            Log.i(TAG, "paused for a call")
+            mutableState.update { it.copy(hearing = Hearing.PAUSED_FOR_CALL, hearingName = false) }
+            while (inCall()) delay(CALL_POLL_MS)
+            Log.i(TAG, "call ended, listening again")
+        }
+        mutableState.update { it.copy(hearing = Hearing.HEARS) }
+    }
+
+    private fun callStarted(): Flow<Answer?> =
+        flow {
+            while (!inCall()) delay(CALL_POLL_MS)
+            emit(null)
+        }
+
+    private fun hears(hears: Boolean) {
+        Log.i(TAG, "microphone hears=$hears")
+        mutableState.update {
+            if (it.hearing ==
+                Hearing.PAUSED_FOR_CALL
+            ) {
+                it
+            } else {
+                it.copy(hearing = if (hears) Hearing.HEARS else Hearing.CANNOT_HEAR)
+            }
         }
     }
 
@@ -232,7 +269,7 @@ class Listening(
         grammar: String,
         persona: Persona,
         answer: Answer,
-    ): Boolean {
+    ) {
         val window = CancelWindow().also { cancelWindow = it }
         val decision =
             try {
@@ -244,8 +281,13 @@ class Listening(
                             val now = SystemClock.elapsedRealtime()
                             window.recordingStarted(now)
                             Log.i(TAG, "cancel window open startup=${now - replyEnded}ms")
-                        })
-                        .map { window.heard(it.tokens, SystemClock.elapsedRealtime()) },
+                        }, onHears = { if (!it) window.cannotHear() })
+                        .map { window.heard(it.tokens, SystemClock.elapsedRealtime()) }
+                        .catch { e ->
+                            if (e is CancellationException) throw e
+                            Log.e(TAG, "cancel window could not listen", e)
+                            emit(window.cannotHear())
+                        },
                     flow {
                         while (true) {
                             delay(WINDOW_TICK_MS)
@@ -257,16 +299,14 @@ class Listening(
                 cancelWindow = null
             }
         Log.i(TAG, "cancel window=$decision")
-        return when (decision) {
+        when (decision) {
             CancelWindow.Decision.DIAL -> {
                 currentCoroutineContext().ensureActive()
-                dial().also { placed -> if (!placed) say(persona, CALL_FAILED) }
+                if (!dial()) say(persona, CALL_FAILED)
             }
-            CancelWindow.Decision.CANCELLED -> {
-                say(persona, CALL_CANCELLED)
-                false
-            }
-            CancelWindow.Decision.STOPPED, CancelWindow.Decision.WAIT -> false
+            CancelWindow.Decision.CANCELLED -> say(persona, CALL_CANCELLED)
+            CancelWindow.Decision.CANNOT_HEAR -> say(persona, CALL_FAILED)
+            CancelWindow.Decision.STOPPED, CancelWindow.Decision.WAIT -> Unit
         }
     }
 
@@ -355,5 +395,6 @@ class Listening(
         const val MODEL_TAG = "DarekModel"
         const val VOICE_TAG = "DarekVoice"
         const val WINDOW_TICK_MS = 50L
+        const val CALL_POLL_MS = 500L
     }
 }

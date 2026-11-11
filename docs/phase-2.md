@@ -138,12 +138,15 @@ finished flow. On Android 13+ the notification is hidden until D asks for `POST_
 
 - **During the Reply** Darek is not listening to himself: recognition pauses while a line plays.
 - **During the Gate call** Listening pauses and resumes by itself when the call ends (the owner,
-  2026-11-10). The platform already silences an ordinary app's capture during a call on API 29+ and
-  lifts it after, and says so through `AudioRecordingCallback` (`isClientSilenced`); on 26–28 the
-  audio mode is polled (`MODE_IN_CALL`, `MODE_IN_COMMUNICATION`). A run of exact zeros longer than
-  about a second is treated as silenced on every API, which also catches another app taking the
-  microphone (ADR-0010's last bullet). Sources: Android's *Sharing audio input* and AOSP
-  `AudioPolicyService` (`updateUidStates_l`, `setAppState_l`); not yet measured on Xiaomi.
+  2026-11-10). The audio mode is polled every 0.5 s on every API (`MODE_IN_CALL`,
+  `MODE_IN_COMMUNICATION`, ringing and the call-screening modes): while it says a call is on, the
+  recording is closed, so the microphone is free for the call and nothing in it is recognised, and a
+  new one opens when the call ends. The platform's own silencing of capture during a call (API 29+,
+  `isClientSilenced`) is not needed for the pause: it reads as zeros, below. A run of exact zeros
+  longer than a second, outside a call, reads as *cannot hear* on every API, which also catches
+  another app taking the microphone (ADR-0010's last bullet). Sources: Android's *Sharing audio
+  input* and AOSP `AudioPolicyService` (`updateUidStates_l`, `setAppState_l`); not yet measured on
+  Xiaomi.
 - **When the microphone fails after the Reply** the call is refused (phase 1) and Darek now says
   *„Nie udało się zadzwonić."* (`CALL_FAILED`), and the notification switches to *cannot hear* (the
   owner, 2026-11-10).
@@ -206,9 +209,8 @@ owner, 2026-11-10).
 - **Silence detection.** A run of exact zeros longer than its bound reads as *cannot hear*; the
   cancel window treats it as no Listening and refuses the dial. Fails towards dialling on a
   microphone that hears nothing.
-- **Pause around the call.** The state that turns the silenced flag (API 29+) or the audio mode
-  (26–28) into paused and back. Fails towards a recogniser fed zeros that never resumes, or one that
-  resumes mid-call.
+- **Pause around the call.** The audio modes that read as a call. Fails towards a recogniser that
+  never resumes, or one that resumes mid-call.
 - **„Hej" in `reactionTo`.** The name without *„hej"* in front gets no answer; a Command fires with or
   without it. Fails towards a phone on a shelf answering the TV.
 - **The after-reboot decision.** Posted only when the remembered state says Listening was on, cleared

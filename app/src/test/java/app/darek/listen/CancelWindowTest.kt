@@ -93,4 +93,19 @@ class CancelWindowTest {
         window.tick(after(2_100))
         assertEquals(Decision.DIAL, window.heard(listOf("anuluj"), after(2_200)))
     }
+
+    @Test
+    fun a_microphone_that_cannot_hear_refuses_the_dial_for_good() {
+        started()
+        assertEquals(Decision.CANNOT_HEAR, window.cannotHear())
+        assertEquals(Decision.CANNOT_HEAR, window.tick(after(2_100)))
+        assertEquals(Decision.CANNOT_HEAR, window.heard(listOf("anuluj"), after(2_200)))
+    }
+
+    @Test
+    fun cannot_hear_after_the_dial_is_decided_changes_nothing() {
+        started()
+        window.tick(after(2_100))
+        assertEquals(Decision.DIAL, window.cannotHear())
+    }
 }

@@ -5,7 +5,7 @@ package app.darek.listen
  * stands, whatever follows. Synchronized because *Zatrzymaj* arrives on the main thread.
  */
 class CancelWindow {
-    enum class Decision { WAIT, DIAL, CANCELLED, STOPPED }
+    enum class Decision { WAIT, DIAL, CANCELLED, STOPPED, CANNOT_HEAR }
 
     private var decision = Decision.WAIT
     private var recordingStartedAt: Long? = null
@@ -24,6 +24,13 @@ class CancelWindow {
 
     @Synchronized
     fun tick(nowMs: Long): Decision = decide(nowMs, cancelWord = false)
+
+    /** The microphone stopped hearing: the cancel word could not be heard, so the dial is refused. */
+    @Synchronized
+    fun cannotHear(): Decision {
+        if (decision == Decision.WAIT) decision = Decision.CANNOT_HEAR
+        return decision
+    }
 
     @Synchronized
     fun listeningStopped(): Decision {

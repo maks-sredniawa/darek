@@ -47,6 +47,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.darek.R
+import app.darek.listen.Hearing
 import app.darek.listen.Listening
 import app.darek.listen.Persona
 import app.darek.listen.listeningRes
@@ -123,6 +124,7 @@ fun HomeScreen(
                         phase = state.listening,
                         persona = state.persona,
                         hearingName = state.hearingName,
+                        hearing = state.hearing,
                         failed = state.listenFailed,
                         onListen = {
                             when {
@@ -178,6 +180,7 @@ private fun ListenControl(
     phase: Listening.Phase,
     persona: Persona,
     hearingName: Boolean,
+    hearing: Hearing,
     failed: Boolean,
     onListen: () -> Unit,
     onStop: () -> Unit,
@@ -210,6 +213,20 @@ private fun ListenControl(
                     style = MaterialTheme.typography.titleMedium,
                     color = if (hearingName) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                 )
+                when (hearing) {
+                    Hearing.HEARS -> Unit
+                    Hearing.PAUSED_FOR_CALL ->
+                        Text(
+                            stringResource(R.string.listening_paused_call),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    Hearing.CANNOT_HEAR ->
+                        Text(
+                            stringResource(R.string.listening_cannot_hear),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                }
                 OutlinedButton(onClick = onStop) { Text(stringResource(R.string.home_stop)) }
             }
     }

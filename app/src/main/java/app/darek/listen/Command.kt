@@ -16,6 +16,9 @@ enum class Command(
     private val phraseWords = phrase.split(' ')
 
     fun words(persona: Persona): List<String> = listOf(persona.word) + phraseWords
+
+    /** As the user says it, *„Darek, otwórz bramę"*: Polish in every locale (ADR-0012). */
+    fun spoken(persona: Persona): String = "${persona.word.replaceFirstChar { it.uppercase() }}, $phrase"
 }
 
 fun enabledCommands(number: String?): Set<Command> = Command.entries.filter { !it.calls || number != null }.toSet()

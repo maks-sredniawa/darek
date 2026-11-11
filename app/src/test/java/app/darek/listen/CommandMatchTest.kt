@@ -164,4 +164,10 @@ class CommandMatchTest {
         assertEquals("Sorry, nie załapałem.", NOT_UNDERSTOOD[2].by(Persona.DAREK))
         assertEquals(Command.SAY_SOMETHING.reply.by(Persona.DAREK), Command.SAY_SOMETHING.reply.by(Persona.DARIA))
     }
+
+    @Test
+    fun a_command_is_spoken_with_the_persona_s_name_in_front_in_polish() {
+        assertEquals("Darek, otwórz bramę", Command.GATE.spoken(Persona.DAREK))
+        assertEquals("Daria, powiedz coś", Command.SAY_SOMETHING.spoken(Persona.DARIA))
+    }
 }
