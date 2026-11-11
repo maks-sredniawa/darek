@@ -94,6 +94,26 @@ Pass is `reaction=GATE` logged, 3 of 3 tries, on each of API 26, 30, 34 and 36 (
    on a level is written into ADR-0010 and that level gets a warning on Home, not a workaround.
 3. **Fails on 34 and 36** → stop; ADR-0010 is reopened with the owner before more code.
 
+### The verdict, taken 2026-11-10 and 2026-11-11
+
+**Verdict 1 on API 26, 30 and 37; API 36 cannot be read on its emulator.** No API 34 image is
+installed, so `pixel-api37` stands in for it: Android 14's background-start rules hold on every level
+from 34. On `urgent-api26`, `small-api30` and `pixel-api37`, each try was a fresh boot, with the task
+gone from `dumpsys activity recents` and the process alive, `mWakefulness=Asleep` and
+`deviceidle get deep` = `IDLE`. Every try logged `reaction=GATE` and a `cancel window=DIAL`, the dial
+showed as an outgoing call in `dumpsys telecom`, and the service stopped after it, as every dial ends
+Listening until checkpoint C.
+
+`pixel-api36` passed 1 of 3, and every later try with the app swiped away heard nothing, even with
+the screen on and no Doze. With the app on screen it passed. What the failing tries showed is below
+Darek and below Android's audio framework. AudioService reports the recording active and
+`silenced:false`. AudioFlinger shows Darek's track active, with `Sil n`, and it is the only capture
+client. Yet the emulator's sound card logged *„pcm_readi was late delivering frames, inserting
+silence"* about 1,800 times in each failing try, against 2 with the app on screen. So the
+injected audio never reached the guest. Opening the injection stream before the swipe did not change
+it. The same Android rules pass on `pixel-api37`, whose audio HAL is newer. The reading on Android 16
+is owed to the owner's phone (API 36, HyperOS), with the Xiaomi readings.
+
 ## 2. The service
 
 - **One Listening, through the service** (the owner, 2026-11-10). A foreground service of type
