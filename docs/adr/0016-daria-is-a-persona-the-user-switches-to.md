@@ -37,9 +37,10 @@ Read on the host on 2026-11-01:
   Command starts with the name as it is written, and *„Dario, otwórz bramę"* gets silence, as
   *„Darku, otwórz bramę"* does today.
 - **The other Persona's name gets a correction.** A final result with no Command in it is answered
-  in this order: the chosen Persona's name gets „nie rozumiem", or the not-configured line while no
-  Command that calls is enabled, as today; failing that, the other Persona's name gets the correction
-  in their place, whatever is enabled; failing both, silence. Daria says *„Nie jestem Darkiem,
+  in this order: the chosen Persona hailed (*„hej"* right before the name, ADR-0009) gets „nie
+  rozumiem", or the not-configured line while no Command that calls is enabled; failing that, the
+  other Persona hailed gets the correction in their place, whatever is enabled; failing both,
+  silence. Daria says *„Nie jestem Darkiem,
   mówisz z Darią."*, Darek says *„Daria? Tu Darek, stary."*.
 - **Daria's voice is `pl_PL-gosia-medium` as Piper publishes it**, bundled in the app at full
   quality and fetched at build time from the same pinned Hugging Face commit as Darek's, SHA-256

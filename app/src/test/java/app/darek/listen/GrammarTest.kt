@@ -57,6 +57,8 @@ class GrammarTest {
         listOf(callOff, callOn).map(::phrases).forEach { phrases ->
             assertTrue(phrases.containsAll(Grammar.decoys(Persona.DAREK)))
             assertTrue(Grammar.UNKNOWN in phrases)
+            assertTrue(HEJ in phrases)
+            assertTrue("hej darek" in phrases)
             assertEquals(phrases.distinct(), phrases)
         }
     }

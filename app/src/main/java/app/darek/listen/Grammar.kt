@@ -3,8 +3,8 @@ package app.darek.listen
 import kotlinx.serialization.json.Json
 
 /**
- * The recogniser's grammar (ADR-0009): each enabled Command as a phrase and word by word, the
- * Decoys, the cancel words while a Command that calls is enabled, and `[unk]`.
+ * The recogniser's grammar (ADR-0009): each enabled Command as a phrase and word by word, *„hej"*
+ * and the hail, the Decoys, the cancel words while a Command that calls is enabled, and `[unk]`.
  *
  * kotlinx.serialization writes `coś` as UTF-8; Vosk takes a `ś` escape for an unknown word and
  * drops it, and the Command could never fire.
@@ -29,6 +29,8 @@ object Grammar {
                 add(words.joinToString(" "))
                 addAll(words)
             }
+            add("$HEJ ${persona.word}")
+            add(HEJ)
             addAll(decoys(persona))
             if (enabled.any { it.calls }) addAll(CANCEL_WORDS)
             add(UNKNOWN)

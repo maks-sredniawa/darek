@@ -199,20 +199,19 @@ class Listening(
         tokens: List<String>,
         enabled: Set<Command>,
         persona: Persona,
-    ): Answer? =
-        when (val reaction = reactionTo(tokens, enabled, persona)) {
-            null -> null
-            is Reaction.Fires ->
-                Answer(reaction.command.name, reaction.command.reply.by(persona), reaction.command.calls)
-            Reaction.Corrected -> Answer("CORRECTED", persona.correction)
-            Reaction.NotUnderstood, Reaction.NotConfigured ->
-                ListeningExtras.reply(appContext, tokens, persona)?.let { Answer("EXTRA", it) }
-                    ?: if (reaction == Reaction.NotUnderstood) {
-                        Answer("NOT_UNDERSTOOD", pickNotUnderstood(persona))
-                    } else {
-                        Answer("NOT_CONFIGURED", NOT_CONFIGURED.by(persona))
-                    }
+    ): Answer? {
+        val reaction = reactionTo(tokens, enabled, persona)
+        if (reaction is Reaction.Fires) {
+            return Answer(reaction.command.name, reaction.command.reply.by(persona), reaction.command.calls)
         }
+        ListeningExtras.reply(appContext, tokens, persona)?.let { return Answer("EXTRA", it) }
+        return when (reaction) {
+            null, is Reaction.Fires -> null
+            Reaction.Corrected -> Answer("CORRECTED", persona.correction)
+            Reaction.NotUnderstood -> Answer("NOT_UNDERSTOOD", pickNotUnderstood(persona))
+            Reaction.NotConfigured -> Answer("NOT_CONFIGURED", NOT_CONFIGURED.by(persona))
+        }
+    }
 
     private fun pickNotUnderstood(persona: Persona): String {
         val ready =
