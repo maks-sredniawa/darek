@@ -28,8 +28,8 @@ out.
 
 - **The microphone, only while you have Listening on.** You start Listening yourself, in the app, from
   its notification or from its Quick Settings tile, and you stop it the same way; it never starts by
-  itself, not even after the phone restarts. While it is on, the app's screen, or later its
-  notification, says that Darek is listening. The sound is processed **on your phone, frame by frame**, by an offline speech
+  itself, not even after the phone restarts. While it is on, a notification says that Darek
+  is listening, and the app does not listen while its notifications are off. The sound is processed **on your phone, frame by frame**, by an offline speech
   recogniser that comes inside the app, and the only thing kept is the text of a Command it
   recognised, in memory, long enough to act on it. **Audio is never recorded, never stored and never
   sent anywhere.** Listening pauses while Darek speaks a reply and while his call is in progress. The

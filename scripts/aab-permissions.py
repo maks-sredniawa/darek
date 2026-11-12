@@ -98,6 +98,7 @@ EXPECTED = {
     "android.permission.FOREGROUND_SERVICE": "Listening's foreground service (ADR-0010)",
     "android.permission.FOREGROUND_SERVICE_MICROPHONE": "Listening's service type, `microphone` (ADR-0010)",
     "android.permission.POST_NOTIFICATIONS": "Listening's notification (ADR-0010)",
+    "android.permission.RECEIVE_BOOT_COMPLETED": "the notification after a reboot that offers Słuchaj (ADR-0010)",
 }
 
 # Permissions that must never appear. Absence is what the Data safety answers

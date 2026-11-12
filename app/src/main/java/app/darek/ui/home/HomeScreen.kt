@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.Settings
 import androidx.activity.compose.LocalActivity
@@ -16,6 +15,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
@@ -29,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,19 +43,30 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.darek.R
 import app.darek.listen.Hearing
+import app.darek.listen.LISTENING_CHANNEL_ID
 import app.darek.listen.Listening
+import app.darek.listen.NotificationBlock
 import app.darek.listen.Persona
+import app.darek.listen.hasMicrophone
+import app.darek.listen.listeningNotificationBlock
 import app.darek.listen.listeningRes
 import app.darek.theme.Spacing
 import app.darek.ui.appViewModelExtras
 import app.darek.ui.common.startActivitySafely
+import app.darek.work.NotificationPermissionOutcome
+import app.darek.work.hasAutostartSettings
+import app.darek.work.isIgnoringBatteryOptimisations
+import app.darek.work.openAppNotificationSettings
+import app.darek.work.openAutostartSettings
+import app.darek.work.openBatteryOptimisationSettings
+import app.darek.work.openChannelNotificationSettings
+import app.darek.work.rememberNotificationPermissionAsk
 
 /** Darek's one screen: *Słuchaj* and the last Reply. Listening outlives it, in [app.darek.listen.ListeningService]. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,25 +82,53 @@ fun HomeScreen(
     val context = LocalContext.current
     val activity = LocalActivity.current
     var granted by remember { mutableStateOf(context.hasMicrophone()) }
+    var notificationBlock by remember { mutableStateOf(context.listeningNotificationBlock()) }
+    var needsSetup by remember { mutableStateOf(context.needsBackgroundSetup()) }
+    var notificationsForGood by rememberSaveable { mutableStateOf(false) }
     var deniedNow by rememberSaveable { mutableStateOf(false) }
     var disclosing by rememberSaveable { mutableStateOf(false) }
     var rationaleBefore by rememberSaveable { mutableStateOf(false) }
 
+    val askNotifications =
+        rememberNotificationPermissionAsk { outcome ->
+            notificationBlock = context.listeningNotificationBlock()
+            notificationsForGood = outcome == NotificationPermissionOutcome.PermanentlyDenied
+            if (notificationBlock == null) viewModel.listen()
+        }
+    val startWithNotifications = {
+        notificationBlock = context.listeningNotificationBlock()
+        when (notificationBlock) {
+            null -> viewModel.listen()
+            NotificationBlock.APP -> askNotifications()
+            NotificationBlock.CHANNEL -> Unit
+        }
+    }
     val ask =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { ok ->
             granted = ok
             deniedNow = !ok
             viewModel.onMicAnswer(ok, rationaleBefore, activity?.rationaleDue() ?: false)
+            if (ok) startWithNotifications()
         }
     val request = {
         rationaleBefore = activity?.rationaleDue() ?: false
         ask.launch(Manifest.permission.RECORD_AUDIO)
+    }
+    val startAfterDisclosure = {
+        when {
+            granted -> startWithNotifications()
+            state.micDeniedForGood -> context.openAppSettings()
+            else -> request()
+        }
     }
 
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
         granted = context.hasMicrophone()
         if (granted) deniedNow = false
         viewModel.onMicGrantRead(granted)
+        notificationBlock = context.listeningNotificationBlock()
+        if (notificationBlock != null) viewModel.onNotificationsBlocked()
+        needsSetup = context.needsBackgroundSetup()
     }
     Scaffold(
         modifier = modifier,
@@ -127,11 +168,7 @@ fun HomeScreen(
                         hearing = state.hearing,
                         failed = state.listenFailed,
                         onListen = {
-                            when {
-                                granted -> viewModel.listen()
-                                state.micDeniedForGood -> context.openAppSettings()
-                                else -> disclosing = true
-                            }
+                            if (state.disclosed) startAfterDisclosure() else disclosing = true
                         },
                         onStop = viewModel::stopListening,
                     )
@@ -140,6 +177,20 @@ fun HomeScreen(
                             text = "„$reply”",
                             style = MaterialTheme.typography.titleLarge,
                             textAlign = TextAlign.Center,
+                        )
+                    }
+                    val block = notificationBlock
+                    if (granted && state.disclosed && block != null) {
+                        NotificationsOff(
+                            persona = state.persona,
+                            onFix = {
+                                when {
+                                    block == NotificationBlock.CHANNEL ->
+                                        context.openChannelNotificationSettings(LISTENING_CHANNEL_ID)
+                                    notificationsForGood -> context.openAppNotificationSettings()
+                                    else -> askNotifications()
+                                }
+                            },
                         )
                     }
                     if (!granted && (deniedNow || state.micDeniedForGood)) {
@@ -156,9 +207,18 @@ fun HomeScreen(
     }
 
     if (disclosing) {
-        ModalBottomSheet(onDismissRequest = { disclosing = false }) {
+        ModalBottomSheet(
+            onDismissRequest = { disclosing = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.base).padding(bottom = Spacing.base),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(
+                            rememberScrollState(),
+                        ).padding(horizontal = Spacing.base)
+                        .padding(bottom = Spacing.base),
                 verticalArrangement = Arrangement.spacedBy(Spacing.snug),
             ) {
                 Text(stringResource(R.string.mic_disclosure_title), style = MaterialTheme.typography.titleLarge)
@@ -166,12 +226,76 @@ fun HomeScreen(
                 Button(
                     onClick = {
                         disclosing = false
-                        request()
+                        viewModel.markDisclosed()
+                        startAfterDisclosure()
                     },
                     modifier = Modifier.align(Alignment.End),
                 ) { Text(stringResource(R.string.mic_disclosure_continue)) }
             }
         }
+    }
+
+    if (state.listening == Listening.Phase.ON && !state.setupShown && needsSetup) {
+        BackgroundSetupSheet(onDone = viewModel::markSetupShown)
+    }
+}
+
+/** Shown once, after the first service start; the same buttons stay in Settings (phase-2.md). */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BackgroundSetupSheet(onDone: () -> Unit) {
+    val context = LocalContext.current
+    val xiaomi = remember { context.hasAutostartSettings() }
+    ModalBottomSheet(
+        onDismissRequest = onDone,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(
+                        rememberScrollState(),
+                    ).padding(horizontal = Spacing.base)
+                    .padding(bottom = Spacing.base),
+            verticalArrangement = Arrangement.spacedBy(Spacing.snug),
+        ) {
+            Text(stringResource(R.string.setup_title), style = MaterialTheme.typography.titleLarge)
+            Text(
+                stringResource(if (xiaomi) R.string.setup_body_xiaomi else R.string.setup_body_battery),
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            if (xiaomi) {
+                OutlinedButton(onClick = { context.openAutostartSettings() }, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.setup_autostart))
+                }
+            }
+            OutlinedButton(
+                onClick = { context.openBatteryOptimisationSettings() },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(stringResource(R.string.setup_battery))
+            }
+            Button(onClick = onDone, modifier = Modifier.align(Alignment.End)) {
+                Text(stringResource(R.string.setup_done))
+            }
+        }
+    }
+}
+
+@Composable
+private fun NotificationsOff(
+    persona: Persona,
+    onFix: () -> Unit,
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = stringResource(persona.notificationsOffRes()),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.error,
+            textAlign = TextAlign.Center,
+        )
+        TextButton(onClick = onFix) { Text(stringResource(R.string.notifications_off_fix)) }
     }
 }
 
@@ -254,8 +378,8 @@ private fun MicDenied(
     }
 }
 
-private fun Context.hasMicrophone(): Boolean =
-    ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+/** On Xiaomi always, since autostart cannot be read back; elsewhere only while the exemption is missing. */
+private fun Context.needsBackgroundSetup(): Boolean = hasAutostartSettings() || !isIgnoringBatteryOptimisations()
 
 private fun Activity.rationaleDue(): Boolean =
     ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO)
@@ -278,6 +402,12 @@ private fun Persona.listenFailedRes(): Int =
     when (this) {
         Persona.DAREK -> R.string.home_listen_failed
         Persona.DARIA -> R.string.home_listen_failed_daria
+    }
+
+private fun Persona.notificationsOffRes(): Int =
+    when (this) {
+        Persona.DAREK -> R.string.notifications_off
+        Persona.DARIA -> R.string.notifications_off_daria
     }
 
 private fun Persona.micDeniedRes(): Int =

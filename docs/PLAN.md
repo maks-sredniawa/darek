@@ -124,9 +124,10 @@ here, so a later phase cannot quietly move an ask forward to "get it out of the 
 | Ask | Made when | Phase |
 | --- | --- | --- |
 | `RECORD_AUDIO`, after the disclosure sheet | the first tap of *Słuchaj* | 1 |
+| The disclosure again, for the background (no permission) | the first service start, granted microphone or not | 2 |
 | `CALL_PHONE` | a Number is first saved for a Command, bundled or from a fucha (debug-only in phase 1) | 1 (debug), 3; F if a fucha's calling half lands there |
 | `POST_NOTIFICATIONS` | Listening is first started as the service | 2 |
-| Battery exemption, autostart (hand-offs, no permission) | after the first service start, on a ROM that needs them | 2 |
+| Battery exemption, autostart (hand-offs, no permission) | a sheet once, after the first service start, on a ROM that needs them; then rows in Settings | 2 |
 | A fucha's permissions, Darek's own grant per fucha or for all (ADR-0015) | the fucha is switched on, at install or, for a bundled one, by the user | F |
 | Approximate location, behind that grant | the first fucha declaring it is switched on, once its own decision is made (ADR-0015) | F, or the phase that decides it |
 

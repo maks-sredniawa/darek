@@ -50,6 +50,9 @@ class AppPreferences(
         val LANGUAGE_JUDGED_UNDER = longPreferencesKey("language_judged_under")
         val MIC_DENIED_UNDER = longPreferencesKey("mic_denied_under")
         val PERSONA = stringPreferencesKey("persona")
+        val LISTENING_WANTED_UNDER = longPreferencesKey("listening_wanted_under")
+        val BACKGROUND_DISCLOSED_UNDER = longPreferencesKey("background_disclosed_under")
+        val SETUP_SHOWN_UNDER = longPreferencesKey("setup_shown_under")
 
         /** What *Restore to default* removes: everything the user chose, so each reads its default again. */
         val SETTINGS: List<Preferences.Key<*>> =
@@ -68,6 +71,9 @@ class AppPreferences(
                 TIP_ANSWERED_UNDER,
                 LANGUAGE_JUDGED_UNDER,
                 MIC_DENIED_UNDER,
+                LISTENING_WANTED_UNDER,
+                BACKGROUND_DISCLOSED_UNDER,
+                SETUP_SHOWN_UNDER,
             )
     }
 
@@ -127,6 +133,22 @@ class AppPreferences(
         }
 
     /**
+     * The `firstInstallTime` under which Listening was last started and not stopped by the user, so
+     * the notification after a reboot offers *Słuchaj* only to someone who left Darek on
+     * (`listen/AfterBoot.kt`). Under the install time so a restore onto a new phone does not ask.
+     */
+    val listeningWantedUnder: Flow<Instant?> = instantAt(Keys.LISTENING_WANTED_UNDER)
+
+    /** The `firstInstallTime` under which the background microphone disclosure was accepted. */
+    val backgroundDisclosedUnder: Flow<Instant?> = instantAt(Keys.BACKGROUND_DISCLOSED_UNDER)
+
+    /** The `firstInstallTime` under which the background setup sheet was shown, once. */
+    val setupShownUnder: Flow<Instant?> = instantAt(Keys.SETUP_SHOWN_UNDER)
+
+    private fun instantAt(key: Preferences.Key<Long>): Flow<Instant?> =
+        store.data.map { prefs -> prefs[key]?.let(Instant::ofEpochMilli) }
+
+    /**
      * The theme mode, read once, before any Activity exists.
      *
      * The one place a `suspend` read is worth its cost: `MainApplication.onCreate` needs the answer
@@ -162,6 +184,19 @@ class AppPreferences(
                 prefs[Keys.MIC_DENIED_UNDER] = installedAt.toEpochMilli()
             }
         }
+    }
+
+    suspend fun setListeningWanted(installedAt: Instant?) = setInstant(Keys.LISTENING_WANTED_UNDER, installedAt)
+
+    suspend fun markBackgroundDisclosed(installedAt: Instant) = setInstant(Keys.BACKGROUND_DISCLOSED_UNDER, installedAt)
+
+    suspend fun markSetupShown(installedAt: Instant) = setInstant(Keys.SETUP_SHOWN_UNDER, installedAt)
+
+    private suspend fun setInstant(
+        key: Preferences.Key<Long>,
+        at: Instant?,
+    ) {
+        store.edit { prefs -> if (at == null) prefs.remove(key) else prefs[key] = at.toEpochMilli() }
     }
 
     suspend fun markLanguageJudged(installedAt: Instant) {

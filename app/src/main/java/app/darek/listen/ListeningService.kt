@@ -1,14 +1,11 @@
 package app.darek.listen
 
-import android.Manifest
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
-import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationChannelCompat
@@ -41,7 +38,8 @@ class ListeningService : Service() {
     private var strings: Context = this
 
     private val listening get() = (application as MainApplication).container.listening
-    private val preferences get() = (application as MainApplication).container.preferences
+    private val container get() = (application as MainApplication).container
+    private val preferences get() = container.preferences
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -51,7 +49,7 @@ class ListeningService : Service() {
         startId: Int,
     ): Int {
         if (intent?.action == ACTION_STOP) {
-            listening.stop()
+            container.stopListening()
             return START_NOT_STICKY
         }
         // startForeground must come before this call returns; both reads are small files.
@@ -65,10 +63,12 @@ class ListeningService : Service() {
             stopSelf()
             return START_NOT_STICKY
         }
+        AfterBootReceiver.cancel(this)
         run?.cancel()
         run =
             scope.launch {
                 listening.start(enabled, persona)
+                launch(Dispatchers.IO) { preferences.setListeningWanted(container.installedAt) }
                 launch { preferences.persona.distinctUntilChanged().collect { listening.switchTo(it) } }
                 launch {
                     combine(preferences.persona, listening.state.map { it.hearing }, ::Pair)
@@ -111,13 +111,17 @@ class ListeningService : Service() {
         enabled: Set<Command>,
         hearing: Hearing,
     ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-            ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
-            PackageManager.PERMISSION_GRANTED
-        ) {
+        // A hidden notification leaves no Stop outside the app, so Listening ends (phase-2.md).
+        if (listeningNotificationBlock() != null) {
+            listening.stop()
             return
         }
-        NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, notification(persona, enabled, hearing))
+        try {
+            NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, notification(persona, enabled, hearing))
+        } catch (e: SecurityException) {
+            Log.e(TAG, "notification refused", e)
+            listening.stop()
+        }
     }
 
     private fun createChannel() {
@@ -188,22 +192,21 @@ class ListeningService : Service() {
 
     companion object {
         private const val TAG = "DarekListen"
-        private const val CHANNEL_ID = "listening"
+        private const val CHANNEL_ID = LISTENING_CHANNEL_ID
         private const val NOTIFICATION_ID = 1
         private const val ACTION_STOP = "app.darek.listen.STOP"
 
-        fun start(context: Context) {
+        /** False when nothing was started; whoever called says why. */
+        fun start(context: Context): Boolean {
             // Android 14+ refuses startForeground for a `microphone` service without RECORD_AUDIO,
             // and a started service that never reaches it crashes the process.
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) !=
-                PackageManager.PERMISSION_GRANTED
-            ) {
-                return
-            }
-            try {
+            if (!context.hasMicrophone() || context.listeningNotificationBlock() != null) return false
+            return try {
                 ContextCompat.startForegroundService(context, Intent(context, ListeningService::class.java))
+                true
             } catch (e: IllegalStateException) {
                 Log.e(TAG, "foreground start refused", e)
+                false
             }
         }
     }

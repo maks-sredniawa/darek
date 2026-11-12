@@ -26,15 +26,23 @@ holds its own wakelock while capturing, so listening continues with the screen o
 
 - **Listening** is one foreground service, type `microphone`, with an ongoing notification that says
   Darek is listening and offers *Stop*.
-- **It starts only from a user action**: the switch in the app, the notification's *Słuchaj* action,
-  or the Quick Settings tile through a translucent activity, opened with
-  `startActivityAndCollapse(PendingIntent)`. The `Intent` overload throws for targetSdk 34+ on API
-  34+, so it is used only below 34.
+- **It starts only from a user action**: *Słuchaj* in the app, the *Słuchaj* of the notification
+  after a reboot, or the Quick Settings tile. The last two open a translucent activity with no window,
+  which starts the service and closes, so neither leans on the notification exemption or on a tile
+  AOSP does not exempt; the tile opens it with `startActivityAndCollapse(PendingIntent)`, since the
+  `Intent` overload throws for targetSdk 34+ on API 34+, and uses that overload only below 34.
+  Whatever a start still owes (the disclosure, the microphone, the notifications) is asked on Home,
+  so that activity opens Home instead.
+- **No notifications, no Listening.** A hidden notification would leave no *Stop* outside the app
+  and no way back after a reboot, so the app's notifications or Listening's channel turned off stop
+  Listening, and Home says why with a button to the fix (phase-2.md, *The start paths*).
 - **After a reboot it does not start by itself.** A boot receiver posts a notification whose action
-  starts it — one tap, an exempt start. The receiver declares `RECEIVE_BOOT_COMPLETED` itself
-  (phase 2), since WorkManager's merged one leaves with the reminders in phase 0.
+  starts it — one tap — and only if Listening was on when the phone went down: *Stop* clears that,
+  so a user who stopped Darek on purpose is not asked at every boot. The receiver declares
+  `RECEIVE_BOOT_COMPLETED` itself, since WorkManager's merged one left with the reminders in phase 0.
 - **MIUI and other vendor ROMs** get a setup step for autostart and the battery saver's "No
-  restrictions", because they kill foreground services the platform would keep.
+  restrictions", because they kill foreground services the platform would keep: a sheet shown once
+  after the first start, then permanent rows in Settings that make no claim about the state.
 - **What the microphone is doing is shown, not hidden**: the notification says Darek hears, is
   paused for a call, or cannot hear. *Cannot hear* is more than a second of exact zeros outside a
   call (another app took the microphone) or a recording that cannot start, which is tried again
