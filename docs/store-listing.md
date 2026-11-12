@@ -52,7 +52,7 @@ The line that appears under the name in search results, and the most-read text i
 Say "Darek, otwórz bramę" and he calls your gate opener. Offline, in Polish.
 ```
 
-### Full description — 3020/4000
+### Full description — 3108/4000
 
 **No health or safety claims**, here or on any page the listing links to — Play's enforcement reads a
 linked page as part of the listing. Say what the app cannot do instead.
@@ -74,7 +74,7 @@ release that ships the call (phase 3) deletes it, in both languages.
 ```
 Darek is a Polish voice assistant for your gate. Say "Darek, otwórz bramę" and he answers out loud and calls your gate's GSM opener, so you do not have to reach for your phone. Recognition, speech and the call all happen on your phone, with no internet at all.
 
-This test build answers one Command, "Hej Darek, powiedz coś", while the app is open on screen. Say his name with anything else, "Darek, otwórz bramę" included, and he answers "nie mam żadnej fuchy" (he has no gigs yet). Setting him up, Listening with the screen off and the call arrive in the next test builds.
+This test build answers one Command, "Darek, powiedz coś", with the screen off and the app closed too. Say "Hej, Darek" with anything else, "otwórz bramę" included, and he answers "nie mam żadnej fuchy" (he has no gigs yet). Setting him up and the call arrive in the next test builds.
 
 HOW IT WORKS
 
@@ -106,6 +106,7 @@ PERMISSIONS
 - Phone. Calls the number you entered for a Command, after Darek's reply.
 - Notifications. Shows that Darek is listening, with a button to stop him.
 - Foreground service. Keeps Listening running while the app is closed.
+- Run at startup. After a restart, a notification offers to start Listening again; it never starts by itself.
 
 Source available, built in the open: github.com/maks-sredniawa/darek
 ```
@@ -127,12 +128,12 @@ Darek
 Powiedz „Darek, otwórz bramę”, a on odpowie i zadzwoni do bramy. Bez internetu.
 ```
 
-### Full description — 3082/4000
+### Full description — 3196/4000
 
 ```
 Darek to głosowy asystent do twojej bramy. Powiedz „Darek, otwórz bramę”, a on odpowie na głos i zadzwoni do sterownika GSM bramy, więc nie musisz sięgać po telefon. Rozpoznawanie mowy, odpowiedź i połączenie odbywają się w telefonie, zupełnie bez internetu.
 
-Ta wersja testowa odpowiada na jedną komendę, „Hej Darek, powiedz coś”, gdy aplikacja jest otwarta na ekranie. Gdy usłyszy swoje imię z czymkolwiek innym, także „Darek, otwórz bramę”, odpowie „nie mam żadnej fuchy”. Konfiguracja, słuchanie przy wyłączonym ekranie i dzwonienie pojawią się w kolejnych wersjach testowych.
+Ta wersja testowa odpowiada na jedną komendę, „Darek, powiedz coś”, także przy wyłączonym ekranie i zamkniętej aplikacji. Gdy powiesz „Hej, Darek” z czymkolwiek innym, także „otwórz bramę”, odpowie „nie mam żadnej fuchy”. Konfiguracja i dzwonienie pojawią się w kolejnych wersjach testowych.
 
 JAK TO DZIAŁA
 
@@ -164,6 +165,7 @@ UPRAWNIENIA
 - Telefon. Darek dzwoni pod numer wpisany dla komendy, po swojej odpowiedzi.
 - Powiadomienia. Pokazują, że Darek słucha, z przyciskiem, który go zatrzymuje.
 - Usługa na pierwszym planie. Utrzymuje słuchanie, gdy aplikacja jest zamknięta.
+- Uruchamianie przy starcie. Po ponownym uruchomieniu telefonu powiadomienie proponuje znów włączyć słuchanie; samo nigdy się nie włącza.
 
 Kod źródłowy jest publicznie dostępny: github.com/maks-sredniawa/darek
 ```
@@ -319,14 +321,14 @@ Gdy Darek lub Daria usłyszy swoje imię, odpowie teraz „No?” zamiast dźwi�
 
 ### 0.9.0 — Listening with the screen off
 
-**English** — 128/500:
+**English** — 303/500:
 
 ```
-Darek and Daria now keep listening with the screen off or the app closed. While they listen, a notification shows it, with Stop.
+Darek and Daria now keep listening with the screen off or the app closed, and a notification shows it, with Stop. Start them in the app, from the Quick Settings tile or, after a restart, from the notification. They pause during a call. The name alone gets no answer now: say „Hej, Darek!” to hear „No?”.
 ```
 
-**Polish** — 146/500:
+**Polish** — 364/500:
 
 ```
-Darek i Daria słuchają teraz także przy wyłączonym ekranie i zamkniętej aplikacji. Gdy słuchają, widać to w powiadomieniu z przyciskiem Zatrzymaj.
+Darek i Daria słuchają teraz także przy wyłączonym ekranie i zamkniętej aplikacji, a pokazuje to powiadomienie z przyciskiem Zatrzymaj. Włączysz ich w aplikacji, kafelkiem w szybkich ustawieniach albo, po ponownym uruchomieniu telefonu, z powiadomienia. Podczas rozmowy robią pauzę. Samo imię zostaje teraz bez odpowiedzi: powiedz „Hej, Darek!”, a usłyszysz „No?”.
 ```

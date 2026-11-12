@@ -8,9 +8,13 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import app.darek.data.AppPreferences
 import app.darek.listen.Listening
+import app.darek.listen.hasMicrophone
+import app.darek.listen.listeningNotificationBlock
 import app.darek.speak.VoiceVolume
 import app.darek.tip.TipJar
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.time.Instant
 
 /**
@@ -66,4 +70,16 @@ class AppContainer(
 
     /** Here so the recogniser's model and the voice stay loaded between one *Słuchaj* and the next. */
     val listening = Listening(appContext, applicationScope) { VoiceVolume.get(appContext) }
+
+    /** Stopped by the user, from Home, the notification or the tile, so no reboot asks again. */
+    fun stopListening() {
+        listening.stop()
+        applicationScope.launch { preferences.setListeningWanted(null) }
+    }
+
+    /** Everything a start needs has been given, so a start from outside the app asks nothing. */
+    suspend fun listeningStartable(): Boolean =
+        preferences.backgroundDisclosedUnder.first() == installedAt &&
+            appContext.hasMicrophone() &&
+            appContext.listeningNotificationBlock() == null
 }

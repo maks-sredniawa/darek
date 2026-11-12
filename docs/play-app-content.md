@@ -39,6 +39,9 @@ without a microphone cannot use Darek, so Play filtering it out is correct.
 | `ACCESS_NETWORK_STATE` | Play Billing's `datatransport` | read before its (blocked) log upload; opens nothing ([ADR-0008](adr/0008-darek-connects-only-where-the-user-can-see.md) allows it as this merge only) | none, but a reviewer may ask why an app with no network reads it — this row is the answer |
 | `com.android.vending.BILLING` | Play Billing Library | the tip ([ADR-0007](adr/0007-the-tip-is-a-play-billing-consumable-that-unlocks-nothing.md)): IPC to the Play app's billing service | none: not on Play's declaration list. The listing shows *Contains in-app purchases* once products exist |
 | `…DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` | AndroidX | its own non-exported receivers, signature-level | none: not user-visible |
+| `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MICROPHONE` | Darek | the Listening service, type `microphone` ([ADR-0010](adr/0010-listening-is-a-microphone-service-the-user-starts.md)) | the foreground-service declaration with its video (*Foreground service permissions*, below) |
+| `POST_NOTIFICATIONS` | Darek | Listening's notification, and the one after a reboot; without it Darek does not listen (ADR-0010) | a runtime permission on Android 13+, asked at the first start of Listening; not on Play's declaration list |
+| `RECEIVE_BOOT_COMPLETED` | Darek | after a reboot, a notification whose *Słuchaj* starts Listening, only if it was on (ADR-0010) | none: not on Play's declaration list. The listing names it, *Run at startup* |
 
 The billing library's `datatransport` dependency merges `INTERNET`; the manifest removes it with
 `tools:node="remove"`, and the gate is what proves it stayed out. Its usage log sits in a database,
@@ -56,9 +59,6 @@ in front of it.
 
 - **Phase 3:** `CALL_PHONE` (the Gate call, [ADR-0011](adr/0011-the-gate-call-is-placed-through-telecom-after-the-reply.md)).
   Phase 1's checkpoint C dials from the debug build only; the release gets it with the Commands.
-- **Phase 2:** the Listening service's `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_MICROPHONE`,
-  `POST_NOTIFICATIONS` for its notification, and `RECEIVE_BOOT_COMPLETED` for the after-reboot
-  notification ([ADR-0010](adr/0010-listening-is-a-microphone-service-the-user-starts.md)).
 
 **Two asks that are not permissions**, from phase 2: the battery-optimisation exemption and Xiaomi's
 autostart, both hand-offs to Settings (`work/`). They appear on no Play list and need no
@@ -171,6 +171,9 @@ The answer rests on one fact per route data could take:
    2026-11-01 against Play's definitions above: still no data collected, so the Console answer stands
    unchanged. From 2026-11-02 the policy also says that *„No?"*, the answer to the name, plays with the
    microphone open (ADR-0011). It is processed like any other sound, so no answer here moves.
+   Re-read 2026-11-12 for phase 2 (0.9.0): Listening now runs with the screen off and the app closed,
+   in a foreground service, and processes the same audio the same way; the boot notification and the
+   tile read nothing but the app's own setting. Still no data collected and none shared.
 3. **The Numbers stay on the device.** The user types each one in; it is kept in DataStore and used
    only to place that Command's call. **Auto Backup is still "no data collected"**: the platform moves
    the user's backup to the user's own Google account, and the developer never sees it. That is
@@ -240,7 +243,10 @@ checkpoint D is in, with the release that ships it ([`DOD.md`](DOD.md)). The ans
   say so if the reviewer needs to hear a Command.
 
 The **prominent disclosure** right before the `RECORD_AUDIO` request shipped with *Słuchaj* in 0.3.0
-(`mic_disclosure_body`); the service's build re-reads it against the notification it adds.
+(`mic_disclosure_body`). Phase 2's checkpoint D rewrote it for the background (Darek hears with the
+screen off and the app closed, a notification shows it, nothing is kept) and shows it once before
+the first service start, whether or not the microphone was already granted, since 0.3.0's users
+agreed to listening with Home on screen only.
 
 ## Privacy policy
 

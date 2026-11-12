@@ -33,6 +33,9 @@ data class HomeUiState(
     val persona: Persona = Persona.DAREK,
     /** The system will not show its dialog again, so Home sends the user to the app's settings. */
     val micDeniedForGood: Boolean = false,
+    /** The background disclosure was accepted on this install; it comes before the first service start. */
+    val disclosed: Boolean = false,
+    val setupShown: Boolean = false,
 )
 
 class HomeViewModel(
@@ -41,7 +44,13 @@ class HomeViewModel(
     private val listening: Listening,
     private val installedAt: Instant,
     private val startListening: () -> Unit,
+    private val userStop: () -> Unit,
 ) : ViewModel() {
+    private val onceOnly =
+        combine(preferences.backgroundDisclosedUnder, preferences.setupShownUnder) { disclosedUnder, setupUnder ->
+            (disclosedUnder == installedAt) to (setupUnder == installedAt)
+        }
+
     val state: StateFlow<HomeUiState> =
         combine(
             preferences.tipAnsweredUnder,
@@ -60,11 +69,13 @@ class HomeViewModel(
                 persona = persona,
                 micDeniedForGood = deniedUnder == installedAt,
             )
+        }.combine(onceOnly) { state, (disclosed, setupShown) ->
+            state.copy(disclosed = disclosed, setupShown = setupShown)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())
 
     fun listen() = startListening()
 
-    fun stopListening() = listening.stop()
+    fun stopListening() = userStop()
 
     /**
      * The microphone answer, judged the only way Android allows: a denial is for good when the
@@ -76,12 +87,21 @@ class HomeViewModel(
         rationaleBefore: Boolean,
         rationaleAfter: Boolean,
     ) {
-        if (granted) {
-            listen()
-        } else if (rationaleBefore && !rationaleAfter) {
+        if (!granted && rationaleBefore && !rationaleAfter) {
             viewModelScope.launch { preferences.setMicDenied(installedAt) }
         }
     }
+
+    fun markDisclosed() {
+        viewModelScope.launch { preferences.markBackgroundDisclosed(installedAt) }
+    }
+
+    fun markSetupShown() {
+        viewModelScope.launch { preferences.markSetupShown(installedAt) }
+    }
+
+    /** Turned off while Listening ran: found here, and Listening stops (phase-2.md, *The start paths*). */
+    fun onNotificationsBlocked() = listening.stop()
 
     /** Re-read on every `ON_START`: a grant given in the app's settings clears the stored denial. */
     fun onMicGrantRead(granted: Boolean) {
@@ -112,6 +132,7 @@ class HomeViewModel(
                         app.container.listening,
                         app.container.installedAt,
                         { ListeningService.start(app) },
+                        app.container::stopListening,
                     )
                 }
             }

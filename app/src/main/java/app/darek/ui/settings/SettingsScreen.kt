@@ -15,11 +15,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.darek.R
@@ -36,6 +39,10 @@ import app.darek.ui.support.SupportRequest
 import app.darek.ui.support.hintRes
 import app.darek.ui.support.sendSupportMail
 import app.darek.ui.support.titleRes
+import app.darek.work.hasAutostartSettings
+import app.darek.work.isIgnoringBatteryOptimisations
+import app.darek.work.openAutostartSettings
+import app.darek.work.openBatteryOptimisationSettings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -106,6 +113,8 @@ fun SettingsScreen(
                 onClick = { context.sendSupportMail(SupportRequest.Language) },
             )
 
+            BackgroundRows()
+
             SectionHeader(stringResource(R.string.settings_data))
             RestoreDefaultsRow(onRestore = viewModel::restoreDefaults)
 
@@ -121,6 +130,34 @@ fun SettingsScreen(
             DebugSettings()
         }
     }
+}
+
+/**
+ * Autostart on Xiaomi, permanently and with no claim about its state, since it cannot be read back;
+ * the battery exemption on Xiaomi too, elsewhere only while it reads as missing (PLAN.md rule 4).
+ */
+@Composable
+private fun BackgroundRows() {
+    val context = LocalContext.current
+    val xiaomi = remember { context.hasAutostartSettings() }
+    var batteryMissing by remember { mutableStateOf(!context.isIgnoringBatteryOptimisations()) }
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { batteryMissing = !context.isIgnoringBatteryOptimisations() }
+    if (!xiaomi && !batteryMissing) return
+    SectionHeader(stringResource(R.string.settings_background))
+    if (xiaomi) {
+        LinkRow(
+            title = stringResource(R.string.setup_autostart),
+            subtitle = stringResource(R.string.settings_autostart_hint),
+            target = LinkTarget.Outside,
+            onClick = { context.openAutostartSettings() },
+        )
+    }
+    LinkRow(
+        title = stringResource(R.string.setup_battery),
+        subtitle = stringResource(R.string.settings_battery_hint),
+        target = LinkTarget.Outside,
+        onClick = { context.openBatteryOptimisationSettings() },
+    )
 }
 
 @Composable

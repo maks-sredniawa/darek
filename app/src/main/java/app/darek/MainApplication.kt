@@ -44,7 +44,9 @@ class MainApplication : Application() {
     var startupThemeMode: ThemeMode = ThemeMode.SYSTEM
         private set
 
-    private lateinit var installedAt: Instant
+    /** When this package was first installed on this phone, which the one-time markers are judged against. */
+    lateinit var installedAt: Instant
+        private set
 
     private var languageUnjudged = false
 

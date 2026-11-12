@@ -144,7 +144,9 @@ finished flow. On Android 13+ the notification is hidden until D asks for `POST_
   new one opens when the call ends. The platform's own silencing of capture during a call (API 29+,
   `isClientSilenced`) is not needed for the pause: it reads as zeros, below. A run of exact zeros
   longer than a second, outside a call, reads as *cannot hear* on every API, which also catches
-  another app taking the microphone (ADR-0010's last bullet). Sources: Android's *Sharing audio
+  another app taking the microphone (ADR-0010's last bullet). Ringing pauses only while a ringtone
+  plays (`MODE_RINGTONE`): a silent ring leaves `MODE_NORMAL`, so Listening goes on until the call is
+  answered (read on the API 36 emulator, 2026-11-12). Sources: Android's *Sharing audio
   input* and AOSP `AudioPolicyService` (`updateUidStates_l`, `setAppState_l`); not yet measured on
   Xiaomi.
 - **When the microphone fails after the Reply** the call is refused (phase 1) and Darek now says
