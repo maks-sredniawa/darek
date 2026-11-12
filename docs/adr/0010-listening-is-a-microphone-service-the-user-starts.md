@@ -35,8 +35,10 @@ holds its own wakelock while capturing, so listening continues with the screen o
   (phase 2), since WorkManager's merged one leaves with the reminders in phase 0.
 - **MIUI and other vendor ROMs** get a setup step for autostart and the battery saver's "No
   restrictions", because they kill foreground services the platform would keep.
-- A **silenced** microphone (another app or a call took it) is shown, not hidden: the notification
-  says Darek cannot hear.
+- **What the microphone is doing is shown, not hidden**: the notification says Darek hears, is
+  paused for a call, or cannot hear. *Cannot hear* is more than a second of exact zeros outside a
+  call (another app took the microphone) or a recording that cannot start, which is tried again
+  rather than ending Listening ([phase-2.md](../phase-2.md), section 3).
 
 ## Alternatives
 

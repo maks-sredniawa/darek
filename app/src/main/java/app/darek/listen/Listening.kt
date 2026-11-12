@@ -153,17 +153,28 @@ class Listening(
                     pauseWhileInCall()
                     val nameHeard = NameHeard(persona.word)
                     val answer =
-                        merge(
-                            Recogniser(loaded)
-                                .heard(grammar, holdAfter = persona.word, onHears = ::hears)
-                                .onEach { heard ->
-                                    val hearing = heard is Heard.Partial && persona.word in heard.tokens
-                                    mutableState.update { it.copy(hearingName = hearing) }
-                                    if (nameHeard.isFirst(heard)) answerName(nameAnswer)
-                                }.filterIsInstance<Heard.Final>()
-                                .mapNotNull { answerTo(it.tokens, enabled, persona) },
-                            callStarted(),
-                        ).first()
+                        try {
+                            merge(
+                                Recogniser(loaded)
+                                    .heard(
+                                        grammar,
+                                        holdAfter = persona.word,
+                                        onRecording = ::recordingStarted,
+                                        onHears = ::hears,
+                                    ).onEach { heard ->
+                                        val hearing = heard is Heard.Partial && persona.word in heard.tokens
+                                        mutableState.update { it.copy(hearingName = hearing) }
+                                        if (nameHeard.isFirst(heard)) answerName(nameAnswer)
+                                    }.filterIsInstance<Heard.Final>()
+                                    .mapNotNull { answerTo(it.tokens, enabled, persona) },
+                                callStarted(),
+                            ).first()
+                        } catch (e: MicrophoneUnavailable) {
+                            Log.e(TAG, "microphone unavailable, trying again", e)
+                            hears(false)
+                            delay(MICROPHONE_RETRY_MS)
+                            null
+                        }
                     if (answer == null) continue
                     Log.i(TAG, "reaction=${answer.label}")
                     mutableState.update { it.copy(hearingName = false, lastReply = answer.text) }
@@ -194,8 +205,10 @@ class Listening(
             while (inCall()) delay(CALL_POLL_MS)
             Log.i(TAG, "call ended, listening again")
         }
-        mutableState.update { it.copy(hearing = Hearing.HEARS) }
     }
+
+    /** Only a recording that has started clears *paused* or *cannot hear*; a zero run sets the latter again. */
+    private fun recordingStarted() = mutableState.update { it.copy(hearing = Hearing.HEARS) }
 
     private fun callStarted(): Flow<Answer?> =
         flow {
@@ -205,15 +218,7 @@ class Listening(
 
     private fun hears(hears: Boolean) {
         Log.i(TAG, "microphone hears=$hears")
-        mutableState.update {
-            if (it.hearing ==
-                Hearing.PAUSED_FOR_CALL
-            ) {
-                it
-            } else {
-                it.copy(hearing = if (hears) Hearing.HEARS else Hearing.CANNOT_HEAR)
-            }
-        }
+        mutableState.update { it.copy(hearing = if (hears) Hearing.HEARS else Hearing.CANNOT_HEAR) }
     }
 
     private fun answerName(line: LoadedLine?) {
@@ -305,7 +310,10 @@ class Listening(
                 if (!dial()) say(persona, CALL_FAILED)
             }
             CancelWindow.Decision.CANCELLED -> say(persona, CALL_CANCELLED)
-            CancelWindow.Decision.CANNOT_HEAR -> say(persona, CALL_FAILED)
+            CancelWindow.Decision.CANNOT_HEAR -> {
+                hears(false)
+                say(persona, CALL_FAILED)
+            }
             CancelWindow.Decision.STOPPED, CancelWindow.Decision.WAIT -> Unit
         }
     }
@@ -396,5 +404,6 @@ class Listening(
         const val VOICE_TAG = "DarekVoice"
         const val WINDOW_TICK_MS = 50L
         const val CALL_POLL_MS = 500L
+        const val MICROPHONE_RETRY_MS = 2_000L
     }
 }

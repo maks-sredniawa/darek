@@ -149,7 +149,9 @@ finished flow. On Android 13+ the notification is hidden until D asks for `POST_
   Xiaomi.
 - **When the microphone fails after the Reply** the call is refused (phase 1) and Darek now says
   *„Nie udało się zadzwonić."* (`CALL_FAILED`), and the notification switches to *cannot hear* (the
-  owner, 2026-11-10).
+  owner, 2026-11-10). A recording that cannot start or stops giving audio, there or anywhere else,
+  is *cannot hear* too, and Listening tries again every 2 s instead of ending; only a recording that
+  has started clears it.
 
 ## 4. „Hej" in front of every answer that is not a Command
 

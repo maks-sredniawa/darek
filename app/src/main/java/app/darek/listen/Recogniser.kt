@@ -30,6 +30,11 @@ sealed interface Heard {
     ) : Heard
 }
 
+/** The recording could not start, or stopped giving audio: Listening shows *cannot hear* and tries again. */
+class MicrophoneUnavailable(
+    message: String,
+) : IllegalStateException(message)
+
 /** The microphone into Vosk, as a cold [Flow]: collecting it records, cancelling it stops. Writes no audio. */
 class Recogniser(
     private val model: Model,
@@ -63,11 +68,17 @@ class Recogniser(
                     ),
                 )
             try {
-                check(record.state == AudioRecord.STATE_INITIALIZED) { "AudioRecord did not initialise" }
+                if (record.state !=
+                    AudioRecord.STATE_INITIALIZED
+                ) {
+                    throw MicrophoneUnavailable("AudioRecord did not initialise")
+                }
                 val rate = SAMPLE_RATE.toFloat()
                 (grammar?.let { Recognizer(model, rate, it) } ?: Recognizer(model, rate)).use { recognizer ->
                     record.startRecording()
-                    check(record.recordingState == AudioRecord.RECORDSTATE_RECORDING) { "AudioRecord did not start" }
+                    if (record.recordingState != AudioRecord.RECORDSTATE_RECORDING) {
+                        throw MicrophoneUnavailable("AudioRecord did not start")
+                    }
                     onRecording()
                     val buffer = ShortArray(CHUNK)
                     var lastPartial = emptyList<String>()
@@ -88,7 +99,7 @@ class Recogniser(
                     while (true) {
                         currentCoroutineContext().ensureActive()
                         val read = record.read(buffer, 0, buffer.size)
-                        check(read >= 0) { "AudioRecord.read returned $read" }
+                        if (read < 0) throw MicrophoneUnavailable("AudioRecord.read returned $read")
                         val silenced = zeros.feed(buffer, read)
                         if (silenced == hears) {
                             hears = !silenced
