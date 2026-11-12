@@ -43,11 +43,12 @@ premium-rate fraud, and `CALL_PHONE` is otherwise unrestricted.
 - **Consent** is the Number the user typed for that Command and the user's own start of Listening:
   that is what Play's malware policy asks for. A false match therefore costs a Reply the user hears
   or sees and can cancel, not a silent dial.
-- **Recognition is paused while he speaks and from the dial until the call ends**, so he cannot hear
-  a Reply or the call; it runs through the cancel window. The end of the call is read from
-  `AudioManager`'s mode (`OnModeChangedListener` on API 31+, `getMode()` below). Because `placeCall`
-  is asynchronous, phase 2 resumes recognition only once the mode has left `MODE_NORMAL` and come
-  back, or after a timeout. No `READ_PHONE_STATE`.
+- **Recognition is paused while he speaks and while a call is on**, so he cannot hear a Reply or the
+  call; it runs through the cancel window. The call is read from `AudioManager.getMode()`, polled
+  every 0.5 s on every API: while the mode says a call is on, the recording is closed, and a new one
+  opens when it ends ([phase-2.md](../phase-2.md), section 3). Recognition reopens right after
+  `placeCall` and closes when the asynchronous call shows in the mode, so a call that never starts
+  costs nothing and needs no timeout. No `READ_PHONE_STATE`.
 - **The answer to the name, *„No?"*, is the one line played with the microphone open.** The Persona says it when a partial result
   first holds the name ([ADR-0009](0009-commands-are-recognised-offline-against-a-grammar-with-decoys.md)),
   while the Command is still being said, so pausing recognition for it would cost the Command's first
@@ -56,7 +57,7 @@ premium-rate fraud, and `CALL_PHONE` is otherwise unrestricted.
   of the consent above. What it costs recognition has no count: the owner tried it and called it good (phase 1's R11).
 - If `placeCall` refuses the dial, he says so (*"Nie udało się zadzwonić"*) rather than staying silent.
   A failure after it returns (airplane mode, no SIM, no service) is the system's own in-call error;
-  phase 2's wait for the audio mode is what could detect it.
+  Listening goes on either way.
 
 ## Alternatives
 
@@ -81,6 +82,7 @@ appears.
   reading on the owner's phone. Phase 1 dials only with the app open, and only in the debug build:
   `CALL_PHONE` reaches the release with phase 3's Number editor.
 - The cancel window adds about 2 s between the Reply and the gate.
-- In phase 1 the in-call screen takes the foreground from Darek's, so Listening ends with every
-  dial; the wait for the audio mode to return starts mattering in phase 2.
+- In phase 1 the in-call screen took the foreground from Darek's, so Listening ended with every
+  dial. From phase 2 Listening is a service: a dial pauses it, and it listens again when the call
+  ends.
 - Dual-SIM phones dial on the default SIM; choosing a SIM per Command waits for someone who needs it.
