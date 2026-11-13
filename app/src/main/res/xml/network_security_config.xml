@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- ADR-0008: Android 8 still allows plain HTTP by default, and minSdk 26 reaches it. -->
+<!-- ADR-0008 -->
 <network-security-config>
     <base-config cleartextTrafficPermitted="false" />
 </network-security-config>
