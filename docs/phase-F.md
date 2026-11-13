@@ -362,8 +362,9 @@ the mail's tag.
 - **With D**, the rest of ADR-0008's *Consequences*, rewritten the day `INTERNET` merges:
   `README.md` (*never opens a network connection*), `docs/index.md` (*no internet permission*) and
   `docs/_config.yml`'s description (*offline*), `CLAUDE.md`'s Stack row for Play Billing,
-  `SupportHandoff.kt`'s KDoc, ADR-0007's *`INTERNET` stays out* ended by its amendment, and
-  `aab-permissions.py` with `ManifestWiringTest` (section 4).
+  ADR-0007's *`INTERNET` stays out* ended by its amendment, and `aab-permissions.py` with
+  `ManifestWiringTest` (section 4). `SupportHandoff.kt`'s KDoc is synced from android-starter, so
+  it changes there first (`DOD.md`).
 - **With F**: the privacy policy (the network, Open-Meteo, the city), the listing in both languages
   naming the fuchy page and the weather, `play-app-content.md` and the Data safety re-answered (the
   city is approximate location, sent to Open-Meteo, optional, for app functionality: **assumed**
@@ -387,7 +388,7 @@ setup.
 | # | Reading | Command | Result |
 | --- | --- | --- | --- |
 | R1 | The gate, section 1: *pogoda*, *jaka*, *darek*, *zaktualizuj*, *fuchy*, and a made-up word | the debug row, plain and release-shaped, API 26 and 36; the host's `vosk` for F's words | **Verdict 1**: every real word known, *pogodzisko* and *zażółć* unknown, plain and R8, API 26 and 36; *zaktualizuj*, *fuchy* on the host (2026-11-13) |
-| R2 | A fresh install connects nowhere until the page opens; `datatransport` uploads nothing | emulator started with `-tcpdump`, the app opened, Listening started, a Command fired, 10 minutes; then the page opened | *(to read)* |
+| R2 | A fresh install connects nowhere until the page opens; `datatransport` uploads nothing | emulator started with `-tcpdump`, the app opened, Listening started, a Command fired, 10 minutes; then the page opened | **Nothing connects**: on `pixel-api36` with `-tcpdump`, launch, Settings, the disclosure, Listening 10 minutes, stop; `dumpsys netstats detail` holds no byte rows for Darek's uid before or after; DNS only the emulator's own (`time.android.com`, `connectivitycheck.gstatic.com`, `www.google.com`); `TransportRuntime` logs *backend 'cct' is not registered* (2026-11-13). The page half waits for F |
 | R3 | The weather answers with the screen off, the app swiped away and the device forced idle | `adb shell dumpsys deviceidle force-idle`, then *„Darek, jaka pogoda?"* injected | *(to read)* |
 | R4 | Installing from the page: the install screen shows the addresses and the value sent, the badge is there, the grant is asked once | the page on a fresh install | *(to read)* |
 | R5 | An unsigned copy of the weather fucha from a file: the strong warning, every grant asked | the picker with a hand-edited file | *(to read)* |
