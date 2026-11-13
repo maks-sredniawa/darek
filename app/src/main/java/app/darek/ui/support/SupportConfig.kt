@@ -104,4 +104,7 @@ object SupportConfig {
                     ),
             ),
         )
+
+    /** People who helped with this app, shown on Credits under the creator; none hides the section. */
+    val CONTRIBUTORS: List<Contributor> = emptyList()
 }
