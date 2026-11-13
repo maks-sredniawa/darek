@@ -1,0 +1,35 @@
+{
+  "format": 1,
+  "id": "darek",
+  "version": 1,
+  "language": "pl",
+  "name": "Darek",
+  "description": "Fuchy Darka od początku: powiedz coś i otwórz bramę.",
+  "author": "MaksForge",
+  "profanity": false,
+  "permissions": [
+    "call"
+  ],
+  "addresses": [],
+  "sends": [],
+  "commands": [
+    {
+      "id": "say-something",
+      "phrase": "powiedz coś",
+      "action": "speak",
+      "reply": "Co tam, mordo?",
+      "decoys": []
+    },
+    {
+      "id": "gate",
+      "phrase": "otwórz bramę",
+      "action": "call",
+      "reply": "Otwieram bramę.",
+      "decoys": [
+        "otwórz",
+        "zamknij",
+        "brama"
+      ]
+    }
+  ]
+}

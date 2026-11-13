@@ -137,9 +137,16 @@ by name, so a missing keep rule is the likely failure.
    check is unusable on device. Only `darek-fuchy`'s CI checks words, and an unapproved fucha gets a
    line in its warning that Darek could not check its words.
 
-### The verdict, taken *(date)*
+### The verdict, taken 2026-11-13
 
-*(Filled in when read.)*
+**Verdict 1.** `Vocabulary.knows` (`listen/Vocabulary.kt`, `Native.register` with one keep rule)
+returned *known* for every real word and *unknown* for the made-up ones, in the plain debug build and
+with R8 on (`-PreleaseShapedDebug`), on `urgent-api26` (Android 8) and `pixel-api36` (Android 16).
+Polish letters reach Vosk intact: *otwórz*, *bramę* and *coś* read known, *zażółć* unknown. API 37
+was not read: another session held that emulator, and 26 and 36 bracket it. *zaktualizuj* and
+*fuchy*, F's Command, were read on the host through the Python `vosk` package against the same
+model, which agrees with the phones on every word both read. That is the check `darek-fuchy`'s CI
+runs.
 
 ## 2. Fuchy as data
 
@@ -175,13 +182,14 @@ refuses format 2 with *„Wymaga nowszej wersji Darka"*, and so for an `action`,
 
 | List | Values in this phase |
 | --- | --- |
-| Actions | `speak`, `weather`, `update_fuchy` (Darek's own only, from F; needs no permission, section 7) |
-| Permissions | `internet` |
+| Actions | `speak`; `call` (Darek's own only, until phase 3); `weather`; `update_fuchy` (Darek's own only, from F; needs no permission, section 7) |
+| Permissions | `call` (Darek's own gate), `internet` |
 | Values sent | `chosen_city` (*the city you chose*) |
 
 **The checks at install**, every one a refusal with the reason on screen, and the same on every
 update: the format and every list value known; `language` is `pl`; every action's permission
-declared (`weather` needs `internet`); every address HTTPS, an exact host, no query, no fragment;
+declared (`weather` needs `internet`); no action kept for Darek's own (`call`, `update_fuchy`) in any
+other fucha, refused as *„Wymaga nowszej wersji Darka"*; the ID `darek` only for Darek's own; every address HTTPS, an exact host, no query, no fragment;
 every Command word known to the model (section 1); no phrase holding a cancel word; the signature,
 when there is one (section 3).
 
@@ -196,7 +204,8 @@ every enabled Command, the bundled fucha's included:
 
 Section 6 has the owner's word on the numbers.
 
-**Darek's own fucha** is `assets/fuchy/darek.darek`, its source in this repo. It is approved by being
+**Darek's own fucha** is `assets/fuchy/darek.darek`, packed by `scripts/pack-fucha.py` from its readable
+source `app/src/main/fuchy/darek.json`, which is the one to edit. It is approved by being
 inside the APK, not signed: it has no `signature`, is never checked against `darek-fuchy`'s key, and
 so needs neither that repo nor its key. In B it holds *powiedz coś* and *otwórz bramę* (still calling
 only in the debug build, until phase 3); *zaktualizuj fuchy* joins it in F (section 7). It needs no
@@ -343,7 +352,7 @@ the mail's tag.
 
 ## Documents this phase amends
 
-- **ADR-0015**, amended with this plan: the repo is `maks-sredniawa/darek-fuchy` (the repos moved,
+- **ADR-0015**, edited in place with this plan: the repo is `maks-sredniawa/darek-fuchy` (the repos moved,
   2026-11-06); a value the user sets for a fucha (*the city you chose*) joins the fixed list beside
   slots; ECDSA P-256 as the signature. ADR-0008 needs nothing: a typed city is not something Darek
   heard, and it already lets a fucha send only the values it declares.
@@ -377,7 +386,7 @@ setup.
 
 | # | Reading | Command | Result |
 | --- | --- | --- | --- |
-| R1 | The gate, section 1: *pogoda*, *jaka*, *darek*, *zaktualizuj*, *fuchy*, and a made-up word | the debug row, release-shaped, API 26 and 37 | *(to read)* |
+| R1 | The gate, section 1: *pogoda*, *jaka*, *darek*, *zaktualizuj*, *fuchy*, and a made-up word | the debug row, plain and release-shaped, API 26 and 36; the host's `vosk` for F's words | **Verdict 1**: every real word known, *pogodzisko* and *zażółć* unknown, plain and R8, API 26 and 36; *zaktualizuj*, *fuchy* on the host (2026-11-13) |
 | R2 | A fresh install connects nowhere until the page opens; `datatransport` uploads nothing | emulator started with `-tcpdump`, the app opened, Listening started, a Command fired, 10 minutes; then the page opened | **Nothing connects**: on `pixel-api36` with `-tcpdump`, launch, Settings, the disclosure, Listening 10 minutes, stop; `dumpsys netstats detail` holds no byte rows for Darek's uid before or after; DNS only the emulator's own (`time.android.com`, `connectivitycheck.gstatic.com`, `www.google.com`); `TransportRuntime` logs *backend 'cct' is not registered* (2026-11-13). The page half waits for F |
 | R3 | The weather answers with the screen off, the app swiped away and the device forced idle | `adb shell dumpsys deviceidle force-idle`, then *„Darek, jaka pogoda?"* injected | *(to read)* |
 | R4 | Installing from the page: the install screen shows the addresses and the value sent, the badge is there, the grant is asked once | the page on a fresh install | *(to read)* |

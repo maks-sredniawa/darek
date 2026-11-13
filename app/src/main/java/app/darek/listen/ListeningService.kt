@@ -67,7 +67,7 @@ class ListeningService : Service() {
                 strings = inAppLanguage()
                 preferences.persona.first()
             }
-        val enabled = enabledCommands(GateNumber.get(this))
+        val enabled = enabledCommands(container.fuchyOn, GateNumber.get(this))
         if (!goForeground(persona, enabled)) {
             stopSelf()
             return START_NOT_STICKY
@@ -76,7 +76,7 @@ class ListeningService : Service() {
         run?.cancel()
         run =
             scope.launch {
-                listening.start(enabled, persona)
+                listening.start(enabled, commandDecoys(container.fuchyOn), persona)
                 launch(Dispatchers.IO) { preferences.setListeningWanted(container.installedAt) }
                 launch { preferences.persona.distinctUntilChanged().collect { listening.switchTo(it) } }
                 launch {
@@ -191,21 +191,11 @@ class ListeningService : Service() {
         persona: Persona,
         enabled: Set<Command>,
         hearing: Hearing,
-    ): String =
+    ): String? =
         when (hearing) {
             Hearing.HEARS ->
-                strings.getString(
-                    R.string.listening_say,
-                    (
-                        if (Command.GATE in
-                            enabled
-                        ) {
-                            Command.GATE
-                        } else {
-                            Command.SAY_SOMETHING
-                        }
-                    ).spoken(persona),
-                )
+                (enabled.firstOrNull { it.calls } ?: enabled.firstOrNull())
+                    ?.let { strings.getString(R.string.listening_say, it.spoken(persona)) }
             Hearing.PAUSED_FOR_CALL -> strings.getString(R.string.listening_paused_call)
             Hearing.CANNOT_HEAR -> strings.getString(R.string.listening_cannot_hear)
         }

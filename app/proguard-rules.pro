@@ -41,6 +41,8 @@
 #
 -keep class com.sun.jna.** { *; }
 -keep class org.vosk.** { *; }
+# `Vocabulary` binds one more Vosk function by its name, as `LibVosk` does.
+-keep class app.darek.listen.Vocabulary { *; }
 # Kept whole, JNA's desktop-only `Native$AWT` names AWT classes Android does not have.
 -dontwarn java.awt.**
 #

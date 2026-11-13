@@ -22,6 +22,9 @@
     <string name="debug_voice_next" translatable="false">Next sample</string>
     <string name="debug_voice_say" translatable="false">Say it</string>
     <string name="debug_voice_volume" translatable="false">Voice volume: %1$d%%</string>
+    <string name="debug_vocabulary" translatable="false">Recogniser vocabulary</string>
+    <string name="debug_vocabulary_words" translatable="false">Words to look up</string>
+    <string name="debug_vocabulary_check" translatable="false">Look up</string>
     <string name="debug_probe" translatable="false">Recogniser probe</string>
     <string name="debug_probe_open" translatable="false">Open the probe</string>
     <string name="debug_probe_likeness" translatable="false">Match likeness: %1$d%%</string>

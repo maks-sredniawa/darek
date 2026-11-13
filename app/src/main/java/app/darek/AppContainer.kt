@@ -7,6 +7,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import app.darek.data.AppPreferences
+import app.darek.fuchy.Fucha
+import app.darek.fuchy.OwnFucha
 import app.darek.listen.Listening
 import app.darek.listen.hasMicrophone
 import app.darek.listen.listeningNotificationBlock
@@ -68,8 +70,14 @@ class AppContainer(
      */
     val tipJar = TipJar(appContext, applicationScope)
 
+    val ownFucha: Fucha = OwnFucha.load(appContext)
+
+    /** Every fucha switched on: until fuchy can be installed or switched off, only Darek's own. */
+    val fuchyOn: List<Fucha> = listOf(ownFucha)
+
     /** Here so the recogniser's model and the voice stay loaded between one *Słuchaj* and the next. */
-    val listening = Listening(appContext, applicationScope) { VoiceVolume.get(appContext) }
+    val listening =
+        Listening(appContext, applicationScope, fuchyOn.flatMap { it.commands }) { VoiceVolume.get(appContext) }
 
     /** Stopped by the user, from Home, the notification or the tile, so no reboot asks again. */
     fun stopListening() {

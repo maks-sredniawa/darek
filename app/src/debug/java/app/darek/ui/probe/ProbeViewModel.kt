@@ -17,6 +17,7 @@ import app.darek.listen.Persona
 import app.darek.listen.Recogniser
 import app.darek.listen.RecogniserModel
 import app.darek.listen.Roast
+import app.darek.listen.commandDecoys
 import app.darek.listen.commandIn
 import app.darek.speak.ReplyPlayer
 import app.darek.speak.Voice
@@ -67,6 +68,9 @@ class ProbeViewModel(
 
     @Volatile private var replies: Map<Command, ShortArray>? = null
 
+    private val fuchyOn = getApplication<MainApplication>().container.fuchyOn
+    private val commands = fuchyOn.flatMap { it.commands }
+
     @Volatile private var persona: Persona = Persona.DAREK
     private var job: Job? = null
 
@@ -109,12 +113,13 @@ class ProbeViewModel(
                     val grammar =
                         when {
                             free -> null
-                            reading -> Grammar.json(Command.entries.toSet(), persona)
+                            reading -> Grammar.json(commands, commandDecoys(fuchyOn), persona)
                             else ->
                                 Json.encodeToString(
                                     (
                                         Grammar.phrases(
-                                            Command.entries.toSet(),
+                                            commands,
+                                            commandDecoys(fuchyOn),
                                             persona,
                                         ) + Roast.phrases(persona)
                                     ).distinct(),
@@ -155,19 +160,19 @@ class ProbeViewModel(
     ) {
         if (heard.tokens.isEmpty()) return
         val tokens = heard.tokens
-        val exact = commandIn(tokens, Command.entries, persona)
+        val exact = commandIn(tokens, commands, persona)
         val likeness = LooseMatch.likeness(getApplication())
         val command =
             when {
                 exact != null || reading -> exact
                 else ->
-                    Command.entries.firstOrNull {
+                    commands.firstOrNull {
                         !it.calls &&
                             LooseMatch.matches(tokens, it.words(persona), likeness)
                     }
             }
         val roasted = if (command == null && !reading) Roast.nameIn(tokens, likeness, persona) else null
-        val fired = command?.name ?: roasted?.let { "ROAST ${it.vocative}" }
+        val fired = command?.label ?: roasted?.let { "ROAST ${it.vocative}" }
         val match =
             when {
                 fired == null -> "-"
@@ -196,13 +201,13 @@ class ProbeViewModel(
         runCatching {
             val started = SystemClock.elapsedRealtime()
             val loaded = voice ?: Voice.load(getApplication(), persona.voice, persona.voiceScales).also { voice = it }
-            Command.entries
+            commands
                 .associateWith { loaded.synthesize(it.reply.by(persona)) }
                 .also { rendered ->
                     val peaks =
                         rendered.entries.joinToString(
                             " ",
-                        ) { (c, pcm) -> "${c.name}=${pcm.maxOf { abs(it.toInt()) }}" }
+                        ) { (c, pcm) -> "${c.label}=${pcm.maxOf { abs(it.toInt()) }}" }
                     Log.i(TAG, "voice ready=${SystemClock.elapsedRealtime() - started}ms peak $peaks")
                 }
         }.getOrElse {

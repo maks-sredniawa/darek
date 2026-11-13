@@ -50,7 +50,7 @@ permission (a weather fucha needs the internet, and one that reads the location 
   service with the screen off, Android 10+ counts it as background access, so it needs either the
   `location` service type (another Play declaration, and on 14+ the grant before the service starts)
   or `ACCESS_BACKGROUND_LOCATION` and Play's background-location declaration. A weather fucha that
-  takes the city as a slot needs neither;
+  takes the city as a slot, or as a value the user sets, needs neither;
 - **the exact addresses it contacts**: HTTPS only, each an exact host, plus a path prefix if one is
   declared. Darek refuses any other, including one found in an answer, and follows no redirect;
 - **each value it sends**, by name, from a fixed list Darek defines in its code, like the
@@ -69,13 +69,14 @@ fucha lists every value with its forms, and the cancel window
 dial. The builder and the install screen warn that slots are less reliable, Polish inflection most
 of all.
 
-**Approved** fuchy are the ones the owner reviewed: community authors open a PR in
+**Approved** fuchy are the ones the owner reviewed, and Darek's own, which are approved by being
+inside the APK and carry no signature: community authors open a PR in
 `maks-sredniawa/darek-fuchy` under published rules, and merging is the decision that a fucha goes live.
 CI signs it with a key held in that repo's secrets, in a workflow that runs only on a push to
 `main`, after the merge, never on `pull_request_target` or in any job that runs a PR's code. Darek
 ships the public half and checks the signature offline. The signature is ECDSA P-256 over SHA-256,
-which the platform verifies from API 26; Ed25519 reaches the platform only at API 33. An approved fucha carries the MaksForge
-badge. Any other `.darek` file still installs, after a strong warning that MaksForge has not
+which the platform verifies from API 26; Ed25519 reaches the platform only at API 33. An approved
+fucha carries the MaksForge badge. Any other `.darek` file still installs, after a strong warning that MaksForge has not
 reviewed it.
 
 **The install screen** shows what the fucha does, its permissions, addresses and values sent, the

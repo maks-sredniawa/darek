@@ -38,6 +38,9 @@ import app.darek.R
 import app.darek.listen.GateNumber
 import app.darek.listen.LooseMatch
 import app.darek.listen.Persona
+import app.darek.listen.RecogniserModel
+import app.darek.listen.Vocabulary
+import app.darek.listen.tokensOf
 import app.darek.speak.ReplyPlayer
 import app.darek.speak.Voice
 import app.darek.speak.VoiceVolume
@@ -50,6 +53,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import org.vosk.Model
 import kotlin.math.roundToInt
 
 /**
@@ -151,8 +155,59 @@ fun DebugSettings() {
         )
     }
 
+    SectionHeader(stringResource(R.string.debug_vocabulary))
+    VocabularyLookup()
+
     SectionHeader(stringResource(R.string.debug_gate))
     GateNumberField()
+}
+
+/** Phase F's gate (R1): `adb logcat -s DarekVocabulary`. */
+@Composable
+private fun VocabularyLookup() {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var words by rememberSaveable { mutableStateOf("jaka pogoda darek pogodzisko otwórz bramę powiedz coś zażółć") }
+    var result by remember { mutableStateOf("") }
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.base),
+        verticalArrangement = Arrangement.spacedBy(Spacing.tight),
+    ) {
+        OutlinedTextField(
+            value = words,
+            onValueChange = { words = it },
+            label = { Text(stringResource(R.string.debug_vocabulary_words)) },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        Button(onClick = {
+            scope.launch {
+                result =
+                    runCatching { withContext(Dispatchers.IO) { DebugVocabulary.lookUp(context, words) } }
+                        .getOrElse { "failed: $it" }
+                        .also { Log.i(DebugVocabulary.TAG, it) }
+            }
+        }) { Text(stringResource(R.string.debug_vocabulary_check)) }
+        if (result.isNotEmpty()) {
+            Text(result, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+private object DebugVocabulary {
+    const val TAG = "DarekVocabulary"
+    private var model: Model? = null
+
+    @Synchronized
+    fun lookUp(
+        context: Context,
+        words: String,
+    ): String {
+        val loaded = model ?: Model(RecogniserModel.unpack(context.applicationContext).path).also { model = it }
+        return tokensOf(words.lowercase()).joinToString(" ") {
+            "$it=${if (Vocabulary.knows(loaded, it)) "known" else "unknown"}"
+        }
+    }
 }
 
 @Composable
