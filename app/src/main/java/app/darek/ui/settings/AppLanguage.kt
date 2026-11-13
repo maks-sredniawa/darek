@@ -2,7 +2,6 @@ package app.darek.ui.settings
 
 import android.content.Context
 import android.content.res.Configuration
-import android.os.Build
 import android.os.LocaleList
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatDelegate
@@ -84,9 +83,11 @@ fun setAppLanguage(language: AppLanguage?) {
  * This context in the app's chosen language, for strings built outside an activity.
  *
  * Below Android 13 AppCompat applies the chosen language to activities only, so a notification, a
- * channel name or anything else a worker, receiver or service builds from the application context
- * comes out in the phone's language. From 13 the platform applies it to every context and follows a
- * later change, which a pinned configuration would stop, so this returns the context untouched there.
+ * channel name or anything else a worker, receiver or service builds outside one comes out in the
+ * phone's language. From 13 the platform is meant to cover every context, but on Android 17 a
+ * service started with no activity since boot still read the phone's language, so the configuration
+ * is pinned on every API. A context taken here does not follow a later change of language; take a
+ * fresh one per notification run.
  *
  * Read through [LocaleManagerCompat] rather than [AppCompatDelegate]: AppCompat loads its stored
  * language only when an activity attaches, so in a process the OS started for a worker or a broadcast
@@ -94,7 +95,6 @@ fun setAppLanguage(language: AppLanguage?) {
  * off the main thread.
  */
 fun Context.inAppLanguage(): Context {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) return this
     val locales = LocaleManagerCompat.getApplicationLocales(this)
     if (locales.isEmpty) return this
     val configuration =
