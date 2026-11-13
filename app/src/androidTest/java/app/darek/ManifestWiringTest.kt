@@ -29,11 +29,11 @@ class ManifestWiringTest {
 
     private companion object {
         // INTERNET never (ADR-0008); the rest is what the template's reminders and WorkManager
-        // declared or merged. This list moves with aab-permissions.py.
+        // declared or merged. RECEIVE_BOOT_COMPLETED is declared on purpose (ADR-0010). This list
+        // moves with aab-permissions.py.
         val NOT_REQUESTED =
             setOf(
                 "android.permission.INTERNET",
-                "android.permission.RECEIVE_BOOT_COMPLETED",
                 "android.permission.SCHEDULE_EXACT_ALARM",
                 "android.permission.WAKE_LOCK",
             )
