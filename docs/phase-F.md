@@ -191,7 +191,7 @@ every enabled Command, the bundled fucha's included:
   Persona names or another enabled Command's word (equal is the same token and fine) → installs
   switched off, behind a warning the user can override.
 
-Section 6 has the owner's word on whether 2 is the number.
+Section 6 has the owner's word on the numbers.
 
 **Darek's own fucha** is `assets/fuchy/darek.darek`, signed like any approved fucha, with
 *powiedz coś*, *otwórz bramę* (still calling only in the debug build, until phase 3) and
@@ -274,9 +274,14 @@ Command stays far inside that. The attribution goes on the fucha's description a
 - **The first fucha:** the weather, installed from the page (2026-11-13).
 - **Where the weather gets the place:** a city set once (2026-11-13, answer A).
 - **Calling from a fucha:** phase 3 (2026-11-13, no objection to the plan).
-- **What counts as configured** once a fucha is installed: *(asked 2026-11-13, awaiting the
-  owner.)*
-- **The clash thresholds** (edit distance 2; containment never both on): *(to ask.)*
+- **What counts as configured:** an enabled Command that calls, or any enabled Command from a fucha
+  the user installed (2026-11-13, answer A). Darek's own reply-only Commands still do not count, so
+  his name and nothing he knows gets a *„nie rozumiem"* line once the weather is on, and *„Stary,
+  nie mam żadnej fuchy."* on a fresh install. `reactionTo` takes the rule in checkpoint B, with its
+  test.
+- **The clash thresholds:** ADR-0015's as written, edit distance 2 and containment never both on
+  (2026-11-13, the owner's *go* on the plan). R4's install on the emulators is where a wrong number
+  would show first.
 
 ## 7. The page
 
@@ -314,6 +319,9 @@ the mail's tag.
 - **The clash rules.** A phrase with *stop* or *anuluj* refused; containment never both on; within
   two letters installs off; a Decoy within two of *darek* or *daria*. Fails towards a fucha
   stealing another's utterances or cancelling a call.
+- **Configured in `reactionTo`.** Darek's own reply-only Commands alone answer *„nie mam żadnej
+  fuchy"*; an installed fucha's Command, or one that calls, makes it *„nie rozumiem"*. Fails towards
+  telling a user with the weather on that he has no fucha.
 - **The update decision.** A new permission, address or value waits; an unsigned file over an
   approved ID is a fresh install. Fails towards a silent widening of what a fucha may do.
 
