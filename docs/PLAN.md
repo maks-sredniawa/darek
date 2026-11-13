@@ -43,11 +43,13 @@ was extracted from and the first app built from it settled on exactly this split
   `RECORD_AUDIO` is already granted: phase 1's promised listening only with Home on screen.
   2026-11-10: planned; built and read on the emulators, Xiaomi's readings owed until a phone is
   attached
-- [ ] **Phase F** — Fuchy (ADR-0015): Commands stored as fuchy, Darek's own bundled; `INTERNET`
-  (ADR-0008); the native fuchy page, install from it or from a file through Darek's picker, the
-  signature check and badge, permissions per fucha and for all, updates, *„Zgłoś fuchę"*. The
-  `darek-fuchy` repo and the builder on the site are their own project. Which half of calling a Number lands here and which in
-  phase 3 is decided in `phase-F.md`
+- [ ] **Phase F** ([`phase-F.md`](phase-F.md)) — Fuchy (ADR-0015): Commands stored as fuchy,
+  Darek's own bundled; `INTERNET` (ADR-0008); the native fuchy page, install from it or from a file
+  through Darek's picker, the signature check and badge, permissions per fucha and for all, updates,
+  *„Zgłoś fuchę"*. The first fucha is the weather, installed from the page, for a city the user sets
+  once. No fucha calls a Number or reads location here: calling stays phase 3's, location waits for
+  the first fucha that needs it. The `darek-fuchy` repo and the builder on the site are their own
+  project. 2026-11-13: planned
 - [ ] **Phase 3** — Safe for a stranger: the user's Numbers for the built-in Commands, which brings
   `CALL_PHONE` and the call into the release, the user's own Reply text for each Command
   (ADR-0014), and the first-run path. Before a Command that calls can fire, phase 1's R1 is finished
@@ -55,7 +57,7 @@ was extracted from and the first app built from it settled on exactly this split
   shipping grammar, against real voices, to
   [phase 1's bar](phase-1.md#the-question-in-the-form-that-can-be-measured); and under either Persona
   the hold after the name is read against a Command in a second voice (ADR-0009, [`DOD.md`](DOD.md));
-  if phase F brings calling first, it owes all three. It freezes `CALL_PHONE` and the
+  a fucha that calls a Number arrives here too. It freezes `CALL_PHONE` and the
   `microphone` service type. *The door is already open*: closed testing started with phase 0's
   Alpha 0.2.0 (2026-10-31), so the microphone disclosure moved to phase 1, where `RECORD_AUDIO`
   arrives
@@ -125,11 +127,11 @@ here, so a later phase cannot quietly move an ask forward to "get it out of the 
 | --- | --- | --- |
 | `RECORD_AUDIO`, after the disclosure sheet | the first tap of *Słuchaj* | 1 |
 | The disclosure again, for the background (no permission) | the first service start, granted microphone or not | 2 |
-| `CALL_PHONE` | a Number is first saved for a Command, bundled or from a fucha (debug-only in phase 1) | 1 (debug), 3; F if a fucha's calling half lands there |
+| `CALL_PHONE` | a Number is first saved for a Command, bundled or from a fucha (debug-only in phase 1) | 1 (debug), 3 |
 | `POST_NOTIFICATIONS` | Listening is first started as the service | 2 |
 | Battery exemption, autostart (hand-offs, no permission) | a sheet once, after the first service start, on a ROM that needs them; then rows in Settings | 2 |
 | A fucha's permissions, Darek's own grant per fucha or for all (ADR-0015) | the fucha is switched on, at install or, for a bundled one, by the user | F |
-| Approximate location, behind that grant | the first fucha declaring it is switched on, once its own decision is made (ADR-0015) | F, or the phase that decides it |
+| Approximate location, behind that grant | the first fucha declaring it is switched on, once its own decision is made (ADR-0015) | the phase that brings that fucha, not F |
 
 **The third clause is the one that gets left out, and it is the one that generates support mail.**
 These denials nearly all fail *silently*: a denied notification permission leaves a foreground
