@@ -3,8 +3,11 @@
 Sequence lives in [`PLAN.md`](PLAN.md); the live worklist lives in [`DOD.md`](DOD.md). This phase
 builds ADR-0015 and the network half of ADR-0008, and leans on ADR-0009 (the grammar and its match
 rule), ADR-0011 (the cancel words), ADR-0014 (the voice) and ADR-0016 (the Persona in front of every
-phrase). [`CONTEXT.md`](../CONTEXT.md) already has *Fucha* and *Approved*; it is owed *Command*
-rewritten so a Command comes from a fucha rather than the catalogue, and nothing else.
+phrase). [`CONTEXT.md`](../CONTEXT.md) is owed three entries in B: *Command* comes from a fucha
+rather than the catalogue, and names Darek's own as section 2 has them (*powiedz coś*, *otwórz
+bramę*, and *zaktualizuj fuchy* from F) instead of *brama*, *garaż*, *furtka*; *Fucha* says he ships
+one fucha of his own holding those Commands, not "fuchy of his own (the gate, *powiedz coś*)"; and
+*Approved* says his own is approved by being inside the APK, not signed.
 
 **What closing this phase means.** Today every Command is an entry in an enum and Darek never
 touches the network. After this phase Darek's own Commands are a bundled fucha, Darek has a native
@@ -92,10 +95,10 @@ all day; a native list from a JSON file is the whole point.
 | --- | --- | --- | --- |
 | **A** | **The gate** — the vocabulary check: `vosk_model_find_word` through JNA, in a release-shaped build | no commit if verdict 1; the binding lands with B | — |
 | **B** | **Fuchy as data**: the format, the loader, Darek's own bundled fucha, the clash rules, the vocabulary check; the enum goes | `refactor:` | A |
-| **C** | **Install from a file**: the picker, the signature check, the install screen, the badge or the warning, the installed list with on/off and remove | `feat:` | B |
+| **C** | **Install from a file**: the picker, the signature check, the install screen, the badge or the warning, the installed list with on/off and remove | `feat:` | B, and `darek-fuchy`'s key (section 5) |
 | **D** | **The network**: `INTERNET`, the network security config, the client that holds ADR-0008's rules, `datatransport` without a backend, the traffic reading | `feat:` | — |
 | **E** | **The weather**: the action, the city, the grants, *„jaka pogoda"* with the screen off | `feat:` | C, D |
-| **F** | **The page**: `fuchy.json`, install from it, *„Wymaga nowszej wersji Darka"*, profanity, updates, *„Zgłoś fuchę"* | `feat:` | E, and section 5 outside this repo |
+| **F** | **The page**: `fuchy.json`, install from it, *„Wymaga nowszej wersji Darka"*, profanity, updates and *zaktualizuj fuchy*, *„Zgłoś fuchę"* | `feat:` | E, and section 5 outside this repo |
 
 B is a `refactor:` on purpose: nothing a user sees changes, and it should not cut a release. D does
 not depend on B or C and can be built beside them; it is split from E because its traffic reading
@@ -112,8 +115,8 @@ with F (*Documents this phase amends*).
 
 Vosk drops a grammar word its model does not know, silently, and the Command can then never fire
 (ADR-0015's *Context*). In a release-shaped build on the API 26 and API 37 emulators, does a JNA
-binding of `vosk_model_find_word(model, word)` return a non-negative id for *„pogoda"*, *„jaka"* and
-*„darek"*, and `-1` for a made-up word (*„pogodzisko"*), against the bundled model?
+binding of `vosk_model_find_word(model, word)` return a non-negative id for *„pogoda"*, *„jaka"*,
+*„darek"*, *„zaktualizuj"* and *„fuchy"*, and `-1` for a made-up word (*„pogodzisko"*), against the bundled model?
 
 ### The apparatus
 
@@ -172,7 +175,7 @@ refuses format 2 with *„Wymaga nowszej wersji Darka"*, and so for an `action`,
 
 | List | Values in this phase |
 | --- | --- |
-| Actions | `speak`, `weather`, `update_fuchy` (Darek's own only) |
+| Actions | `speak`, `weather`, `update_fuchy` (Darek's own only, from F; needs no permission, section 7) |
 | Permissions | `internet` |
 | Values sent | `chosen_city` (*the city you chose*) |
 
@@ -193,10 +196,14 @@ every enabled Command, the bundled fucha's included:
 
 Section 6 has the owner's word on the numbers.
 
-**Darek's own fucha** is `assets/fuchy/darek.darek`, signed like any approved fucha, with
-*powiedz coś*, *otwórz bramę* (still calling only in the debug build, until phase 3) and
-*zaktualizuj fuchy*. It can be switched off, never removed. The name Decoys stay in `Grammar`, not in
-the fucha: they belong to the Persona (ADR-0016).
+**Darek's own fucha** is `assets/fuchy/darek.darek`, its source in this repo. It is approved by being
+inside the APK, not signed: it has no `signature`, is never checked against `darek-fuchy`'s key, and
+so needs neither that repo nor its key. In B it holds *powiedz coś* and *otwórz bramę* (still calling
+only in the debug build, until phase 3); *zaktualizuj fuchy* joins it in F (section 7). It needs no
+grant, so it is on by default; it can be switched off, never removed. `Grammar.COMMAND_WORD_DECOYS`
+(*otwórz*, *zamknij*, *brama*) become the gate Command's `decoys` in it, so they join the grammar
+while this fucha is on, as they do today. The name Decoys stay in `Grammar`, not in the fucha: they
+belong to the Persona (ADR-0016).
 
 **Storage.** An installed fucha's original file goes to `filesDir/fuchy/<id>.darek`, so its
 signature can be checked again on every start; the state (on or off, grants, the city, the update
@@ -209,7 +216,8 @@ never positions. Both are inside platform Auto Backup (ADR-0005), so a restored 
 Ed25519 arrives in the platform only at API 33 and would mean bundling a crypto library. CI signs
 with `openssl` in `darek-fuchy`'s workflow; Darek ships the public key as a constant.
 
-**Approved** means: the signature verifies against that key. Anything else installs only after the
+**Approved** means: the signature verifies against that key, or the fucha is Darek's own, inside
+the APK (section 2). Anything else installs only after the
 strong warning, and an unsigned file over an approved fucha with the same ID is a fresh install
 (ADR-0015, *Updates*): every grant asked again.
 
@@ -222,13 +230,15 @@ user's own risk. Then *Zainstaluj* or *Anuluj*.
 ## 4. The network
 
 Built to ADR-0008, which this section does not restate: `INTERNET` moves from FORBIDDEN to EXPECTED
-in `aab-permissions.py` with its user named; `network_security_config.xml` with
+in `aab-permissions.py` with its user named, and `ManifestWiringTest` with it;
+`network_security_config.xml` with
 `cleartextTrafficPermitted="false"`; `datatransport`'s `CctBackendFactory` meta-data removed.
 
 **One client for every request**, `HttpURLConnection` (no new dependency): HTTPS only,
 `instanceFollowRedirects = false`, and a request goes out only when its URL's host equals a declared
 address's host and its path starts with that address's path. Darek's own requests go only to
-`maksforge.com`. The allowlist check is the function with the test; the client cannot be called
+`maksforge.com` and need no grant: the `internet` grant is a fucha's, for the addresses it
+declares (ADR-0008). The allowlist check is the function with the test; the client cannot be called
 without it.
 
 **A connection with the screen off.** A foreground service's process is exempt from Doze's network
@@ -243,7 +253,7 @@ into Polish words from a table in Darek's code, and the Persona says it, for exa
 pochmurno. Dziś od 8 do 15 stopni."* The Reply names no city: the city is typed in its nominative,
 and *„w Krakowie"* would need its locative.
 
-**The city** is asked once, when the fucha is switched on: a text field, then Open-Meteo's geocoding
+**The city** is asked once, when the fucha is switched on and after its grant (below): a text field, then Open-Meteo's geocoding
 search, then the user picks one of its answers (*Kraków, małopolskie*). The coordinates are stored;
 the city's name is sent once to the geocoding search and the coordinates on every forecast, both
 declared as *the city you chose*. Settings for the fucha change it.
@@ -252,15 +262,18 @@ declared as *the city you chose*. Settings for the fucha change it.
 within the Reply's usual time: a 5-second timeout, then that line. Nothing is retried in the
 background.
 
-**The grant.** On the first switch-on, unless *allow for every fucha* already covers it, a sheet asks
-for the `internet` grant for this fucha (ADR-0015, *Permissions can be granted per fucha or for
-all*). Refused, the fucha stays off. The per-permission default (ask, allow for all approved, never)
+**The grant.** On the first switch-on, before the city field, unless *allow for every fucha* already
+covers it, a sheet asks for the `internet` grant for this fucha (ADR-0015, *Permissions can be
+granted per fucha or for all*). Refused, the fucha stays off and no city is asked, so the geocoding
+search never goes out ungranted. The per-permission default (ask, allow for all approved, never)
 and its exceptions live on a *Uprawnienia fuch* screen under Settings; allowing unapproved fuchy for
 all is behind the ten-second dialog.
 
-**Outside this repo, before F's readings:** `maks-sredniawa/darek-fuchy` (public, so
-`maksforge.com/darek-fuchy/` serves it), with the published rules for authors, the vocabulary check
-in CI, a signing workflow on push to `main` only (ADR-0015), the weather fucha, and `fuchy.json`.
+**Outside this repo, before F's readings:** `maks-sredniawa/darek-fuchy`, public, with
+`docs/_config.yml` holding `remote_theme: maks-sredniawa/pages-theme`: that, not being public, is
+what makes the site's deploy serve its `docs/` at `maksforge.com/darek-fuchy/`. In it: the published
+rules for authors, the vocabulary check in CI, a signing workflow on push to `main` only (ADR-0015)
+that writes the signed `.darek` files and `fuchy.json` under `docs/`, and the weather fucha.
 The signing key's public half goes into Darek at checkpoint C, so the repo and its key come first.
 
 **Open-Meteo's terms** (read 2026-11-13, `open-meteo.com/en/terms`): free for apps without
@@ -295,8 +308,11 @@ anywhere.
 
 **Updates.** With an approved fucha other than Darek's own installed, Darek reads `fuchy.json` when
 the page opens, and once a day at process start. *Aktualizuj fuchy automatycznie* is on by default;
-off, the page shows *Zaktualizuj*. *„Darek, zaktualizuj fuchy"* runs the same check and says what
-it did. An update adding a permission, an address or a value sent waits for the user on the page.
+off, the page shows *Zaktualizuj*. *„Darek, zaktualizuj fuchy"*, which joins Darek's own fucha in
+this checkpoint, runs the same check and says what it did; with no fucha but his own installed it
+says so and connects nowhere. It needs no grant: it talks only to `maksforge.com`, which ADR-0008 lets
+Darek reach for fuchy themselves, so his own fucha never needs the `internet` grant and stays on by
+default. An update adding a permission, an address or a value sent waits for the user on the page.
 
 **„Zgłoś fuchę"** on every installed fucha: the support hand-off with the fucha's ID and version in
 the mail's tag.
@@ -332,8 +348,13 @@ the mail's tag.
   slots; ECDSA P-256 as the signature. ADR-0008 needs nothing: a typed city is not something Darek
   heard, and it already lets a fucha send only the values it declares.
 - **ADR-0009**: the catalogue is the bundled fucha.
-- **`CONTEXT.md`**: *Command* from a fucha.
+- **`CONTEXT.md`**, in B: *Command*, *Fucha* and *Approved*, as the top of this file says.
 - **`PLAN.md`**: phase F's paragraph and rule 4's table (location and calling leave F).
+- **With D**, the rest of ADR-0008's *Consequences*, rewritten the day `INTERNET` merges:
+  `README.md` (*never opens a network connection*), `docs/index.md` (*no internet permission*) and
+  `docs/_config.yml`'s description (*offline*), `CLAUDE.md`'s Stack row for Play Billing,
+  `SupportHandoff.kt`'s KDoc, ADR-0007's *`INTERNET` stays out* ended by its amendment, and
+  `aab-permissions.py` with `ManifestWiringTest` (section 4).
 - **With F**: the privacy policy (the network, Open-Meteo, the city), the listing in both languages
   naming the fuchy page and the weather, `play-app-content.md` and the Data safety re-answered (the
   city is approximate location, sent to Open-Meteo, optional, for app functionality: **assumed**
@@ -356,7 +377,7 @@ setup.
 
 | # | Reading | Command | Result |
 | --- | --- | --- | --- |
-| R1 | The gate, section 1 | the debug row, release-shaped, API 26 and 37 | *(to read)* |
+| R1 | The gate, section 1: *pogoda*, *jaka*, *darek*, *zaktualizuj*, *fuchy*, and a made-up word | the debug row, release-shaped, API 26 and 37 | *(to read)* |
 | R2 | A fresh install connects nowhere until the page opens; `datatransport` uploads nothing | emulator started with `-tcpdump`, the app opened, Listening started, a Command fired, 10 minutes; then the page opened | *(to read)* |
 | R3 | The weather answers with the screen off, the app swiped away and the device forced idle | `adb shell dumpsys deviceidle force-idle`, then *„Darek, jaka pogoda?"* injected | *(to read)* |
 | R4 | Installing from the page: the install screen shows the addresses and the value sent, the badge is there, the grant is asked once | the page on a fresh install | *(to read)* |
