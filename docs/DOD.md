@@ -75,7 +75,9 @@ close. Whenever `APP_SCHEMA_VERSION` changes, all five hold before the release g
       (`screencap` + `pad-screenshot.py --status-bar-px 75`), because `screenshots.py --locale`
       needs API 33 and the test phone is API 30. Re-shot 2026-11-13 for phase 2 on the API 37
       emulator from a release build: Home, the background disclosure, Listening, the notification
-      (cropped to the card, so the shade's system chrome stays out) and Settings with *W tle*.
+      (cropped to the card, so the shade's system chrome stays out) and Settings with *W tle*. The
+      Polish notification was re-shot the same day on the API 36 emulator with the system language
+      Polish, so its header reads *„Darek • teraz"*.
 - [ ] **Put the app on maksforge.com.** Its icon goes at `assets/icons/<repo>.webp` in
       maks-sredniawa/maks-sredniawa.github.io, which the app's own site loads, and the app goes on that home
       page. Replace `description` in `docs/_config.yml` too: it is the tagline under the app's name.
