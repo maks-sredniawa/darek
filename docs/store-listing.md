@@ -349,14 +349,14 @@ Odświeżone Pomoc i opinie: adres pomocy i wersję aplikacji skopiujesz jednym 
 
 ### 0.11.0 — Who made the app
 
-**English** — 137/500:
+**English** — 152/500:
 
 ```
-Credits now open with who made the app. Each open-source library there shows the full name of its licence, with a link to read its terms.
+Credits now open with who made the app. Each licence there now has a link to read it or open its terms, and a licence's page is headed by its full name.
 ```
 
-**Polish** — 158/500:
+**Polish** — 195/500:
 
 ```
-Podziękowania zaczynają się teraz od tego, kto zrobił aplikację. Każda biblioteka open source pokazuje tam pełną nazwę swojej licencji i link do jej warunków.
+Podziękowania zaczynają się teraz od tego, kto zrobił aplikację. Przy każdej licencji jest tam teraz link, by ją przeczytać albo otworzyć jej warunki, a strona licencji ma u góry jej pełną nazwę.
 ```
