@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.11.0](https://github.com/maks-sredniawa/darek/compare/v0.10.0...v0.11.0) (2026-11-13)
+
+
+### Features
+
+* **support:** link licence terms and show licence names on Credits ([23fdaee](https://github.com/maks-sredniawa/darek/commit/23fdaee83ec459aacad1d37184cfda5cd79c5ef4))
+* **support:** open Credits with the people who made the app ([28eca3c](https://github.com/maks-sredniawa/darek/commit/28eca3cff1ba6a9f8351905b9de2f39aa68a735d))
+
+
+### Bug Fixes
+
+* **support:** say when the language report finds no mail app, and keep the licence screen safe ([bf92b4a](https://github.com/maks-sredniawa/darek/commit/bf92b4a4ec0fc5e3f14fedfcca7e848d54d1b542))
+
 ## [0.10.0](https://github.com/maks-sredniawa/darek/compare/v0.9.0...v0.10.0) (2026-11-13)
 
 
