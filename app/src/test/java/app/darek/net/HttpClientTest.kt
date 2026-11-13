@@ -1,18 +1,31 @@
 package app.darek.net
 
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
 import java.net.HttpURLConnection
+import java.net.InetAddress
+import java.net.ServerSocket
 import java.net.SocketTimeoutException
 import java.net.URL
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.microseconds
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
 
 class HttpClientTest {
     private class FakeConnection(
@@ -133,5 +146,50 @@ class HttpClientTest {
             assertEquals("Darek", connection.header("User-Agent"))
             assertFalse(connection.useCaches)
             assertTrue(connection.disconnected)
+        }
+
+    @Test
+    fun `a timeout under a millisecond, infinite or past an Int of milliseconds is refused`() =
+        runTest {
+            for (timeout in listOf(
+                Duration.ZERO,
+                (-1).seconds,
+                500.microseconds,
+                Duration.INFINITE,
+                (Int.MAX_VALUE + 1L).milliseconds,
+            )) {
+                assertThrows(
+                    IllegalArgumentException::class.java,
+                ) { runBlocking { client().get(fuchyJson, connectTimeout = timeout) } }
+                assertThrows(
+                    IllegalArgumentException::class.java,
+                ) { runBlocking { client().get(fuchyJson, readTimeout = timeout) } }
+            }
+            assertTrue(opened.isEmpty())
+            client().get(fuchyJson, connectTimeout = 1.milliseconds, readTimeout = 1.milliseconds)
+            assertEquals(1, opened.single().readTimeout)
+        }
+
+    @Test
+    fun `cancelling a request to a server that never answers returns at once and closes the socket`() =
+        runBlocking {
+            ServerSocket(0, 1, InetAddress.getLoopbackAddress()).use { server ->
+                val closedByClient = CountDownLatch(1)
+                thread(isDaemon = true) {
+                    server.accept().use { socket ->
+                        while (socket.getInputStream().read() != -1) Unit
+                        closedByClient.countDown()
+                    }
+                }
+                val silent = URL("http", server.inetAddress.hostAddress, server.localPort, "/")
+                val client = HttpClient(Allowlist.DAREK) { silent.openConnection() as HttpURLConnection }
+
+                val started = TimeSource.Monotonic.markNow()
+                val result = withTimeoutOrNull(200.milliseconds) { client.get(fuchyJson, readTimeout = 60.seconds) }
+
+                assertNull(result)
+                assertTrue(started.elapsedNow() < 2.seconds)
+                assertTrue(closedByClient.await(2, TimeUnit.SECONDS))
+            }
         }
 }
