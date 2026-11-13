@@ -73,7 +73,9 @@ close. Whenever `APP_SCHEMA_VERSION` changes, all five hold before the release g
       a local release build on the test phone (see *Before the next upload*). Re-shot 2026-11-01 for
       0.3.0: Home with *Słuchaj*, the microphone disclosure, Listening and Settings, by hand
       (`screencap` + `pad-screenshot.py --status-bar-px 75`), because `screenshots.py --locale`
-      needs API 33 and the test phone is API 30.
+      needs API 33 and the test phone is API 30. Re-shot 2026-11-13 for phase 2 on the API 37
+      emulator from a release build: Home, the background disclosure, Listening, the notification
+      (cropped to the card, so the shade's system chrome stays out) and Settings with *W tle*.
 - [ ] **Put the app on maksforge.com.** Its icon goes at `assets/icons/<repo>.webp` in
       maks-sredniawa/maks-sredniawa.github.io, which the app's own site loads, and the app goes on that home
       page. Replace `description` in `docs/_config.yml` too: it is the tagline under the app's name.
@@ -159,12 +161,11 @@ Console matches. A new permission, foreground service or data type is a Console 
       The repo half is done 2026-11-01 (listing, policy, `play-app-content.md`, screenshots; the
       allowlist and licences came with B). Tick when 0.3.0 is uploaded with its listing and the
       Console's Data safety is confirmed unchanged.
-- [ ] **In 0.9.0, phase 2's release** ([`phase-2.md`](phase-2.md)), on internal since
-      2026-11-13 as versionCode 158. The foreground-service declaration for `microphone` was filed
-      and sent for review that day (`play-app-content.md`, *Foreground service permissions*). Still
-      owed: Google's approval of it, the Console's Data safety confirmed unchanged against the
-      repo's re-read, and the screenshots re-shot with the notification and the background
-      disclosure. Tick when all three hold.
+- [x] **In 0.9.0, phase 2's release** ([`phase-2.md`](phase-2.md)). Done 2026-11-13: on internal
+      as versionCode 158 (0.10.0 followed through CI the same day); the foreground-service
+      declaration for `microphone` filed and published that day (`play-app-content.md`); the
+      Console's Data safety read back unchanged (*doesn't collect*, *doesn't share*, the policy URL);
+      the listing's full description and five screenshots per language sent for review.
 
 ## Owed to the owner's phone
 
