@@ -1,7 +1,8 @@
 package app.darek.net
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.asExecutor
+import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
@@ -9,6 +10,7 @@ import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
 import java.net.URL
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 sealed interface HttpResult {
@@ -51,7 +53,9 @@ class HttpClient(
         readTimeout: Duration = DEFAULT_TIMEOUT,
         maxBytes: Int = DEFAULT_MAX_BYTES,
     ): HttpResult {
-        require(connectTimeout.isPositive() && readTimeout.isPositive()) { "HttpURLConnection reads 0 as no timeout" }
+        require(connectTimeout in TIMEOUT_RANGE && readTimeout in TIMEOUT_RANGE) {
+            "A timeout is 1 ms to Int.MAX_VALUE ms, HttpURLConnection reads 0 as none: got $connectTimeout, $readTimeout"
+        }
         val admitted =
             when (val inspection = allowlist.admit(url)) {
                 is Inspection.Refused -> return HttpResult.Refused(inspection.problem)
@@ -60,22 +64,29 @@ class HttpClient(
         // From the checked parts, not re-parsed: java.net.URL and URI may not agree on a host.
         val file = admitted.rawPath + admitted.rawQuery?.let { "?$it" }.orEmpty()
         val target = URL("https", admitted.host, file)
-        return withContext(Dispatchers.IO) { fetch(target, connectTimeout, readTimeout, maxBytes) }
-    }
-
-    private fun fetch(
-        url: URL,
-        connectTimeout: Duration,
-        readTimeout: Duration,
-        maxBytes: Int,
-    ): HttpResult {
         val connection =
             try {
-                open(url)
+                open(target)
             } catch (e: IOException) {
                 return HttpResult.Network(e)
             }
-        return try {
+        // A blocked socket ignores cancellation, and DNS is under no timeout: disconnecting unblocks
+        // the socket, and not waiting for the blocked thread covers the rest.
+        return suspendCancellableCoroutine { continuation ->
+            continuation.invokeOnCancellation { connection.disconnect() }
+            Dispatchers.IO.asExecutor().execute {
+                continuation.resumeWith(runCatching { fetch(connection, connectTimeout, readTimeout, maxBytes) })
+            }
+        }
+    }
+
+    private fun fetch(
+        connection: HttpURLConnection,
+        connectTimeout: Duration,
+        readTimeout: Duration,
+        maxBytes: Int,
+    ): HttpResult =
+        try {
             connection.instanceFollowRedirects = false
             connection.useCaches = false
             connection.connectTimeout = connectTimeout.inWholeMilliseconds.toInt()
@@ -98,10 +109,10 @@ class HttpClient(
         } finally {
             connection.disconnect()
         }
-    }
 
     companion object {
         val DEFAULT_TIMEOUT = 5.seconds
+        private val TIMEOUT_RANGE = 1.milliseconds..Int.MAX_VALUE.milliseconds
         const val DEFAULT_MAX_BYTES = 512 * 1024
         private const val USER_AGENT = "Darek"
     }
