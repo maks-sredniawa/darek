@@ -5,8 +5,14 @@ import app.darek.listen.Line
 import app.darek.listen.Persona
 import app.darek.listen.commandDecoys
 import app.darek.listen.enabledCommands
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.io.File
+import java.util.Base64
 
 /** Checkpoint B is a refactor: Darek's own Commands as a bundled fucha must leave the recogniser hearing exactly what it heard. */
 class OwnFuchaTest {
@@ -31,6 +37,16 @@ class OwnFuchaTest {
         assertEquals(Line("Otwieram bramę."), gate.reply)
         assertEquals(listOf("otwórz", "zamknij", "brama"), gate.decoys)
         assertEquals(true, fucha.commands.all { it.bundled && it.fucha == "darek" })
+    }
+
+    @Test
+    fun the_asset_is_packed_from_its_readable_source() {
+        val packed = Json.parseToJsonElement(ownFuchaFile.decodeToString()) as JsonObject
+        assertArrayEquals(
+            "run python3 scripts/pack-fucha.py",
+            File("src/main/fuchy/darek.json").readBytes(),
+            Base64.getDecoder().decode(packed.getValue("fucha").jsonPrimitive.content),
+        )
     }
 
     @Test
