@@ -346,3 +346,17 @@ Help and feedback is renewed: copy the support address or the app version with a
 ```
 Odświeżone Pomoc i opinie: adres pomocy i wersję aplikacji skopiujesz jednym dotknięciem, a politykę prywatności, stronę aplikacji i podziękowania otworzysz z jednego miejsca. Po ponownym uruchomieniu telefonu powiadomienie o słuchaniu jest teraz w języku aplikacji.
 ```
+
+### 0.11.0 — Who made the app
+
+**English** — 137/500:
+
+```
+Credits now open with who made the app. Each open-source library there shows the full name of its licence, with a link to read its terms.
+```
+
+**Polish** — 158/500:
+
+```
+Podziękowania zaczynają się teraz od tego, kto zrobił aplikację. Każda biblioteka open source pokazuje tam pełną nazwę swojej licencji i link do jej warunków.
+```
