@@ -27,6 +27,11 @@ sealed interface Refusal {
 
     data object Unreadable : Refusal
 
+    /** Only Darek's own, inside the APK, is `darek`: any other would read as an update of it. */
+    data class ReservedId(
+        val id: String,
+    ) : Refusal
+
     data class WrongLanguage(
         val language: String,
     ) : Refusal
@@ -75,6 +80,7 @@ fun refusals(
     buildList {
         if (source.format != FORMAT) add(Refusal.NewerFormat(source.format))
         if (source.language != LANGUAGE) add(Refusal.WrongLanguage(source.language))
+        if (source.id == OwnFucha.ID && !bundled) add(Refusal.ReservedId(source.id))
         val declared = source.permissions.mapNotNull { named<Permission>(it) }
         source.permissions
             .filter { named<Permission>(it) == null }
@@ -90,7 +96,9 @@ fun refusals(
             } else {
                 action.needs?.takeIf { it !in declared }?.let { add(Refusal.Undeclared(command.id, it)) }
                 if (action.ownOnly && !bundled) add(Refusal.OwnOnly(command.id, action))
-                if (command.reply.isNullOrBlank()) add(Refusal.NoReply(command.id))
+                if (command.reply.isNullOrBlank() || command.replyFeminine?.isBlank() == true) {
+                    add(Refusal.NoReply(command.id))
+                }
             }
             val words = wordsOf(command.phrase)
             if (words.isEmpty()) add(Refusal.EmptyPhrase(command.id))
