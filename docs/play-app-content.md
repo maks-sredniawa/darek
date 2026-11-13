@@ -264,7 +264,7 @@ Grow → Store presence → Store settings, saved 2026-10-31.
   user's gate opener. Tools was offered, so Productivity was not needed.
 - **Tags:** none.
 - **Contact email:** `darek.support@maksforge.com`, public on the listing and the same address
-  `SupportHandoff.kt` compiles in. The Console field changes without a release; the app's copy needs
+  `ui/support/SupportConfig.kt` compiles in. The Console field changes without a release; the app's copy needs
   one. Replying from it needs Gmail's *Send mail as* entry (`DOD.md`).
 - **Phone:** empty. **Website:** `https://maksforge.com/darek/`. **External marketing:** left at the
   default, ticked.

@@ -63,7 +63,7 @@ close. Whenever `APP_SCHEMA_VERSION` changes, all five hold before the release g
       and the Play docs. Mail to it arrives through the domain's catch-all; replying from it needs the
       receiving Gmail's *Send mail as* entry, confirmed. Send *Report a problem* from a non-Gmail
       account and check it lands outside Spam. One address everywhere — the listing's contact field
-      and IARC's rating contact too; `SupportHandoff.kt` says why it lives on our own domain.
+      and IARC's rating contact too; `ui/support/SupportConfig.kt` says why it lives on our own domain.
 - [x] **Write the listing.** `docs/store-listing.md` — every heading in it is parsed by a script.
       Done 2026-10-31, Polish and English, for Darek as he will ship, with one paragraph saying the
       test build has only Home and Settings (see *Before the next upload*).

@@ -35,10 +35,8 @@ import app.darek.ui.common.LinkRow
 import app.darek.ui.common.LinkTarget
 import app.darek.ui.common.SectionHeader
 import app.darek.ui.common.SwitchRow
-import app.darek.ui.support.SupportRequest
-import app.darek.ui.support.hintRes
-import app.darek.ui.support.sendSupportMail
-import app.darek.ui.support.titleRes
+import app.darek.ui.support.AboutSection
+import app.darek.ui.support.LanguageReportRow
 import app.darek.work.hasAutostartSettings
 import app.darek.work.isIgnoringBatteryOptimisations
 import app.darek.work.openAutostartSettings
@@ -55,7 +53,6 @@ fun SettingsScreen(
         viewModel(factory = SettingsViewModel.Factory, extras = appViewModelExtras()),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     DetailScaffold(
         title = stringResource(R.string.settings_title),
@@ -103,24 +100,14 @@ fun SettingsScreen(
 
             SectionHeader(stringResource(R.string.settings_language))
             LanguageRow()
-            // The channel that stands in for a native read-through (docs/translator-brief.md §8),
-            // beside the picker because that is where somebody is standing the moment a translation
-            // reads wrong. Its wording lives with the other two requests, in ui/support/.
-            LinkRow(
-                title = stringResource(SupportRequest.Language.titleRes()),
-                subtitle = stringResource(SupportRequest.Language.hintRes()),
-                target = LinkTarget.Outside,
-                onClick = { context.sendSupportMail(SupportRequest.Language) },
-            )
+            LanguageReportRow()
 
             BackgroundRows()
 
             SectionHeader(stringResource(R.string.settings_data))
             RestoreDefaultsRow(onRestore = viewModel::restoreDefaults)
 
-            SectionHeader(stringResource(R.string.settings_about))
-            LinkRow(stringResource(R.string.settings_support), LinkTarget.Inside, onClick = onOpenSupport)
-            LinkRow(stringResource(R.string.settings_licences), LinkTarget.Inside, onClick = onOpenLicences)
+            AboutSection(onOpenSupport, onOpenLicences)
 
             // The developer-only section. In a release build this composable is a no-op that
             // renders nothing — see `src/release/…/DebugSettings.kt`. It is a source-set seam
