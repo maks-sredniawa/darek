@@ -179,7 +179,7 @@ Console matches. A new permission, foreground service or data type is a Console 
 [`phase-F.md`](phase-F.md) has the plan; tick a checkpoint when it merges with its readings.
 
 - [x] **A**, the gate: Vosk's vocabulary check through JNA (R1). Verdict 1, 2026-11-13.
-- [ ] **B**, fuchy as data, Darek's own bundled.
+- [x] **B**, fuchy as data, Darek's own bundled. Done 2026-11-13; no reading, it is a refactor.
 - [ ] **`maks-sredniawa/darek-fuchy`** with its signing key and workflow, before C: C ships the
       public half. Its `docs/_config.yml` has `remote_theme: maks-sredniawa/pages-theme`, and the
       workflow writes the signed files and `fuchy.json` under `docs/`.

@@ -189,7 +189,7 @@ refuses format 2 with *„Wymaga nowszej wersji Darka"*, and so for an `action`,
 **The checks at install**, every one a refusal with the reason on screen, and the same on every
 update: the format and every list value known; `language` is `pl`; every action's permission
 declared (`weather` needs `internet`); no action kept for Darek's own (`call`, `update_fuchy`) in any
-other fucha, refused as *„Wymaga nowszej wersji Darka"*; every address HTTPS, an exact host, no query, no fragment;
+other fucha, refused as *„Wymaga nowszej wersji Darka"*; the ID `darek` only for Darek's own; every address HTTPS, an exact host, no query, no fragment;
 every Command word known to the model (section 1); no phrase holding a cancel word; the signature,
 when there is one (section 3).
 
@@ -204,7 +204,8 @@ every enabled Command, the bundled fucha's included:
 
 Section 6 has the owner's word on the numbers.
 
-**Darek's own fucha** is `assets/fuchy/darek.darek`, its source in this repo. It is approved by being
+**Darek's own fucha** is `assets/fuchy/darek.darek`, packed by `scripts/pack-fucha.py` from its readable
+source `app/src/main/fuchy/darek.json`, which is the one to edit. It is approved by being
 inside the APK, not signed: it has no `signature`, is never checked against `darek-fuchy`'s key, and
 so needs neither that repo nor its key. In B it holds *powiedz coś* and *otwórz bramę* (still calling
 only in the debug build, until phase 3); *zaktualizuj fuchy* joins it in F (section 7). It needs no
