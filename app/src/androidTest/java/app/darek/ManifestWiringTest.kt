@@ -1,9 +1,14 @@
 package app.darek
 
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.service.quicksettings.TileService
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import app.darek.listen.AfterBootReceiver
+import app.darek.listen.ListeningTile
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -18,14 +23,39 @@ class ManifestWiringTest {
 
     @Test
     fun no_network_and_none_of_the_stripped_permissions() {
-        val requested =
-            context.packageManager
-                .getPackageInfo(context.packageName, PackageManager.GET_PERMISSIONS)
-                .requestedPermissions
-                .orEmpty()
-                .toSet()
-        assertEquals(emptySet<String>(), requested intersect NOT_REQUESTED)
+        assertEquals(emptySet<String>(), requestedPermissions() intersect NOT_REQUESTED)
     }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun boot_completed_reaches_the_after_boot_receiver() {
+        val receivers =
+            context.packageManager.queryBroadcastReceivers(
+                Intent(Intent.ACTION_BOOT_COMPLETED).setPackage(context.packageName),
+                0,
+            )
+        assertEquals(listOf(AfterBootReceiver::class.java.name), receivers.map { it.activityInfo.name })
+        assertTrue("android.permission.RECEIVE_BOOT_COMPLETED" in requestedPermissions())
+    }
+
+    @Suppress("DEPRECATION")
+    @Test
+    fun the_tile_is_bound_only_by_the_system() {
+        val tiles =
+            context.packageManager.queryIntentServices(
+                Intent(TileService.ACTION_QS_TILE).setPackage(context.packageName),
+                0,
+            )
+        assertEquals(listOf(ListeningTile::class.java.name), tiles.map { it.serviceInfo.name })
+        assertEquals("android.permission.BIND_QUICK_SETTINGS_TILE", tiles.single().serviceInfo.permission)
+    }
+
+    private fun requestedPermissions(): Set<String> =
+        context.packageManager
+            .getPackageInfo(context.packageName, PackageManager.GET_PERMISSIONS)
+            .requestedPermissions
+            .orEmpty()
+            .toSet()
 
     private companion object {
         // INTERNET never (ADR-0008); the rest is what the template's reminders and WorkManager
