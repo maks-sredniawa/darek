@@ -40,10 +40,11 @@ Billing, and it unlocks nothing.**
   everywhere outside Poland.
 - **The wording is "tip the developer"**, never "donate" or "support the project": it is a payment to
   a person, and it buys nothing.
-- **`INTERNET` stays out.** The billing library depends on Google's `datatransport`, which merges
-  `INTERNET` for its own logging. The manifest removes it with `tools:node="remove"`, and
-  `scripts/aab-permissions.py` keeps it forbidden. Billing never needed it: a purchase is IPC to the
-  Play Store app, which does the networking in its own process.
+- **`INTERNET` stayed out until phase F's checkpoint D** (the 2026-11-01 amendment below). The
+  billing library depends on Google's `datatransport`, which merges `INTERNET` for its own logging.
+  Until then the manifest removed it with `tools:node="remove"`, and `scripts/aab-permissions.py`
+  kept it forbidden. Billing never needed it: a purchase is IPC to the Play Store app, which does the
+  networking in its own process.
 
 ## Alternatives
 
@@ -83,8 +84,8 @@ differs, so the new install is asked once more, a month after the move, as befor
 
 ## Amendment — 2026-11-01
 
-*`INTERNET` stays out* holds until the phase that builds fuchy, which declares `INTERNET` for Darek
-itself ([ADR-0008](0008-darek-connects-only-where-the-user-can-see.md)). From then the manifest no
-longer removes it, and `datatransport`'s log upload is held off by ADR-0008's rule instead: its
+*`INTERNET` stays out* held until phase F's checkpoint D, which declared `INTERNET` for Darek
+itself ([ADR-0008](0008-darek-connects-only-where-the-user-can-see.md)). The manifest no longer
+removes it, and `datatransport`'s log upload is held off by ADR-0008's rule instead: its
 `CctBackendFactory` backend is removed, so it has nothing to upload through. Billing still needs no
 network of its own.

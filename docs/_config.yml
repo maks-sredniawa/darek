@@ -16,7 +16,7 @@ remote_theme: maks-sredniawa/pages-theme
 plugins:
   - jekyll-remote-theme
 title: Darek
-description: A Polish voice assistant that opens your gate with a phone call, offline.
+description: A Polish voice assistant that opens your gate with a phone call, and your voice never leaves the phone.
 maksforge:
   icon: /assets/icons/darek.webp
   status: building

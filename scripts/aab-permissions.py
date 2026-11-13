@@ -84,8 +84,7 @@ EXPECTED = {
     # now that WorkManager is gone. It leaves with the tip.
     "android.permission.ACCESS_NETWORK_STATE": "Play Billing's datatransport — reads connectivity state, opens nothing",
     # The tip (ADR-0007), merged from the Play Billing Library. It lets the app talk to
-    # the Play Store app's billing service; no dialog, and no data of the user's. Its
-    # datatransport dependency also merges INTERNET, which the manifest removes.
+    # the Play Store app's billing service; no dialog, and no data of the user's.
     "com.android.vending.BILLING": "the Play Billing Library — the tip, ADR-0007",
     # AndroidX defines and uses this itself, signature-level. The prefix is the
     # applicationId, which differs between the debug and release builds, so it is
@@ -99,6 +98,7 @@ EXPECTED = {
     "android.permission.FOREGROUND_SERVICE_MICROPHONE": "Listening's service type, `microphone` (ADR-0010)",
     "android.permission.POST_NOTIFICATIONS": "Listening's notification (ADR-0010)",
     "android.permission.RECEIVE_BOOT_COMPLETED": "the notification after a reboot that offers Słuchaj (ADR-0010)",
+    "android.permission.INTERNET": "the fuchy page on maksforge.com and the addresses a fucha declares (ADR-0008)",
 }
 
 # Permissions that must never appear. Absence is what the Data safety answers
@@ -107,12 +107,7 @@ FORBIDDEN = {
     "com.google.android.gms.permission.AD_ID": "Data safety says no advertising ID",
     "android.permission.QUERY_ALL_PACKAGES": "the <queries> element names one package instead",
     "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS": "Play restricts it; work/BatteryExemption.kt deep-links instead",
-    # "No backend, no account" is a claim the Data safety form and the privacy policy
-    # both make, and this is the only thing that checks it against the artifact: a
-    # dependency that merges INTERNET makes the claim false without touching a line of
-    # our source. An app that genuinely needs the network moves it to EXPECTED — and
-    # rewrites both of those documents in the same commit.
-    "android.permission.INTERNET": "no network: a merged one makes the privacy policy and Data safety wrong",
+    "android.permission.ACCESS_WIFI_STATE": "ADR-0008: nothing reads which network the phone is on",
     # The TakePicture intent needs no permission. Declaring CAMERA would make the
     # intent *require* it to be granted, and changes the listing.
     "android.permission.CAMERA": "the camera intent needs none; declaring it changes the listing",

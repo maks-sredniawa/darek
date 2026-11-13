@@ -7,7 +7,9 @@ title: Darek
 
 **A Polish voice assistant that calls your gate opener when you tell him to.** Say *"Darek, otwórz
 bramę"*, and he answers out loud and calls the number you gave him. Recognition, speech and the call
-all happen on your phone: the app has no internet permission, no account and no server.
+all happen on your phone, and your voice never leaves it. There is no account and no server that
+knows you: Darek connects only to maksforge.com, for his page of fuchy (gigs), and to the addresses a
+fucha shows you before you install it.
 
 Darek is still being built, and is not on Google Play yet.
 
