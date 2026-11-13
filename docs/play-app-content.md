@@ -229,9 +229,15 @@ window before the dial. Would change: any permission from that group, or an SMS-
 
 ## Foreground service permissions
 
-**Owed with 0.9.0.** From phase 2's checkpoint A the artifact declares `FOREGROUND_SERVICE` and
-`FOREGROUND_SERVICE_MICROPHONE` for the Listening service (ADR-0010). The declaration is filed once
-checkpoint D is in, with the release that ships it ([`DOD.md`](DOD.md)). The answers to give then:
+**Filed 2026-11-13 with 0.9.0 (versionCode 158), in review.** The artifact declares
+`FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_MICROPHONE` for the Listening service (ADR-0010). The
+Console lists the type only once a release holds a bundle that declares it: CI's upload of 158 was
+refused at commit (*"You must let us know whether your app uses any Foreground Service
+permissions"*), so the bundle went up by hand into the internal release and the form appeared then.
+Answered: `FOREGROUND_SERVICE_MICROPHONE` → task **Background audio input**, with a 39 s video of a
+first start on the API 37 emulator from a release build (Słuchaj, the disclosure, both permission
+asks, the notification with *Zatrzymaj*, stopped), linked from the owner's Google Drive and also
+attached to the `v0.9.0` GitHub release. The answers behind it:
 
 - **Use case:** voice commands for an assistant, started by the user; nothing is saved.
 - **What the user sees:** after turning Listening on, a notification that Darek is listening, with
