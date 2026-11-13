@@ -137,14 +137,19 @@ close. Whenever `APP_SCHEMA_VERSION` changes, all five hold before the release g
 ADR-0007. The code is in; these are the parts only Play and a phone can prove. The steps are
 *Selling the tip* in [`RELEASING.md`](RELEASING.md).
 
-- [ ] **Keep it or delete it, before the first upload.** Deleting is in
-      [`optional-modules.md`](optional-modules.md); keeping it costs Brazil's rating (14+).
-- [ ] **A build with billing on internal testing**, then the four products created and active.
-- [ ] **One purchase from a licence tester** on the internal install, ending in the thank-you line,
-      and the *same* tip bought again — the second purchase is the proof that the first was consumed.
+- [x] **Keep it or delete it, before the first upload.** Kept: it shipped with Alpha 0.2.0, and the
+      rating's Brazil 14+ came with it.
+- [x] **A build with billing on internal testing**, then the four products created and active.
+      Done 2026-11-13: `tip_small` … `tip_xlarge`, option `tip`, multi-quantity, Poland at
+      5/10/20/50 PLN.
+- [x] **One purchase from a licence tester** on the internal install, ending in the thank-you line,
+      and the *same* tip bought again. Not owed by Darek: `TipJar` and `TipBilling` are the shared
+      code, and the purchase was proven once for every app on Binky (2026-11-13).
 - [ ] **The debug build shows no tip section and no card.** Play has never heard of the `.debug`
       package, so absent is the correct reading, not a failure.
-- [ ] **Content rating re-submitted** with *digital purchases* Yes, before production.
+- [x] **Content rating re-submitted** with *digital purchases* Yes, before production. Answered so in
+      the first rating, 2026-10-31 ([`play-app-content.md`](play-app-content.md), *Content rating*);
+      phase F re-answers it for fuchy.
 
 ## Before the next upload
 
@@ -168,6 +173,22 @@ Console matches. A new permission, foreground service or data type is a Console 
       declaration for `microphone` filed and published that day (`play-app-content.md`); the
       Console's Data safety read back unchanged (*doesn't collect*, *doesn't share*, the policy URL);
       the listing's full description and five screenshots per language sent for review.
+
+## Phase F — the weather fucha from the fuchy page
+
+[`phase-F.md`](phase-F.md) has the plan; tick a checkpoint when it merges with its readings.
+
+- [ ] **Two owner decisions** (`phase-F.md`, section 6): what counts as configured once a fucha is
+      installed, and the clash thresholds.
+- [ ] **A**, the gate: Vosk's vocabulary check through JNA (R1).
+- [ ] **B**, fuchy as data, Darek's own bundled.
+- [ ] **`maks-sredniawa/darek-fuchy`** with its signing key and workflow, before C: C ships the
+      public half.
+- [ ] **C**, install from a file.
+- [ ] **D**, the network (R2).
+- [ ] **E**, the weather (R3).
+- [ ] **F**, the page, updates and *„Zgłoś fuchę"* (R4–R6), with the listing, policy, Data safety
+      and content rating in the same release.
 
 ## Owed to the owner's phone
 

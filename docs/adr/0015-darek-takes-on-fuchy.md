@@ -54,8 +54,8 @@ permission (a weather fucha needs the internet and the location) is off on a fre
 - **the exact addresses it contacts**: HTTPS only, each an exact host, plus a path prefix if one is
   declared. Darek refuses any other, including one found in an answer, and follows no redirect;
 - **each value it sends**, by name, from a fixed list Darek defines in its code, like the
-  permissions: *your approximate location*, or the value said in one of its slots (*the city you
-  say*). A fucha declaring a value not on the list is refused. **Audio and the rest of what Darek
+  permissions: *your approximate location*, the value said in one of its slots (*the city you
+  say*), or a value the user sets for the fucha when switching it on (*the city you chose*). A fucha declaring a value not on the list is refused. **Audio and the rest of what Darek
   heard are never sent**, whatever a fucha declares
   ([ADR-0008](0008-darek-connects-only-where-the-user-can-see.md));
 - **its language.** Only `pl` is accepted today ([ADR-0012](0012-darek-speaks-polish-and-opens-in-polish.md));
@@ -70,10 +70,11 @@ dial. The builder and the install screen warn that slots are less reliable, Poli
 of all.
 
 **Approved** fuchy are the ones the owner reviewed: community authors open a PR in
-`maksforge/darek-fuchy` under published rules, and merging is the decision that a fucha goes live.
+`maks-sredniawa/darek-fuchy` under published rules, and merging is the decision that a fucha goes live.
 CI signs it with a key held in that repo's secrets, in a workflow that runs only on a push to
 `main`, after the merge, never on `pull_request_target` or in any job that runs a PR's code. Darek
-ships the public half and checks the signature offline. An approved fucha carries the MaksForge
+ships the public half and checks the signature offline. The signature is ECDSA P-256 over SHA-256,
+which the platform verifies from API 26; Ed25519 reaches the platform only at API 33. An approved fucha carries the MaksForge
 badge. Any other `.darek` file still installs, after a strong warning that MaksForge has not
 reviewed it.
 
