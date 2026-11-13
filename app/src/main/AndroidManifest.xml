@@ -76,11 +76,7 @@
             tools:ignore="MissingClass"
             tools:node="remove" />
 
-        <!--
-            ADR-0008: Play Billing's datatransport keeps logging and scheduling, but with its only
-            backend gone it has nothing to upload through. The scheduler entries stay, because
-            JobScheduler throws for a job service missing from the manifest.
-        -->
+        <!-- ADR-0008: datatransport without its upload backend. -->
         <service
             android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
             android:exported="false">
