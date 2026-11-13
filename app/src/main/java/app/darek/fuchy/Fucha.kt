@@ -2,12 +2,16 @@ package app.darek.fuchy
 
 import app.darek.listen.Command
 
-/** ADR-0015's fixed lists. A `.darek` file writes each value as its name in lower case. */
+/**
+ * ADR-0015's fixed lists. A `.darek` file writes each value as its name in lower case. [Action.ownOnly]:
+ * only Darek's own fucha may use it; a fucha calling a Number waits for phase 3 (`docs/PLAN.md`).
+ */
 enum class Action(
     val needs: Permission?,
+    val ownOnly: Boolean = false,
 ) {
     SPEAK(null),
-    CALL(Permission.CALL),
+    CALL(Permission.CALL, ownOnly = true),
 }
 
 enum class Permission { CALL, INTERNET }
