@@ -86,8 +86,10 @@ fun setAppLanguage(language: AppLanguage?) {
  * channel name or anything else a worker, receiver or service builds outside one comes out in the
  * phone's language. From 13 the platform is meant to cover every context, but on Android 17 a
  * service started with no activity since boot still read the phone's language, so the configuration
- * is pinned on every API. A context taken here does not follow a later change of language; take a
- * fresh one per notification run.
+ * is pinned on every API. A context taken here does not follow a later change of language: take a
+ * fresh one per notification run, or, in something long-lived like `ListeningService`, again in
+ * `onConfigurationChanged`, which the platform calls on a language change from Android 13 (below it
+ * AppCompat recreates activities only, so a running service picks the change up at its next start).
  *
  * Read through [LocaleManagerCompat] rather than [AppCompatDelegate]: AppCompat loads its stored
  * language only when an activity attaches, so in a process the OS started for a worker or a broadcast
