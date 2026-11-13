@@ -12,7 +12,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
-/** The Quick Settings tile: shows whether Darek is listening and toggles it (phase-2.md, *The start paths*). */
+/** See phase-2.md, *The start paths*. */
 class ListeningTile : TileService() {
     private var scope: CoroutineScope? = null
     private var running = false

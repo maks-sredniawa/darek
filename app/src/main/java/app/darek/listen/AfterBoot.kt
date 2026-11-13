@@ -23,10 +23,7 @@ fun offersListenAfterBoot(
     installedAt: Instant,
 ): Boolean = wantedUnder == installedAt
 
-/**
- * After a reboot Darek may not start listening by himself (ADR-0010), so this posts a notification
- * whose *Słuchaj* starts him with one tap.
- */
+/** Posts the after-reboot notification that offers *Słuchaj* (ADR-0010). */
 class AfterBootReceiver : BroadcastReceiver() {
     override fun onReceive(
         context: Context,
