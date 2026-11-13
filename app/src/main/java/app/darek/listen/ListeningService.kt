@@ -6,6 +6,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.content.res.Configuration
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationChannelCompat
@@ -27,6 +28,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 /**
  * Listening as a foreground service of type `microphone` (ADR-0010): it keeps the container's
@@ -36,6 +38,13 @@ class ListeningService : Service() {
     private val scope = MainScope()
     private var run: Job? = null
     private var strings: Context = this
+    private var shown: Shown? = null
+
+    private data class Shown(
+        val persona: Persona,
+        val enabled: Set<Command>,
+        val hearing: Hearing,
+    )
 
     private val listening get() = (application as MainApplication).container.listening
     private val container get() = (application as MainApplication).container
@@ -81,6 +90,15 @@ class ListeningService : Service() {
         return START_NOT_STICKY
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        scope.launch {
+            strings = withContext(Dispatchers.IO) { inAppLanguage() }
+            createChannel()
+            shown?.let { renotify(it.persona, it.enabled, it.hearing) }
+        }
+    }
+
     override fun onDestroy() {
         listening.stop()
         scope.cancel()
@@ -99,6 +117,7 @@ class ListeningService : Service() {
                 notification(persona, enabled, Hearing.HEARS),
                 ServiceInfo.FOREGROUND_SERVICE_TYPE_MICROPHONE,
             )
+            shown = Shown(persona, enabled, Hearing.HEARS)
             true
         } catch (e: RuntimeException) {
             Log.e(TAG, "foreground start refused", e)
@@ -118,6 +137,7 @@ class ListeningService : Service() {
         }
         try {
             NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, notification(persona, enabled, hearing))
+            shown = Shown(persona, enabled, hearing)
         } catch (e: SecurityException) {
             Log.e(TAG, "notification refused", e)
             listening.stop()
