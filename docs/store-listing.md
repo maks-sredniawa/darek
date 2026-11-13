@@ -332,3 +332,17 @@ Darek and Daria now keep listening with the screen off or the app closed, and a 
 ```
 Darek i Daria słuchają teraz także przy wyłączonym ekranie i zamkniętej aplikacji, a pokazuje to powiadomienie z przyciskiem Zatrzymaj. Włączysz ich w aplikacji, kafelkiem w szybkich ustawieniach albo, po ponownym uruchomieniu telefonu, z powiadomienia. Podczas rozmowy robią pauzę. Samo imię zostaje teraz bez odpowiedzi: powiedz „Hej, Darek!”, a usłyszysz „No?”.
 ```
+
+### 0.10.0 — Help and feedback, and the notification's language
+
+**English** — 240/500:
+
+```
+Help and feedback is renewed: copy the support address or the app version with a tap, and open the privacy policy, the app's web page and the credits from one place. After a restart, Listening's notification now shows in the app's language.
+```
+
+**Polish** — 266/500:
+
+```
+Odświeżone Pomoc i opinie: adres pomocy i wersję aplikacji skopiujesz jednym dotknięciem, a politykę prywatności, stronę aplikacji i podziękowania otworzysz z jednego miejsca. Po ponownym uruchomieniu telefonu powiadomienie o słuchaniu jest teraz w języku aplikacji.
+```
