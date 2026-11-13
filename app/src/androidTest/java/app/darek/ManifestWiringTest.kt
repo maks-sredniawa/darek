@@ -1,13 +1,16 @@
 package app.darek
 
+import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.security.NetworkSecurityPolicy
 import android.service.quicksettings.TileService
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import app.darek.listen.AfterBootReceiver
 import app.darek.listen.ListeningTile
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,8 +25,33 @@ class ManifestWiringTest {
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
 
     @Test
-    fun no_network_and_none_of_the_stripped_permissions() {
+    fun internet_and_none_of_the_stripped_permissions() {
+        assertTrue("android.permission.INTERNET" in requestedPermissions())
         assertEquals(emptySet<String>(), requestedPermissions() intersect NOT_REQUESTED)
+    }
+
+    @Test
+    fun no_host_is_reached_over_plain_http() {
+        assertFalse(NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted)
+        assertFalse(NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted("maksforge.com"))
+    }
+
+    @Test
+    fun datatransport_has_no_backend_to_upload_through_and_keeps_its_scheduler() {
+        val discovery =
+            context.packageManager.getServiceInfo(
+                ComponentName(context, TRANSPORT_BACKEND_DISCOVERY),
+                PackageManager.GET_META_DATA,
+            )
+        assertEquals(
+            emptySet<String>(),
+            discovery.metaData
+                ?.keySet()
+                .orEmpty()
+                .filter { it.startsWith("backend:") }
+                .toSet(),
+        )
+        context.packageManager.getServiceInfo(ComponentName(context, TRANSPORT_JOB_SERVICE), 0)
     }
 
     @Suppress("DEPRECATION")
@@ -58,14 +86,19 @@ class ManifestWiringTest {
             .toSet()
 
     private companion object {
-        // INTERNET never (ADR-0008); the rest is what the template's reminders and WorkManager
+        // ACCESS_WIFI_STATE per ADR-0008; the rest is what the template's reminders and WorkManager
         // declared or merged. RECEIVE_BOOT_COMPLETED is declared on purpose (ADR-0010). This list
         // moves with aab-permissions.py.
         val NOT_REQUESTED =
             setOf(
-                "android.permission.INTERNET",
+                "android.permission.ACCESS_WIFI_STATE",
                 "android.permission.SCHEDULE_EXACT_ALARM",
                 "android.permission.WAKE_LOCK",
             )
+
+        const val TRANSPORT_BACKEND_DISCOVERY =
+            "com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+        const val TRANSPORT_JOB_SERVICE =
+            "com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
     }
 }
