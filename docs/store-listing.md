@@ -347,7 +347,11 @@ Help and feedback is renewed: copy the support address or the app version with a
 Odświeżone Pomoc i opinie: adres pomocy i wersję aplikacji skopiujesz jednym dotknięciem, a politykę prywatności, stronę aplikacji i podziękowania otworzysz z jednego miejsca. Po ponownym uruchomieniu telefonu powiadomienie o słuchaniu jest teraz w języku aplikacji.
 ```
 
-### 0.11.0 — Who made the app
+### 0.12.0 — Who made the app
+
+The build these notes ship with is 0.12.0, not the 0.11.0 this heading named until 2026-11-13.
+0.12.0 adds phase F's checkpoint D: the `INTERNET` permission and the one HTTP client, which nothing
+calls yet, so an owner sees no change and the bodies below stand unchanged.
 
 **English** — 152/500:
 
