@@ -41,7 +41,7 @@ permissions a shipped feature promoted in the listing uses.
 
 **Darek's own Commands are fuchy too**, bundled in the app in the same format, so there is one loader
 and one path into the grammar. A bundled fucha can be switched off, never removed. One that needs a
-permission (a weather fucha needs the internet and the location) is off on a fresh install.
+permission (a weather fucha needs the internet, and one that reads the location needs that too) is off on a fresh install.
 
 **What a fucha declares, the user sees before installing:**
 - **its permissions**, from a fixed list Darek defines, mostly Android's own (location, calling)
