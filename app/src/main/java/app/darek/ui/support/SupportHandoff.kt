@@ -118,9 +118,8 @@ fun Context.versionLine(): String = "${getString(R.string.app_name)} $versionNum
  *
  * Composed from [BuildConfig] and [Build] — nothing read here that the app does not already know
  * about itself, and nothing that needs a permission. It is not a privacy question in the ordinary
- * sense either: this app declares no `INTERNET` permission and has no route off the device, so this
- * is the *user's own* mail, composed in their client, visible to them before they send it and
- * deletable line by line.
+ * sense either: the app sends none of it itself, so this is the *user's own* mail, composed in their
+ * client, visible to them before they send it and deletable line by line.
  *
  * `app_name` rather than a literal, because the debug source set overrides it — a report from a
  * sideloaded debug build carries the debug label and is told apart from a Play one at a glance.
