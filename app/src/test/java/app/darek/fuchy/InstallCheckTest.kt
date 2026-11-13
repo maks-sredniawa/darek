@@ -62,6 +62,20 @@ class InstallCheckTest {
                 refused(weather.withCommand(speak.copy(reply = reply))),
             )
         }
+        listOf("", "  ").forEach { feminine ->
+            assertEquals(
+                listOf(Refusal.NoReply("jaka-pogoda")),
+                refused(weather.withCommand(speak.copy(replyFeminine = feminine))),
+            )
+        }
+    }
+
+    @Test
+    fun only_the_fucha_inside_the_apk_may_be_darek() {
+        val claimed = weather.copy(id = OwnFucha.ID)
+        assertEquals(listOf(Refusal.ReservedId(OwnFucha.ID)), refused(claimed))
+        assertEquals(emptyList<Refusal>(), refused(claimed, bundled = true))
+        assertTrue(checked(fileOf(claimed), knowsAll) is Checked.Refused)
     }
 
     @Test

@@ -4,6 +4,7 @@ import android.content.Context
 
 /** Darek's own fucha, approved by being inside the APK rather than signed (phase-F.md section 2). */
 object OwnFucha {
+    const val ID = "darek"
     const val ASSET = "fuchy/darek.darek"
 
     fun load(context: Context): Fucha = from(context.assets.open(ASSET).use { it.readBytes() })

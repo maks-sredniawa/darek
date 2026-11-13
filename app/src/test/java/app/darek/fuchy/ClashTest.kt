@@ -93,10 +93,16 @@ class ClashTest {
     }
 
     @Test
-    fun a_fucha_does_not_clash_with_its_own_commands_already_on() {
-        val update = candidate("otwórz bramę dwa", listOf("brama")).copy(id = "darek")
-        assertEquals(emptyList<Clash>(), clashes(update, enabled))
-        assertEquals(emptyList<Clash>(), clashes(ownFucha, enabled))
+    fun an_update_does_not_clash_with_its_own_installed_commands() {
+        val installed = candidate("jaka pogoda", listOf("jaka przygoda"))
+        val update = candidate("jaka pogoda dziś", listOf("jaka przygoda"))
+        assertEquals(emptyList<Clash>(), clashes(update, enabled + installed.commands))
+    }
+
+    @Test
+    fun a_fucha_claiming_darek_s_id_still_clashes_with_darek_s_own_commands() {
+        val claimed = candidate("otwórz bramę").copy(id = OwnFucha.ID)
+        assertEquals(listOf(Clash.Holds(claimed.commands.single(), gate)), clashes(claimed, enabled))
     }
 
     @Test

@@ -6,7 +6,6 @@ import java.util.Locale
 
 /** ADR-0015's *Phrases that clash*, judged between a fucha about to be installed and the Commands already on. */
 sealed interface Clash {
-    /** Never both on: switching one on switches the other off. */
     val neverBothOn: Boolean get() = false
 
     /** Identical, or one holding the other's words adjacent and in order, which ADR-0009's match rule would fire. */
@@ -43,7 +42,7 @@ fun clashes(
     candidate: Fucha,
     enabled: Collection<Command>,
 ): List<Clash> {
-    val others = enabled.filter { it.fucha != candidate.id }
+    val others = enabled.filter { it.bundled || it.fucha != candidate.id }
     val phrases =
         candidate.commands.flatMap { mine ->
             others.mapNotNull { other ->
@@ -92,7 +91,6 @@ private fun near(
 private fun List<String>.holds(other: List<String>): Boolean =
     other.isNotEmpty() && (0..size - other.size).any { start -> other.indices.all { this[start + it] == other[it] } }
 
-/** Levenshtein: insertions, deletions and substitutions, each one letter. */
 fun editDistance(
     a: String,
     b: String,
