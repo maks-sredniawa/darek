@@ -335,10 +335,10 @@ Darek i Daria słuchają teraz także przy wyłączonym ekranie i zamkniętej ap
 
 ### 0.10.0 — Help and feedback, and the notification's language
 
-**English** — 240/500:
+**English** — 249/500:
 
 ```
-Help and feedback is renewed: copy the support address or the app version with a tap, and open the privacy policy, the app's web page and the credits from one place. After a restart, Listening's notification now shows in the app's language.
+Help and feedback is renewed: copy the support address or the app version with a tap, and open the privacy policy, the app's web page and the credits from one place. After the phone restarts, Listening's notification now shows in the app's language.
 ```
 
 **Polish** — 266/500:
