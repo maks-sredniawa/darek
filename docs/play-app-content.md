@@ -22,12 +22,12 @@ Two rules keep this file honest:
 
 ## What the artifact carries
 
-Read at **versionCode 72** from a local release bundle (`./gradlew bundleRelease`, commit
-`10d15a1`, the code 0.3.0 ships) on 2026-11-01. `publish-play.yml`'s verify step reads the uploaded
-bundle again:
+Read at **versionCode 152** from a local release bundle (`./gradlew bundleRelease`, commit
+`c85e72b`, phase 2's checkpoint D, the code 0.9.0 ships) on 2026-11-12. `publish-play.yml`'s verify
+step reads the uploaded bundle again:
 
 ```text
-4 permissions, all accounted for; none of the 6 forbidden ones present; 0 <uses-feature> declared; 0 of the 4 activities lock their orientation, every one of them expected
+8 permissions, all accounted for; none of the 6 forbidden ones present; 0 <uses-feature> declared; 0 of the 5 activities lock their orientation, every one of them expected
 ```
 
 `RECORD_AUDIO` implies `android.hardware.microphone`, `required`, though nothing declares it: a phone
