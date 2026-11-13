@@ -174,7 +174,7 @@ The answer rests on one fact per route data could take:
    Re-read 2026-11-12 for phase 2 (0.9.0): Listening now runs with the screen off and the app closed,
    in a foreground service, and processes the same audio the same way; the boot notification and the
    tile read nothing but the app's own setting. Still no data collected and none shared. The
-   Console's preview read back the same that day, unchanged.
+   Console's preview read back the same on 2026-11-13, unchanged.
 3. **The Numbers stay on the device.** The user types each one in; it is kept in DataStore and used
    only to place that Command's call. **Auto Backup is still "no data collected"**: the platform moves
    the user's backup to the user's own Google account, and the developer never sees it. That is
