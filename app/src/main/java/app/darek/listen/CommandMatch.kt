@@ -20,10 +20,11 @@ fun List<String>.hails(name: String): Boolean = indices.any { this[it] == HEJ &&
 
 /**
  * What one final result makes the Persona do: fire a Command; when hailed with its own name and
- * nothing it knows, say it does not understand, or, while no Command the user sets up is enabled,
- * say it has no fucha; failing that, correct a user who hailed the other Persona (ADR-0016); or stay
- * silent, so talk that names either without *„hej"* never gets an answer. The built-in Command that
- * only replies does not count as set up (the owner's call, 2026-11-01).
+ * nothing it knows, say it does not understand, or, while nothing is configured, say it has no fucha;
+ * failing that, correct a user who hailed the other Persona (ADR-0016); or stay silent, so talk that
+ * names either without *„hej"* never gets an answer. Configured is an enabled Command that calls, or
+ * any enabled Command from a fucha the user installed; Darek's own Commands that only reply do not
+ * count (the owner, 2026-11-13; ADR-0015, *Consequences*).
  */
 fun reactionTo(
     tokens: List<String>,
@@ -32,11 +33,13 @@ fun reactionTo(
 ): Reaction? {
     commandIn(tokens, enabled, persona)?.let { return Reaction.Fires(it) }
     return when {
-        tokens.hails(persona.word) -> if (enabled.any { it.calls }) Reaction.NotUnderstood else Reaction.NotConfigured
+        tokens.hails(persona.word) -> if (enabled.any(::configures)) Reaction.NotUnderstood else Reaction.NotConfigured
         tokens.hails(persona.other.word) -> Reaction.Corrected
         else -> null
     }
 }
+
+private fun configures(command: Command): Boolean = command.calls || !command.bundled
 
 sealed interface Reaction {
     data class Fires(

@@ -52,6 +52,7 @@ import java.util.concurrent.ConcurrentHashMap
 class Listening(
     context: Context,
     scope: CoroutineScope,
+    private val commands: List<Command>,
     private val volume: () -> Float,
 ) {
     enum class Phase { OFF, PREPARING, ON }
@@ -82,11 +83,12 @@ class Listening(
 
     private data class Wanted(
         val enabled: Set<Command>,
+        val decoys: List<String>,
         val persona: Persona,
     )
 
     private val runs =
-        LatestRun<Wanted>(scope, { listen(it.enabled, it.persona) }) {
+        LatestRun<Wanted>(scope, { listen(it.enabled, it.decoys, it.persona) }) {
             mutableState.update { it.copy(phase = Phase.OFF, hearingName = false, hearing = Hearing.HEARS) }
         }
 
@@ -102,10 +104,11 @@ class Listening(
     /** Started again under another Persona, a running Listening restarts (ADR-0016). */
     fun start(
         enabled: Set<Command>,
+        decoys: List<String>,
         persona: Persona,
     ) {
         if (enabled.isEmpty()) return
-        runs.run(Wanted(enabled, persona))
+        runs.run(Wanted(enabled, decoys, persona))
     }
 
     /** A running Listening restarts under [persona]; a stopped one stays stopped (ADR-0016). */
@@ -120,6 +123,7 @@ class Listening(
 
     private suspend fun listen(
         enabled: Set<Command>,
+        decoys: List<String>,
         persona: Persona,
     ) {
         if (ContextCompat.checkSelfPermission(appContext, Manifest.permission.RECORD_AUDIO) !=
@@ -147,7 +151,7 @@ class Listening(
                     }
                     launch(Dispatchers.Default) { renderAhead(persona, NOT_UNDERSTOOD.drop(1)) }
                 }
-                val grammar = Grammar.json(enabled, persona, ListeningExtras.phrases(persona))
+                val grammar = Grammar.json(enabled, decoys, persona, ListeningExtras.phrases(persona))
                 mutableState.update { it.copy(phase = Phase.ON) }
                 while (true) {
                     pauseWhileInCall()
@@ -244,7 +248,7 @@ class Listening(
     ): Answer? {
         val reaction = reactionTo(tokens, enabled, persona)
         if (reaction is Reaction.Fires) {
-            return Answer(reaction.command.name, reaction.command.reply.by(persona), reaction.command.calls)
+            return Answer(reaction.command.label, reaction.command.reply.by(persona), reaction.command.calls)
         }
         ListeningExtras.reply(appContext, tokens, persona)?.let { return Answer("EXTRA", it) }
         return when (reaction) {
@@ -363,7 +367,7 @@ class Listening(
                 .onFailure { Log.e(VOICE_TAG, "voice failed to load", it) }
                 .getOrNull()
                 ?.let { persona to it } ?: return
-        renderAhead(persona, Command.entries.map { it.reply } + NOT_CONFIGURED + Line(persona.correction))
+        renderAhead(persona, commands.map { it.reply } + NOT_CONFIGURED + Line(persona.correction))
         Log.i(VOICE_TAG, "persona=$persona ready=${SystemClock.elapsedRealtime() - started}ms")
     }
 

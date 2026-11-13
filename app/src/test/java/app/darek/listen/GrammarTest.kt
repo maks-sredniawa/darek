@@ -1,5 +1,7 @@
 package app.darek.listen
 
+import app.darek.fuchy.ownCommand
+import app.darek.fuchy.ownFucha
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -8,8 +10,11 @@ import org.junit.Test
 
 /** A grammar Vosk cannot read drops its words without a sound, and the Command never fires. */
 class GrammarTest {
-    private val callOff = Grammar.json(setOf(Command.SAY_SOMETHING), Persona.DAREK)
-    private val callOn = Grammar.json(Command.entries.toSet(), Persona.DAREK)
+    private val sayOnly = setOf(ownCommand("say-something"))
+    private val all = ownFucha.commands
+    private val decoys = ownFucha.decoys
+    private val callOff = Grammar.json(sayOnly, decoys, Persona.DAREK)
+    private val callOn = Grammar.json(all, decoys, Persona.DAREK)
 
     private fun phrases(json: String): List<String> = Json.decodeFromString(json)
 
@@ -40,22 +45,22 @@ class GrammarTest {
 
     @Test
     fun without_a_number_the_gate_is_not_enabled_and_not_in_the_grammar() {
-        val enabled = enabledCommands(number = null)
-        assertEquals(setOf(Command.SAY_SOMETHING), enabled)
-        assertFalse(phrases(Grammar.json(enabled, Persona.DAREK)).any { "bramę" in it })
+        val enabled = enabledCommands(listOf(ownFucha), number = null)
+        assertEquals(sayOnly, enabled)
+        assertFalse(phrases(Grammar.json(enabled, decoys, Persona.DAREK)).any { "bramę" in it })
     }
 
     @Test
     fun with_a_number_the_gate_is_enabled_and_in_the_grammar() {
-        val enabled = enabledCommands(number = "123456789")
-        assertEquals(setOf(Command.SAY_SOMETHING, Command.GATE), enabled)
-        assertTrue("darek otwórz bramę" in phrases(Grammar.json(enabled, Persona.DAREK)))
+        val enabled = enabledCommands(listOf(ownFucha), number = "123456789")
+        assertEquals(all.toSet(), enabled)
+        assertTrue("darek otwórz bramę" in phrases(Grammar.json(enabled, decoys, Persona.DAREK)))
     }
 
     @Test
     fun the_decoys_and_unk_are_always_in() {
         listOf(callOff, callOn).map(::phrases).forEach { phrases ->
-            assertTrue(phrases.containsAll(Grammar.decoys(Persona.DAREK)))
+            assertTrue(phrases.containsAll(Grammar.decoys(Persona.DAREK, decoys)))
             assertTrue(Grammar.UNKNOWN in phrases)
             assertTrue(HEJ in phrases)
             assertTrue("hej darek" in phrases)
@@ -65,11 +70,11 @@ class GrammarTest {
 
     @Test
     fun the_chosen_persona_s_name_starts_every_command_and_the_other_name_is_a_decoy() {
-        val daria = phrases(Grammar.json(Command.entries.toSet(), Persona.DARIA))
+        val daria = phrases(Grammar.json(all, decoys, Persona.DARIA))
         assertTrue("daria powiedz coś" in daria)
         assertTrue("daria otwórz bramę" in daria)
         assertEquals(
-            Grammar.decoyPhrases(Command.entries.toSet(), Persona.DARIA).filter { it.startsWith("darek ") },
+            Grammar.decoyPhrases(all, Persona.DARIA).filter { it.startsWith("darek ") },
             daria.filter { it.startsWith("darek ") },
         )
         assertTrue("darek" in daria)
@@ -95,21 +100,21 @@ class GrammarTest {
                 "zamknij",
                 "brama",
             )
-        assertEquals(adr0016 + "daria", Grammar.decoys(Persona.DAREK).toSet())
-        assertEquals(adr0016 + "darek", Grammar.decoys(Persona.DARIA).toSet())
-        Persona.entries.forEach { assertEquals(Grammar.decoys(it).distinct(), Grammar.decoys(it)) }
+        assertEquals(adr0016 + "daria", Grammar.decoys(Persona.DAREK, decoys).toSet())
+        assertEquals(adr0016 + "darek", Grammar.decoys(Persona.DARIA, decoys).toSet())
+        Persona.entries.forEach { assertEquals(Grammar.decoys(it, decoys).distinct(), Grammar.decoys(it, decoys)) }
     }
 
     @Test
     fun every_name_decoy_has_a_whole_phrase_for_each_enabled_command_and_none_for_the_others() {
         val off = phrases(callOff)
-        val on = phrases(Grammar.json(Command.entries.toSet(), Persona.DARIA))
+        val on = phrases(Grammar.json(all, decoys, Persona.DARIA))
         assertTrue("dario powiedz coś" in off)
         assertFalse(off.any { it.endsWith("otwórz bramę") && !it.startsWith("darek") })
         (Grammar.NAME_DECOYS + "darek").forEach { name ->
             assertTrue(name, "$name otwórz bramę" in on)
             assertTrue(name, "$name powiedz coś" in on)
         }
-        assertFalse("daria otwórz bramę" in Grammar.decoyPhrases(Command.entries.toSet(), Persona.DARIA))
+        assertFalse("daria otwórz bramę" in Grammar.decoyPhrases(all, Persona.DARIA))
     }
 }

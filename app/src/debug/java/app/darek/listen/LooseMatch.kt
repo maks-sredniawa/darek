@@ -2,6 +2,7 @@ package app.darek.listen
 
 import android.content.Context
 import androidx.core.content.edit
+import app.darek.fuchy.editDistance
 
 /**
  * Debug-only: lets a reply-only Command fire when each of its words is only *alike* what was heard,
@@ -40,23 +41,6 @@ object LooseMatch {
         b: String,
     ): Float {
         val longest = maxOf(a.length, b.length)
-        return if (longest == 0) 1f else 1f - distance(a, b).toFloat() / longest
-    }
-
-    private fun distance(
-        a: String,
-        b: String,
-    ): Int {
-        var previous = IntArray(b.length + 1) { it }
-        for (i in 1..a.length) {
-            val current = IntArray(b.length + 1)
-            current[0] = i
-            for (j in 1..b.length) {
-                val substitution = previous[j - 1] + if (a[i - 1] == b[j - 1]) 0 else 1
-                current[j] = minOf(previous[j] + 1, current[j - 1] + 1, substitution)
-            }
-            previous = current
-        }
-        return previous[b.length]
+        return if (longest == 0) 1f else 1f - editDistance(a, b).toFloat() / longest
     }
 }
