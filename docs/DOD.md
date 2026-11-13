@@ -159,14 +159,12 @@ Console matches. A new permission, foreground service or data type is a Console 
       The repo half is done 2026-11-01 (listing, policy, `play-app-content.md`, screenshots; the
       allowlist and licences came with B). Tick when 0.3.0 is uploaded with its listing and the
       Console's Data safety is confirmed unchanged.
-- [ ] **In 0.9.0, phase 2's release, which waits for checkpoint D** ([`phase-2.md`](phase-2.md)):
-      the foreground-service declaration for `microphone`, with its video of a user starting
-      Listening, answered from `play-app-content.md`'s *Foreground service permissions*; the
-      Data safety re-read; the screenshots re-shot with the notification and the disclosure for the
-      background. `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MICROPHONE` and `POST_NOTIFICATIONS` are
-      in the build from checkpoint A, `RECEIVE_BOOT_COMPLETED` from D. The repo half came with D: the
-      0.9.0 notes, the listing's test-build paragraph and its *Run at startup* line in both
-      languages, the privacy policy and `play-app-content.md`'s permission rows.
+- [ ] **In 0.9.0, phase 2's release** ([`phase-2.md`](phase-2.md)), on internal since
+      2026-11-13 as versionCode 158. The foreground-service declaration for `microphone` was filed
+      and sent for review that day (`play-app-content.md`, *Foreground service permissions*). Still
+      owed: Google's approval of it, the Console's Data safety confirmed unchanged against the
+      repo's re-read, and the screenshots re-shot with the notification and the background
+      disclosure. Tick when all three hold.
 
 ## Owed to the owner's phone
 
