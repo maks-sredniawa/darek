@@ -173,6 +173,11 @@ Console matches. A new permission, foreground service or data type is a Console 
       declaration for `microphone` filed and published that day (`play-app-content.md`); the
       Console's Data safety read back unchanged (*doesn't collect*, *doesn't share*, the policy URL);
       the listing's full description and five screenshots per language sent for review.
+- [ ] **No build carrying `INTERNET` leaves internal testing until phase F's checkpoint F** has
+      rewritten the privacy policy, the listing, the Data safety and
+      [`play-app-content.md`](play-app-content.md): until then they still say Darek has no network
+      ([`phase-F.md`](phase-F.md), *With F*). `aab-permissions.py` no longer stops such a build, so
+      this line is the only gate. Tick when F's release carries all four.
 
 ## Phase F — the weather fucha from the fuchy page
 
