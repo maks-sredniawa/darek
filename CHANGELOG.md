@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.9.0](https://github.com/maks-sredniawa/darek/compare/v0.8.0...v0.9.0) (2026-11-13)
+
+
+### Features
+
+* answer the name only when hailed with hej ([3fd08c1](https://github.com/maks-sredniawa/darek/commit/3fd08c13dc037819f903574298c16833d2156b46))
+* listen through a microphone foreground service ([acc67c2](https://github.com/maks-sredniawa/darek/commit/acc67c2e350fafc0f4a1c9016b807235e8a354df))
+* pause Listening during a call and listen again when it ends ([3c6a1ba](https://github.com/maks-sredniawa/darek/commit/3c6a1ba0999e577b4a161dd3da9d7aa912bea0e0))
+* start Listening from the Quick Settings tile and after a reboot, and refuse to listen without notifications ([8b0c262](https://github.com/maks-sredniawa/darek/commit/8b0c2622cba3f474b1c6d6ffa8ddf3c7727c609c))
+
+
+### Bug Fixes
+
+* answer the name only once the hail holds still for 400 ms ([74d2a40](https://github.com/maks-sredniawa/darek/commit/74d2a40850a531b89276d217c952d19722d46263))
+* give each name Decoy a whole phrase in front of every Command ([15771e8](https://github.com/maks-sredniawa/darek/commit/15771e8679e3f2ef9185c8b9dfd302cfd2116497))
+* let the manifest test expect RECEIVE_BOOT_COMPLETED, which the reboot notification needs ([6a765c7](https://github.com/maks-sredniawa/darek/commit/6a765c781b7b124ea9cd30fc8093070a2209d876))
+* point the persona hint and Hej comments at the Hej rule, and give ADR-0010 its consequence ([8493681](https://github.com/maks-sredniawa/darek/commit/84936812236fc5f9d4ef62ad4c0290caf1710702))
+* show cannot hear and try again when the microphone cannot record, and give ADR-0010 and ADR-0011 the call pause as built ([3a824fa](https://github.com/maks-sredniawa/darek/commit/3a824fa86d725dbd075ed6142a73adb3a5aab999))
+* start Listening only with the microphone granted, in the app's language ([30212fa](https://github.com/maks-sredniawa/darek/commit/30212fa655898b749cbef6be11143fde8084f9aa))
+
 ## [0.8.0](https://github.com/maksforge/darek/compare/v0.7.0...v0.8.0) (2026-11-02)
 
 
