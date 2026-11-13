@@ -25,4 +25,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class LicenceText(
     val spdxId: String,
+    val title: String,
 ) : NavKey
