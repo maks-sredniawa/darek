@@ -191,13 +191,11 @@ class ListeningService : Service() {
         persona: Persona,
         enabled: Set<Command>,
         hearing: Hearing,
-    ): String =
+    ): String? =
         when (hearing) {
             Hearing.HEARS ->
-                strings.getString(
-                    R.string.listening_say,
-                    (enabled.firstOrNull { it.calls } ?: enabled.first()).spoken(persona),
-                )
+                (enabled.firstOrNull { it.calls } ?: enabled.firstOrNull())
+                    ?.let { strings.getString(R.string.listening_say, it.spoken(persona)) }
             Hearing.PAUSED_FOR_CALL -> strings.getString(R.string.listening_paused_call)
             Hearing.CANNOT_HEAR -> strings.getString(R.string.listening_cannot_hear)
         }

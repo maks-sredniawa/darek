@@ -30,7 +30,6 @@ data class Command(
     fun spoken(persona: Persona): String = "${persona.word.replaceFirstChar { it.uppercase() }}, $phrase"
 }
 
-/** A Command that calls is enabled only with a Number to call. */
 fun enabledCommands(
     on: Collection<Fucha>,
     number: String?,
