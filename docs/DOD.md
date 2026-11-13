@@ -178,8 +178,6 @@ Console matches. A new permission, foreground service or data type is a Console 
 
 [`phase-F.md`](phase-F.md) has the plan; tick a checkpoint when it merges with its readings.
 
-- [ ] **Two owner decisions** (`phase-F.md`, section 6): what counts as configured once a fucha is
-      installed, and the clash thresholds.
 - [ ] **A**, the gate: Vosk's vocabulary check through JNA (R1).
 - [ ] **B**, fuchy as data, Darek's own bundled.
 - [ ] **`maks-sredniawa/darek-fuchy`** with its signing key and workflow, before C: C ships the
