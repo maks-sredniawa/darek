@@ -27,8 +27,8 @@ private const val MIUI_AUTOSTART_ACTIVITY = "com.miui.permcenter.autostart.AutoS
  * package-visibility filtering on API 30+ returns null for an activity that would have launched
  * perfectly well. It is a **live read**, which is what lets a settings row about surviving a restart
  * be *absent* on a phone with no such screen rather than a dead button on every other vendor's
- * device. `PackageManager.resolveActivity`, not `Intent.resolveActivity`: the latter hands back an
- * explicit component without checking it exists, so it answered yes on every phone.
+ * device. `PackageManager.resolveActivity`, because `Intent.resolveActivity` returns an explicit
+ * component unchecked.
  */
 fun Context.hasAutostartSettings(): Boolean = packageManager.resolveActivity(autostartIntent(), 0) != null
 
