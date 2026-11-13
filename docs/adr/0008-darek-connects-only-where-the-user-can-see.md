@@ -24,8 +24,10 @@ reading the source and watching the traffic, not by reading the manifest.
 
 ## Decision
 
-**Darek declares `INTERNET` from the phase that builds fuchy** (`docs/PLAN.md`). Until that phase
-ships, the merged manifest declares none, and `scripts/aab-permissions.py` keeps it in FORBIDDEN.
+**Darek declares `INTERNET` from the phase that builds fuchy** (`docs/PLAN.md`), at its checkpoint D
+(`docs/phase-F.md`), the network rules below landing in the same merge. Internal builds carry it
+before the privacy policy, the listing and Data safety say so: those change with checkpoint F,
+before any build reaches a tester.
 
 **Darek connects to two kinds of address, over HTTPS only, follows no redirect, and connects to
 no other:**
