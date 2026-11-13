@@ -362,8 +362,9 @@ the mail's tag.
 - **With D**, the rest of ADR-0008's *Consequences*, rewritten the day `INTERNET` merges:
   `README.md` (*never opens a network connection*), `docs/index.md` (*no internet permission*) and
   `docs/_config.yml`'s description (*offline*), `CLAUDE.md`'s Stack row for Play Billing,
-  `SupportHandoff.kt`'s KDoc, ADR-0007's *`INTERNET` stays out* ended by its amendment, and
-  `aab-permissions.py` with `ManifestWiringTest` (section 4).
+  ADR-0007's *`INTERNET` stays out* ended by its amendment, and `aab-permissions.py` with
+  `ManifestWiringTest` (section 4). `SupportHandoff.kt`'s KDoc is synced from android-starter, so
+  it changes there first (`DOD.md`).
 - **With F**: the privacy policy (the network, Open-Meteo, the city), the listing in both languages
   naming the fuchy page and the weather, `play-app-content.md` and the Data safety re-answered (the
   city is approximate location, sent to Open-Meteo, optional, for app functionality: **assumed**
