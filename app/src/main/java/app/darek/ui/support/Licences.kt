@@ -34,10 +34,10 @@ data class LicensedArtifact(
     val artifactId: String,
     val version: String,
     val name: String? = null,
+    /** Where a file the build fetched itself came from, and its SHA-256; Licensee never writes it. */
+    val source: String? = null,
     val spdxLicenses: List<SpdxLicence> = emptyList(),
     val unknownLicenses: List<UnknownLicence> = emptyList(),
-    /** Where a bundled file was fetched from and its SHA-256; licensee never writes it. */
-    val source: String? = null,
 ) {
     /** `androidx.room:room-runtime:2.8.4` — the identity a reader can actually look up. */
     val coordinates: String get() = "$groupId:$artifactId:$version"
@@ -86,84 +86,6 @@ data class LicenceGroup(
     val url: String?,
     val artifacts: List<LicensedArtifact>,
 )
-
-/**
- * The two models the build fetches as files rather than Maven artifacts, which licensee never sees:
- * the recogniser's (ADR-0009) and Darek's voice (ADR-0014), whose base voice's terms are named as
- * that ADR states them.
- */
-val BUNDLED_MODELS =
-    listOf(
-        LicensedArtifact(
-            groupId = "com.alphacephei",
-            artifactId = "vosk-model-small-pl",
-            version = "0.22",
-            name = "Vosk Polish speech model",
-            source =
-                "https://alphacephei.com/vosk/models/vosk-model-small-pl-0.22.zip · " +
-                    "SHA-256 c4cd16498ea544f446f9e9a55cbd602b71cfe5a2b6f2b0834d81e1b6fce15f0d",
-            spdxLicenses =
-                listOf(
-                    SpdxLicence("Apache-2.0", "Apache License 2.0", "https://alphacephei.com/vosk/models"),
-                ),
-        ),
-        LicensedArtifact(
-            groupId = "rhasspy.piper-voices",
-            artifactId = "pl_PL-mc_speech-medium",
-            version = "medium",
-            name = "Darek's voice: Piper pl_PL mc_speech",
-            source =
-                "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/" +
-                    "pl/pl_PL/mc_speech/medium/" +
-                    "pl_PL-mc_speech-medium.onnx · " +
-                    "SHA-256 a6b043358bc81e6c111a5140606a21959ce7f34969b8b7207f62869787cc3907",
-            spdxLicenses =
-                listOf(
-                    SpdxLicence(
-                        "MIT",
-                        "MIT License",
-                        "https://huggingface.co/rhasspy/piper-voices/blob/b4e358ffcb232591bf73a540e70f7de528e4174a/" +
-                            "pl/pl_PL/mc_speech/medium/MODEL_CARD",
-                    ),
-                    SpdxLicence("CC0-1.0", "Creative Commons Zero v1.0 Universal (MC Speech recordings)"),
-                ),
-            unknownLicenses =
-                listOf(
-                    UnknownLicence(
-                        "Blizzard 2013 lessac recordings, the base voice it was fine-tuned from: research use only",
-                        "https://www.cstr.ed.ac.uk/projects/blizzard/2013/lessac_blizzard2013/license.html",
-                    ),
-                ),
-        ),
-        LicensedArtifact(
-            groupId = "rhasspy.piper-voices",
-            artifactId = "pl_PL-gosia-medium",
-            version = "medium",
-            name = "Daria's voice: Piper pl_PL gosia",
-            source =
-                "https://huggingface.co/rhasspy/piper-voices/resolve/b4e358ffcb232591bf73a540e70f7de528e4174a/" +
-                    "pl/pl_PL/gosia/medium/" +
-                    "pl_PL-gosia-medium.onnx · " +
-                    "SHA-256 38f66464240ed74f186e6b7dc13c6e3b22e023426299f25c2b3cc9dfa9373fbc",
-            spdxLicenses =
-                listOf(
-                    SpdxLicence(
-                        "MIT",
-                        "MIT License",
-                        "https://huggingface.co/rhasspy/piper-voices/blob/b4e358ffcb232591bf73a540e70f7de528e4174a/" +
-                            "pl/pl_PL/gosia/medium/MODEL_CARD",
-                    ),
-                    SpdxLicence("CC0-1.0", "Creative Commons Zero v1.0 Universal (OHF-Voice gosia recordings)"),
-                ),
-            unknownLicenses =
-                listOf(
-                    UnknownLicence(
-                        "Blizzard 2013 lessac recordings, the base voice it was fine-tuned from: research use only",
-                        "https://www.cstr.ed.ac.uk/projects/blizzard/2013/lessac_blizzard2013/license.html",
-                    ),
-                ),
-        ),
-    )
 
 /**
  * Lenient on purpose — see the file header. `isLenient` is *not* set: the input is machine-written

@@ -41,6 +41,35 @@ class LicencesTest {
     }
 
     @Test
+    fun `a bundled artifact joins the group of its licence and lists its source under the coordinates`() {
+        val report =
+            """[{"groupId":"a","artifactId":"one","version":"1.0",
+                 "spdxLicenses":[{"identifier":"Apache-2.0","name":"Apache License 2.0"}]}]"""
+        val model =
+            LicensedArtifact(
+                groupId = "models",
+                artifactId = "tiny",
+                version = "3",
+                source = "https://example.org/tiny.bin sha256:abc",
+                spdxLicenses = listOf(SpdxLicence("MIT", "MIT License")),
+            )
+        val dataSet =
+            LicensedArtifact(
+                groupId = "data",
+                artifactId = "set",
+                version = "1",
+                spdxLicenses = listOf(SpdxLicence("Apache-2.0", "Apache License 2.0")),
+            )
+
+        val groups = groupLicences(report, bundled = listOf(model, dataSet)).associateBy { it.spdxId }
+
+        assertEquals(listOf("a:one:1.0", "data:set:1"), groups.getValue("Apache-2.0").artifacts.map { it.coordinates })
+        assertEquals(listOf(model), groups.getValue("MIT").artifacts)
+        assertEquals("models:tiny:3\nhttps://example.org/tiny.bin sha256:abc", model.listing)
+        assertEquals(dataSet.coordinates, dataSet.listing)
+    }
+
+    @Test
     fun `a plugin bump that adds an unknown field must not blank the screen`() {
         val report =
             """[{"groupId":"a","artifactId":"one","version":"1.0","somethingNew":true,
@@ -55,47 +84,5 @@ class LicencesTest {
         // behind an empty screen. `LicencesViewModel` wraps the call so a user never sees a crash,
         // which is the right place for the decision — one caller, one policy.
         assertThrows(Exception::class.java) { groupLicences("not json") }
-    }
-
-    @Test
-    fun `the bundled models join their licences, each voice under each of its three`() {
-        val report =
-            """
-            [{"groupId":"a","artifactId":"one","version":"1.0",
-              "spdxLicenses":[{"identifier":"MIT","name":"MIT License"}]}]
-            """.trimIndent()
-        val groups = groupLicences(report, BUNDLED_MODELS)
-        listOf("pl_PL-mc_speech-medium", "pl_PL-gosia-medium").forEach { voice ->
-            val voiceIn = groups.filter { group -> group.artifacts.any { it.artifactId == voice } }
-            assertEquals(voice, listOf("CC0-1.0", "MIT", null), voiceIn.map { it.spdxId })
-        }
-        assertEquals(3, groups.single { it.spdxId == "MIT" }.artifacts.size)
-        val apache = groups.single { it.spdxId == "Apache-2.0" }
-        assertTrue(apache.artifacts.any { it.artifactId == "vosk-model-small-pl" })
-    }
-
-    @Test
-    fun `each bundled model lists its source and SHA-256 under its coordinates`() {
-        BUNDLED_MODELS.forEach { model ->
-            assertTrue(model.listing.startsWith("${model.coordinates}\nhttps://"))
-            assertTrue(Regex("SHA-256 [0-9a-f]{64}$").containsMatchIn(model.listing))
-        }
-    }
-
-    @Test
-    fun `an artifact from the report has no source and lists only its coordinates`() {
-        val report =
-            """
-            [{"groupId":"a","artifactId":"one","version":"1.0",
-              "spdxLicenses":[{"identifier":"MIT","name":"MIT License"}]}]
-            """.trimIndent()
-        assertEquals(
-            "a:one:1.0",
-            groupLicences(report)
-                .single()
-                .artifacts
-                .single()
-                .listing,
-        )
     }
 }

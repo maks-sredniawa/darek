@@ -19,6 +19,7 @@ import app.darek.ui.settings.SettingsScreen
 import app.darek.ui.support.LicenceTextScreen
 import app.darek.ui.support.LicencesScreen
 import app.darek.ui.support.SupportScreen
+import app.darek.ui.support.TipSection
 
 /**
  * What every back-stack entry is wrapped in — above all, **one `ViewModelStore` per entry**.
@@ -88,7 +89,11 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                         )
                     }
                     entry<Support> {
-                        SupportScreen(onBack = { backStack.removeLastOrNull() })
+                        SupportScreen(
+                            onBack = { backStack.removeLastOrNull() },
+                            onOpenCredits = { backStack.add(Licences) },
+                            tip = { TipSection() },
+                        )
                     }
                     entry<Licences> {
                         LicencesScreen(
