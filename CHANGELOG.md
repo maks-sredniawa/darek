@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.10.0](https://github.com/maks-sredniawa/darek/compare/v0.9.0...v0.10.0) (2026-11-13)
+
+
+### Features
+
+* **support:** adopt the shared Help and feedback from android-starter ([c183a33](https://github.com/maks-sredniawa/darek/commit/c183a33bc6a347dc9f079eb7a688822066b24396))
+* **support:** resync with android-starter for the address row, clearer report hint and neutral tip log tag ([edea3d0](https://github.com/maks-sredniawa/darek/commit/edea3d0421ef4fc2741f5469f4f3dab5dd84f124))
+
+
+### Bug Fixes
+
+* build Listening's notification in the app's language after a reboot on Android 13+ ([65e19c9](https://github.com/maks-sredniawa/darek/commit/65e19c9c5b4e64ce5891c9e66507fed252fbce21))
+* refresh Listening's notification when the app language changes while it runs ([8b8a780](https://github.com/maks-sredniawa/darek/commit/8b8a7808cea80bf6f918b4bf066143781a975ed4))
+
 ## [0.9.0](https://github.com/maks-sredniawa/darek/compare/v0.8.0...v0.9.0) (2026-11-13)
 
 
