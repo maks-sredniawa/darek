@@ -44,7 +44,8 @@ let us do otherwise".">
 | Kotlin, Jetpack Compose, Material 3 | Android only, `minSdk` 26 |
 | **Navigation 3** (`androidx.navigation3`) | Replaces Navigation Compose 2.x — don't reintroduce the old one |
 | Manual DI via `AppContainer`, **not Hilt** | Constructor injection is clearer at this size and easy to migrate later |
-| Play Billing (`tip/`), for the tip only | Unlocks nothing; adds `BILLING`, and its merged `INTERNET` is removed until phase F declares it — ADR-0007, ADR-0008 |
+| Play Billing (`tip/`), for the tip only | Unlocks nothing; adds `BILLING`. Its `datatransport` has its upload backend removed — ADR-0007, ADR-0008 |
+| `INTERNET`, every request through `net/HttpClient` | HTTPS only, no redirects, maksforge.com's fuchy page and a fucha's declared addresses only — ADR-0008 |
 | On-device storage only | No backend. Platform Auto Backup, no custom agent — ADR-0005 |
 
 ## House rules
@@ -97,6 +98,7 @@ app/src/main/java/<namespace>/
                how the app hangs together rather than any one screen
   data/        the preferences (DataStore)
   theme/       generated palette, type scale, spacing, the night-mode window half
+  net/         the one HTTP client and its address allowlist (ADR-0008)
   tip/         the tip through Play Billing, held by AppContainer so a purchase finishes after its
                screen is gone, and the rule for its one ask on the home screen (ADR-0007)
   ui/          Compose screens + ViewModels, one package per area

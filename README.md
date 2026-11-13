@@ -3,8 +3,10 @@
 Darek is a Polish voice assistant for Android. Say *"Darek, otwórz bramę"* and he answers you out
 loud and calls your gate's GSM opener, so the gate opens without touching the phone.
 
-Everything happens on the phone: speech recognition and the spoken replies run offline, and the app
-never opens a network connection. Free, no ads, no account.
+Everything happens on the phone: speech recognition and the spoken replies run offline, and your
+voice never leaves it. Darek connects only to maksforge.com, for his page of fuchy (gigs), and to the
+addresses a fucha shows you before you install it ([ADR-0008](docs/adr/0008-darek-connects-only-where-the-user-can-see.md)).
+Free, no ads, no account.
 
 ## Status
 
