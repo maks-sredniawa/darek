@@ -20,6 +20,11 @@ sealed interface Refusal {
         val name: String,
     ) : NeedsNewerDarek
 
+    data class OwnOnly(
+        val command: String,
+        val action: Action,
+    ) : NeedsNewerDarek
+
     data object Unreadable : Refusal
 
     data class WrongLanguage(
@@ -65,6 +70,7 @@ const val LANGUAGE = "pl"
 fun refusals(
     source: FuchaSource,
     knows: (String) -> Boolean,
+    bundled: Boolean = false,
 ): List<Refusal> =
     buildList {
         if (source.format != FORMAT) add(Refusal.NewerFormat(source.format))
@@ -83,6 +89,7 @@ fun refusals(
                 add(Refusal.UnknownName(NamedList.ACTION, command.action))
             } else {
                 action.needs?.takeIf { it !in declared }?.let { add(Refusal.Undeclared(command.id, it)) }
+                if (action.ownOnly && !bundled) add(Refusal.OwnOnly(command.id, action))
                 if (command.reply.isNullOrBlank()) add(Refusal.NoReply(command.id))
             }
             val words = wordsOf(command.phrase)
@@ -131,7 +138,7 @@ fun checked(
     when (val parsed = parse(file)) {
         is Parsed.Refused -> Checked.Refused(listOf(parsed.refusal))
         is Parsed.Read ->
-            refusals(parsed.source, knows)
+            refusals(parsed.source, knows, bundled)
                 .takeIf { it.isNotEmpty() }
                 ?.let(Checked::Refused)
                 ?: Checked.Accepted(parsed.source.toFucha(parsed.signature, bundled))

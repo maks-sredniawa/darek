@@ -12,13 +12,14 @@ class InstallCheckTest {
 
     private fun refused(
         source: FuchaSource,
+        bundled: Boolean = false,
         knows: (String) -> Boolean = knowsAll,
-    ) = refusals(source, knows)
+    ) = refusals(source, knows, bundled)
 
     @Test
     fun a_fucha_that_breaks_no_rule_is_accepted() {
         assertEquals(emptyList<Refusal>(), refused(weather))
-        assertEquals(emptyList<Refusal>(), refused((parse(ownFuchaFile) as Parsed.Read).source))
+        assertEquals(emptyList<Refusal>(), refused((parse(ownFuchaFile) as Parsed.Read).source, bundled = true))
     }
 
     @Test
@@ -32,14 +33,25 @@ class InstallCheckTest {
         val call = speak.copy(id = "brama-dwa", action = "call")
         assertEquals(
             listOf(Refusal.Undeclared("brama-dwa", Permission.CALL)),
-            refused(weather.withCommand(call)),
+            refused(weather.withCommand(call), bundled = true),
         )
         assertEquals(
             listOf(Refusal.Undeclared("brama-dwa", Permission.CALL)),
-            refused(weather.copy(permissions = emptyList()).withCommand(call)),
+            refused(weather.copy(permissions = emptyList()).withCommand(call), bundled = true),
         )
-        assertEquals(emptyList<Refusal>(), refused(weather.copy(permissions = listOf("call")).withCommand(call)))
+        assertEquals(
+            emptyList<Refusal>(),
+            refused(weather.copy(permissions = listOf("call")).withCommand(call), bundled = true),
+        )
         assertEquals(emptyList<Refusal>(), refused(weather.copy(permissions = emptyList())))
+    }
+
+    @Test
+    fun only_darek_s_own_fucha_may_call_a_number() {
+        val call = speak.copy(id = "brama-dwa", action = "call")
+        val withCall = weather.copy(permissions = listOf("call")).withCommand(call)
+        assertEquals(listOf(Refusal.OwnOnly("brama-dwa", Action.CALL)), refused(withCall))
+        assertTrue(refused(withCall).single() is Refusal.NeedsNewerDarek)
     }
 
     @Test
@@ -144,6 +156,7 @@ class InstallCheckTest {
                 Refusal.WrongLanguage("de"),
                 Refusal.BadAddress("http://x.example"),
                 Refusal.Undeclared("jaka-pogoda", Permission.CALL),
+                Refusal.OwnOnly("jaka-pogoda", Action.CALL),
                 Refusal.CancelWord("jaka-pogoda", "stop"),
                 Refusal.UnknownWords(listOf("pogoda")),
             ),
