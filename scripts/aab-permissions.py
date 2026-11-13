@@ -98,11 +98,6 @@ EXPECTED = {
     "android.permission.FOREGROUND_SERVICE_MICROPHONE": "Listening's service type, `microphone` (ADR-0010)",
     "android.permission.POST_NOTIFICATIONS": "Listening's notification (ADR-0010)",
     "android.permission.RECEIVE_BOOT_COMPLETED": "the notification after a reboot that offers Słuchaj (ADR-0010)",
-    # Declared by Darek's own manifest; every request goes through app.darek.net, which
-    # admits only maksforge.com/darek-fuchy/ and the addresses an installed fucha
-    # declares. datatransport merges it too, with its upload backend removed (ADR-0008).
-    # The privacy policy and Data safety still say "no network" until phase F's last
-    # checkpoint, which is the first build to leave the internal track (docs/phase-F.md).
     "android.permission.INTERNET": "the fuchy page on maksforge.com and the addresses a fucha declares (ADR-0008)",
 }
 
