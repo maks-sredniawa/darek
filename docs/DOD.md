@@ -184,9 +184,13 @@ Console matches. A new permission, foreground service or data type is a Console 
       public half. Its `docs/_config.yml` has `remote_theme: maks-sredniawa/pages-theme`, and the
       workflow writes the signed files and `fuchy.json` under `docs/`.
 - [ ] **C**, install from a file.
-- [ ] **D**, the network (R2), with `README.md`, `docs/index.md`, `docs/_config.yml`'s description,
-      `CLAUDE.md`'s Stack row, `SupportHandoff.kt`'s KDoc, ADR-0007 and `ManifestWiringTest`
-      rewritten to ADR-0008 the same day ([`phase-F.md`](phase-F.md), *Documents this phase amends*).
+- [x] **D**, the network (R2), with `README.md`, `docs/index.md`, `docs/_config.yml`'s description,
+      `CLAUDE.md`'s Stack row, ADR-0007 and `ManifestWiringTest` rewritten to ADR-0008 the same day
+      ([`phase-F.md`](phase-F.md), *Documents this phase amends*). Done 2026-11-13: nothing connects on
+      a fresh install. The page half of R2 waits for F.
+- [ ] **`SupportHandoff.kt`'s KDoc** still says the app declares no `INTERNET`. It is synced from
+      android-starter, so the wording changes there first, with the owner's look, then
+      `sync-support.py` brings it here.
 - [ ] **E**, the weather (R3).
 - [ ] **F**, the page, updates and *„Zgłoś fuchę"* (R4–R6), with the listing, policy, Data safety
       and content rating in the same release.
