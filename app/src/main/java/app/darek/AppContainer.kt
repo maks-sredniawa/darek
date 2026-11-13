@@ -70,7 +70,6 @@ class AppContainer(
      */
     val tipJar = TipJar(appContext, applicationScope)
 
-    /** Darek's own fucha (ADR-0015), read once from the APK. */
     val ownFucha: Fucha = OwnFucha.load(appContext)
 
     /** Every fucha switched on: until fuchy can be installed or switched off, only Darek's own. */

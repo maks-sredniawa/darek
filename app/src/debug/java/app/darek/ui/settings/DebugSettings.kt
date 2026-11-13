@@ -167,7 +167,7 @@ fun DebugSettings() {
 private fun VocabularyLookup() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var words by rememberSaveable { mutableStateOf("jaka pogoda darek pogodzisko otwórz bramę coś zażółć") }
+    var words by rememberSaveable { mutableStateOf("jaka pogoda darek pogodzisko otwórz bramę powiedz coś zażółć") }
     var result by remember { mutableStateOf("") }
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.base),
