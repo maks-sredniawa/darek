@@ -378,7 +378,7 @@ setup.
 | # | Reading | Command | Result |
 | --- | --- | --- | --- |
 | R1 | The gate, section 1: *pogoda*, *jaka*, *darek*, *zaktualizuj*, *fuchy*, and a made-up word | the debug row, release-shaped, API 26 and 37 | *(to read)* |
-| R2 | A fresh install connects nowhere until the page opens; `datatransport` uploads nothing | emulator started with `-tcpdump`, the app opened, Listening started, a Command fired, 10 minutes; then the page opened | *(to read)* |
+| R2 | A fresh install connects nowhere until the page opens; `datatransport` uploads nothing | emulator started with `-tcpdump`, the app opened, Listening started, a Command fired, 10 minutes; then the page opened | **Nothing connects**: on `pixel-api36` with `-tcpdump`, launch, Settings, the disclosure, Listening 10 minutes, stop; `dumpsys netstats detail` holds no byte rows for Darek's uid before or after; DNS only the emulator's own (`time.android.com`, `connectivitycheck.gstatic.com`, `www.google.com`); `TransportRuntime` logs *backend 'cct' is not registered* (2026-11-13). The page half waits for F |
 | R3 | The weather answers with the screen off, the app swiped away and the device forced idle | `adb shell dumpsys deviceidle force-idle`, then *„Darek, jaka pogoda?"* injected | *(to read)* |
 | R4 | Installing from the page: the install screen shows the addresses and the value sent, the badge is there, the grant is asked once | the page on a fresh install | *(to read)* |
 | R5 | An unsigned copy of the weather fucha from a file: the strong warning, every grant asked | the picker with a hand-edited file | *(to read)* |
