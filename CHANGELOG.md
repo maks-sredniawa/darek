@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.14.0](https://github.com/maks-sredniawa/darek/compare/v0.13.0...v0.14.0) (2026-11-17)
+
+
+### Features
+
+* tell the weather from the pogoda fucha, with its internet grant, its city and gig permissions ([70d471b](https://github.com/maks-sredniawa/darek/commit/70d471b0888cc4e7ef45cde8214129766968db76))
+
+
+### Bug Fixes
+
+* clash a switch-on against every fucha the user switched on, granted or not ([ea4fe20](https://github.com/maks-sredniawa/darek/commit/ea4fe201054c5da6a7f50b273b4cc357e14a73c9))
+* close the keyboard on a city search and space the hand-given grants heading ([5544976](https://github.com/maks-sredniawa/darek/commit/55449764d89eaa8be0afb108c8c2bc8f46ba69a6))
+* report switch-offs from the city screen and announce take-backs, search results and never-allowed fuchy ([153cdb0](https://github.com/maks-sredniawa/darek/commit/153cdb077eb29f842fcfa6694644aef4b8121eed))
+
 ## [0.13.0](https://github.com/maks-sredniawa/darek/compare/v0.12.0...v0.13.0) (2026-11-17)
 
 
