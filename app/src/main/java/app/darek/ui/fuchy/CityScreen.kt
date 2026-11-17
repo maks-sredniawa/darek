@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
@@ -97,6 +98,7 @@ fun CityScreen(
                     if (result.cities.isEmpty()) {
                         Message(stringResource(R.string.city_none))
                     } else {
+                        Message(pluralStringResource(R.plurals.city_found, result.cities.size, result.cities.size))
                         SectionHeader(stringResource(R.string.city_pick))
                         result.cities.forEach { city ->
                             LinkRow(

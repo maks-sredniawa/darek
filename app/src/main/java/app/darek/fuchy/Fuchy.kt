@@ -4,7 +4,10 @@ import android.util.Log
 import app.darek.data.AppPreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
@@ -24,6 +27,12 @@ data class FuchaState(
     val on: Boolean,
     val granted: Set<Permission> = emptySet(),
     val city: City? = null,
+)
+
+/** [off] was switched off because it can never be on beside [by], which was switched on. */
+data class SwitchedOff(
+    val off: Fucha,
+    val by: Fucha,
 )
 
 /** *The city you chose* (phase-F.md section 5): picked from the geocoding search, sent as its coordinates. */
@@ -49,6 +58,10 @@ class Fuchy(
 ) {
     private val files = MutableStateFlow<List<Fucha>?>(null)
     private val writes = Mutex()
+    private val switchOffs = MutableSharedFlow<SwitchedOff>(extraBufferCapacity = 16)
+
+    /** Whichever screen switched a fucha on, *Fuchy* tells the user what that turned off. */
+    val switchedOff: SharedFlow<SwitchedOff> = switchOffs.asSharedFlow()
 
     val installed: Flow<List<Installed>> =
         combine(files.filterNotNull(), preferences.fuchy, preferences.grantDefaults) { files, states, defaults ->
@@ -87,11 +100,11 @@ class Fuchy(
             files.value = files.value.orEmpty().filter { it.id != id }
         }
 
-    /** Switches [fucha] on and off what can never be on beside it, which it returns (ADR-0015). */
-    suspend fun switchOn(fucha: Fucha): List<Fucha> {
+    /** Switches [fucha] on and off what can never be on beside it, told on [switchedOff] (ADR-0015). */
+    suspend fun switchOn(fucha: Fucha) {
         val turnsOff = switchingOn(fucha, installed.first()).turnsOff
         switch(mapOf(fucha.id to true) + turnsOff.associate { it.id to false })
-        return turnsOff
+        turnsOff.forEach { switchOffs.emit(SwitchedOff(it, fucha)) }
     }
 
     val grantDefaults: Flow<Map<Permission, GrantDefault>> get() = preferences.grantDefaults

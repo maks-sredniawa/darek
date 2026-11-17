@@ -138,6 +138,7 @@
     <string name="settings_grants_hint">Czego fuchy mogą używać bez pytania</string>
     <string name="fuchy_blocked">%1$s zostaje wyłączona: Uprawnienia fuch nigdy nie pozwalają na: %2$s.</string>
     <string name="fuchy_off_not_granted">Wyłączona: brak zgody na: %1$s</string>
+    <string name="fuchy_off_never">Wyłączona: Uprawnienia fuch nigdy nie pozwalają na: %1$s</string>
     <string name="fuchy_city">Miasto</string>
     <string name="grant_title">Pozwolić fusze %1$s na: %2$s?</string>
     <string name="grant_addresses">Łączy się tylko z:</string>
@@ -151,6 +152,12 @@
     <string name="city_field">Miasto</string>
     <string name="city_search">Szukaj</string>
     <string name="city_pick">Wybierz swoje miasto</string>
+    <plurals name="city_found">
+        <item quantity="one">Znaleziono %d miasto.</item>
+        <item quantity="few">Znaleziono %d miasta.</item>
+        <item quantity="many">Znaleziono %d miast.</item>
+        <item quantity="other">Znaleziono %d miasta.</item>
+    </plurals>
     <string name="city_none">Nie ma miasta o tej nazwie. Sprawdź pisownię i spróbuj jeszcze raz.</string>
     <string name="city_no_internet">Brak internetu. Spróbuj, gdy będziesz online.</string>
     <string name="city_failed">Wyszukiwanie nie zadziałało. Spróbuj za chwilę.</string>
@@ -163,6 +170,7 @@
     <string name="grants_exceptions">Pozwolone osobno</string>
     <string name="grants_no_exceptions">Żadna fucha nie ma osobnej zgody.</string>
     <string name="grants_revoke">Cofnij</string>
+    <string name="grants_took_back">Fucha %1$s nie może już używać: %2$s.</string>
     <string name="grants_all_title">Pozwalać każdej fusze: %1$s?</string>
     <string name="grants_all_body">Także fuchom, których MaksForge nie zatwierdził: każdy może taką zrobić i ci ją przesłać. Dostałyby to bez pytania.</string>
     <string name="grants_all_confirm">Pozwalaj każdej fusze</string>
