@@ -4,7 +4,7 @@ import kotlinx.serialization.json.Json
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.util.Base64
+import java.io.File
 
 /** phase-F.md, *Tests*: fails towards badging what MaksForge never reviewed. */
 class SignatureTest {
@@ -53,8 +53,9 @@ class SignatureTest {
     }
 
     @Test
-    fun the_shipped_key_reads_as_a_p256_key() {
-        assertTrue(FuchyKey.maksForge.algorithm == "EC")
-        assertFalse(signedBy(Base64.getDecoder().decode("e30="), null, FuchyKey.maksForge))
+    fun the_shipped_key_is_the_one_darek_fuchy_signs_with() {
+        val pogoda = parse(File("src/test/fuchy/pogoda.darek").readBytes()) as Parsed.Read
+        assertTrue(signedBy(pogoda.bytes, pogoda.signature, FuchyKey.maksForge))
+        assertFalse(signedBy(pogoda.bytes + 0, pogoda.signature, FuchyKey.maksForge))
     }
 }

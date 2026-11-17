@@ -46,7 +46,7 @@ class Fuchy(
 
     suspend fun load() = writes.withLock { if (files.value == null) files.value = read() }
 
-    /** Throws [IOException] when the file cannot be saved, leaving no partial file and no state behind. */
+    /** Throws [IOException] when the file cannot be saved, leaving no partial file and the state untouched. */
     suspend fun install(
         file: ByteArray,
         plan: InstallPlan,

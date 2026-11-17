@@ -10,7 +10,7 @@ import java.util.Base64
 /** The public half of `darek-fuchy`'s signing key (phase-F.md section 3); a leaked key means a release with a new one (ADR-0015). */
 object FuchyKey {
     private const val SPKI =
-        "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEwi26CAfphXwpUw27BL7/8QK5ZeMZEk+VpdSLy9jALMgLdp1su8w5epM1qXjijWcjnk4dsdyMLTLK42j406ilxQ=="
+        "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEylQl66lypEahQLgByRLtYBLgvlPKdM1HAFkt1UAlUaX+7l1tSsc2opALHYZ1KiHvKGhyECB2qEJY12BUXtRRdw=="
 
     val maksForge: PublicKey by lazy { publicKey(SPKI) }
 

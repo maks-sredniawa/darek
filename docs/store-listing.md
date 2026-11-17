@@ -365,7 +365,7 @@ Credits now open with who made the app. Each licence there now has a link to rea
 Podziękowania zaczynają się teraz od tego, kto zrobił aplikację. Przy każdej licencji jest tam teraz link, by ją przeczytać albo otworzyć jej warunki, a strona licencji ma u góry jej pełną nazwę.
 ```
 
-### 0.12.0 — Gigs from a file
+### 0.13.0 — Gigs from a file
 
 **English** — 273/500:
 
