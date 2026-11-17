@@ -364,3 +364,17 @@ Credits now open with who made the app. Each licence there now has a link to rea
 ```
 Podziękowania zaczynają się teraz od tego, kto zrobił aplikację. Przy każdej licencji jest tam teraz link, by ją przeczytać albo otworzyć jej warunki, a strona licencji ma u góry jej pełną nazwę.
 ```
+
+### 0.12.0 — Gigs from a file
+
+**English** — 273/500:
+
+```
+Darek can now take on gigs. In Settings, under Gigs, install one from a .darek file and see what it does, what it may use and where it connects before you say yes. Switch gigs on and off, or remove them. A gig MaksForge has not approved installs only after a clear warning.
+```
+
+**Polish** — 293/500:
+
+```
+Darek może teraz brać fuchy. W Ustawieniach, w sekcji Fuchy, zainstalujesz fuchę z pliku .darek i przed zgodą zobaczysz, co robi, czego może używać i z czym się łączy. Fuchy włączysz, wyłączysz albo usuniesz. Fucha niezatwierdzona przez MaksForge instaluje się dopiero po wyraźnym ostrzeżeniu.
+```
