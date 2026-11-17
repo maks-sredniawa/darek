@@ -285,6 +285,19 @@ search never goes out ungranted. The per-permission default (ask, allow for all 
 and its exceptions live on a *Uprawnienia fuch* screen under Settings; allowing unapproved fuchy for
 all is behind the ten-second dialog.
 
+Built in E as follows. The grant is a dialog on *Fuchy*, listing the addresses and the values sent,
+asked after any clash override and before the city screen; refused, nothing more is asked. A fucha's
+stored *on* counts only with every grant and, for one that sends *the city you chose*, its city
+(`fuchy/Grants.kt`, `isOn`), so an *on* stored in C before grants existed is not trusted, and a
+grant taken back on *Uprawnienia fuch* switches its fucha off with the reason on its row. The
+defaults are *ask* (none stored), *allow approved*, *allow every fucha* (behind the ten-second
+dialog) and *never*; the exceptions are the grants given one fucha at a time, which win over the
+default and are taken back there. ADR-0015's exceptions the other way, one fucha refused under an
+*allow* default, are not built: under *allow* a fucha the user does not want is switched off or
+removed. The `weather` action needs no Reply in the file (`Action.speaksReply`) and must declare
+`chosen_city` (`Refusal.UndeclaredValue`). An update keeps the city and the grants for permissions
+it still declares. Open-Meteo's attribution is in Credits beside the bundled models.
+
 **Outside this repo, before F's readings:** `maks-sredniawa/darek-fuchy`, public, with
 `docs/_config.yml` holding `remote_theme: maks-sredniawa/pages-theme`: that, not being public, is
 what makes the site's deploy serve its `docs/` at `maksforge.com/darek-fuchy/`. In it: the published

@@ -24,6 +24,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.darek.R
@@ -69,8 +71,16 @@ fun GrantsScreen(
                 }
                 Text(
                     stringResource(R.string.grants_exceptions),
-                    style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.padding(start = Spacing.base, end = Spacing.base, top = Spacing.base),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier =
+                        Modifier
+                            .padding(
+                                start = Spacing.base,
+                                end = Spacing.base,
+                                top = Spacing.base,
+                                bottom = Spacing.tight,
+                            ).semantics { heading() },
                 )
                 if (grants.exceptions.isEmpty()) {
                     Text(

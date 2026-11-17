@@ -19,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
@@ -47,6 +48,12 @@ fun CityScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(state.done) { if (state.done) onDone() }
+    val keyboard = LocalSoftwareKeyboardController.current
+    // The keyboard would otherwise stay open over the answers it was searched for.
+    val search = {
+        keyboard?.hide()
+        viewModel.search()
+    }
 
     DetailScaffold(
         title = stringResource(R.string.city_title),
@@ -73,10 +80,10 @@ fun CityScreen(
                         label = { Text(stringResource(R.string.city_field)) },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                        keyboardActions = KeyboardActions(onSearch = { viewModel.search() }),
+                        keyboardActions = KeyboardActions(onSearch = { search() }),
                         modifier = Modifier.weight(1f),
                     )
-                    Button(onClick = viewModel::search, enabled = state.query.isNotBlank() && !state.searching) {
+                    Button(onClick = search, enabled = state.query.isNotBlank() && !state.searching) {
                         Text(stringResource(R.string.city_search))
                     }
                 }
