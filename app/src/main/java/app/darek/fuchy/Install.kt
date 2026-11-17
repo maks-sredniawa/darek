@@ -5,7 +5,13 @@ data class Installed(
     val fucha: Fucha,
     val on: Boolean,
     val state: FuchaState? = null,
-)
+) {
+    /**
+     * What the user switched, whether or not its grants let it count. Clashes are checked against this, so
+     * a default widened later on *Uprawnienia fuch* never brings two clashing fuchy on together (ADR-0015).
+     */
+    val switchedOn: Boolean get() = state?.on ?: on
+}
 
 /** What *Zainstaluj* does, shown before the tap (phase-F.md section 3). */
 data class InstallPlan(
@@ -22,9 +28,7 @@ data class InstallPlan(
      * grants decide whether that counts (`isOn`).
      */
     val startsOn: Boolean
-        get() = clashes.isEmpty() && if (fresh) candidate.permissions.isEmpty() else switchedOn(replaces)
-
-    private fun switchedOn(old: Installed?): Boolean = old?.state?.on ?: old?.on ?: false
+        get() = clashes.isEmpty() && if (fresh) candidate.permissions.isEmpty() else replaces?.switchedOn == true
 }
 
 fun planInstall(
@@ -58,7 +62,7 @@ fun switchingOn(
 private fun commandsOn(
     installed: List<Installed>,
     except: String,
-) = installed.filter { it.on && it.fucha.id != except }.flatMap { it.fucha.commands }
+) = installed.filter { it.switchedOn && it.fucha.id != except }.flatMap { it.fucha.commands }
 
 private fun Clash.with(): String? =
     when (this) {
