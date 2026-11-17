@@ -107,6 +107,16 @@ class InstallTest {
     }
 
     @Test
+    fun a_fucha_switched_on_but_held_off_by_a_missing_grant_still_clashes() {
+        val ungranted = fucha(id = "kawaly", permissions = listOf("internet"))
+        val held = Installed(ungranted, on = false, state = FuchaState(on = true))
+        val holder = fucha(phrase = "jaki kawał dwa")
+        val all = listOf(Installed(ownFucha, true), held, Installed(holder, false))
+        assertEquals(listOf(ungranted), switchingOn(holder, all).turnsOff)
+        assertTrue(planInstall(fucha(id = "inne", phrase = "jaki kawał dwa"), all).clashes.isNotEmpty())
+    }
+
+    @Test
     fun switching_on_darek_s_own_checks_it_against_what_is_on() {
         val holder = fucha(phrase = "powiedz coś")
         val plan = switchingOn(ownFucha, installed(ownFucha to false, holder to true))
