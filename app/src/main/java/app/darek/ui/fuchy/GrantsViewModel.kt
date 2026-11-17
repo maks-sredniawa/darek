@@ -27,11 +27,20 @@ data class PermissionGrants(
     val exceptions: List<Fucha>,
 )
 
+/** [fucha] lost [permission]; its row was the [index]th, where focus goes next so it is not left on a removed node. */
+data class TookBack(
+    val fucha: Fucha,
+    val permission: Permission,
+    val index: Int,
+)
+
 data class GrantsUiState(
     val loaded: Boolean = false,
     val permissions: List<PermissionGrants> = emptyList(),
     /** *Allow for every fucha* waits behind the ten-second dialog, since it covers unapproved ones too. */
     val confirmingAll: Permission? = null,
+    /** Shown only once its row is gone, so focus never lands on the row being removed. */
+    val tookBack: TookBack? = null,
 )
 
 /** *Uprawnienia fuch*: per permission, the default and its exceptions (phase-F.md section 5). */
@@ -40,23 +49,34 @@ class GrantsViewModel(
     private val preferences: AppPreferences,
 ) : ViewModel() {
     private val confirming = MutableStateFlow<Permission?>(null)
+    private val tookBack = MutableStateFlow<TookBack?>(null)
 
     val state: StateFlow<GrantsUiState> =
-        combine(fuchy.installed, fuchy.grantDefaults, confirming) { installed, defaults, confirming ->
+        combine(
+            fuchy.installed,
+            fuchy.grantDefaults,
+            confirming,
+            tookBack,
+        ) { installed, defaults, confirming, tookBack ->
+            val permissions =
+                Permission.entries.filter { it.forFuchy }.map { permission ->
+                    PermissionGrants(
+                        permission,
+                        defaults.defaultFor(permission),
+                        installed
+                            .filter { !it.fucha.bundled && permission in it.state?.granted.orEmpty() }
+                            .map { it.fucha }
+                            .sortedBy { it.name },
+                    )
+                }
             GrantsUiState(
                 loaded = true,
-                permissions =
-                    Permission.entries.filter { it.forFuchy }.map { permission ->
-                        PermissionGrants(
-                            permission,
-                            defaults.defaultFor(permission),
-                            installed
-                                .filter { !it.fucha.bundled && permission in it.state?.granted.orEmpty() }
-                                .map { it.fucha }
-                                .sortedBy { it.name },
-                        )
-                    },
+                permissions = permissions,
                 confirmingAll = confirming,
+                tookBack =
+                    tookBack?.takeIf { took ->
+                        permissions.none { it.permission == took.permission && took.fucha in it.exceptions }
+                    },
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), GrantsUiState())
 
@@ -85,6 +105,12 @@ class GrantsViewModel(
         fucha: Fucha,
         permission: Permission,
     ) {
+        val index =
+            state.value.permissions
+                .firstOrNull { it.permission == permission }
+                ?.exceptions
+                ?.indexOf(fucha) ?: 0
+        tookBack.value = TookBack(fucha, permission, index.coerceAtLeast(0))
         viewModelScope.launch { fuchy.revoke(fucha.id, permission) }
     }
 

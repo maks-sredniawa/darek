@@ -157,6 +157,7 @@
     <string name="settings_grants_hint">What gigs may use without asking you</string>
     <string name="fuchy_blocked">%1$s stays off: Gig permissions never allow %2$s.</string>
     <string name="fuchy_off_not_granted">Off: not allowed %1$s</string>
+    <string name="fuchy_off_never">Off: Gig permissions never allow %1$s</string>
     <string name="fuchy_city">City</string>
     <string name="grant_title">Allow the gig %1$s to use: %2$s?</string>
     <string name="grant_addresses">It connects only to:</string>
@@ -170,6 +171,10 @@
     <string name="city_field">City</string>
     <string name="city_search">Search</string>
     <string name="city_pick">Pick your city</string>
+    <plurals name="city_found">
+        <item quantity="one">%d city found.</item>
+        <item quantity="other">%d cities found.</item>
+    </plurals>
     <string name="city_none">No city by that name. Check the spelling and try again.</string>
     <string name="city_no_internet">No internet connection. Try again when you are online.</string>
     <string name="city_failed">The search did not work. Try again in a moment.</string>
@@ -182,6 +187,7 @@
     <string name="grants_exceptions">Allowed by hand</string>
     <string name="grants_no_exceptions">No gig allowed by hand.</string>
     <string name="grants_revoke">Take back</string>
+    <string name="grants_took_back">The gig %1$s may no longer use: %2$s.</string>
     <string name="grants_all_title">Allow every gig: %1$s?</string>
     <string name="grants_all_body">This includes gigs MaksForge has not approved: anyone can make one and send it to you. They would get it without being asked.</string>
     <string name="grants_all_confirm">Allow every gig</string>

@@ -44,6 +44,11 @@ sealed interface OffBecause {
     data class NotGranted(
         val permission: Permission,
     ) : OffBecause
+
+    /** *Uprawnienia fuch* never allows [permission], so switching it on asks nothing and does nothing. */
+    data class Never(
+        val permission: Permission,
+    ) : OffBecause
 }
 
 data class FuchaRow(
@@ -74,7 +79,7 @@ data class FuchyUiState(
 )
 
 sealed interface FuchyEvent {
-    /** One fucha switched off because it can never be on beside the one switched on. */
+    /** One fucha switched off because it can never be on beside the one switched on, from here or from *Twoje miasto*. */
     data class SwitchedOff(
         val off: Fucha,
         val by: Fucha,
@@ -99,6 +104,10 @@ class FuchyViewModel(
     private val dialogs = MutableStateFlow(FuchyUiState())
     private val channel = Channel<FuchyEvent>(Channel.BUFFERED)
     val events: Flow<FuchyEvent> = channel.receiveAsFlow()
+
+    init {
+        viewModelScope.launch { fuchy.switchedOff.collect { channel.send(FuchyEvent.SwitchedOff(it.off, it.by)) } }
+    }
 
     val state: StateFlow<FuchyUiState> =
         combine(fuchy.installed, fuchy.grantDefaults, persona, dialogs) { all, defaults, persona, dialogs ->
@@ -176,7 +185,7 @@ class FuchyViewModel(
         when {
             missing.isNotEmpty() -> dialogs.value = dialogs.value.copy(grantAsk = GrantAsk(fucha, missing))
             fucha.needsCity && state?.city == null -> channel.send(FuchyEvent.PickCity(fucha))
-            else -> fuchy.switchOn(fucha).forEach { channel.send(FuchyEvent.SwitchedOff(it, fucha)) }
+            else -> fuchy.switchOn(fucha)
         }
     }
 
@@ -186,9 +195,9 @@ class FuchyViewModel(
         defaults: Map<Permission, GrantDefault>,
     ): OffBecause? {
         val fucha = installed.fucha
-        if (installed.state?.on == true) {
-            missingGrants(fucha, installed.state, defaults).firstOrNull()?.let { return OffBecause.NotGranted(it) }
-        }
+        val missing = missingGrants(fucha, installed.state, defaults)
+        if (installed.state?.on == true) missing.firstOrNull()?.let { return OffBecause.NotGranted(it) }
+        missing.firstOrNull { defaults.defaultFor(it) == GrantDefault.NEVER }?.let { return OffBecause.Never(it) }
         val plan = switchingOn(fucha, all)
         plan.turnsOff.firstOrNull()?.let { return OffBecause.Holds(it) }
         val warning = plan.warnings.firstOrNull() ?: return null

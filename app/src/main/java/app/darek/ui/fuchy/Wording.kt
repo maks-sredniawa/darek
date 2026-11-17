@@ -110,7 +110,7 @@ fun Permission.labelRes(): Int =
         Permission.INTERNET -> R.string.permission_internet
     }
 
-/** *Kraków, Małopolskie*: the name and where it is, as the geocoding search gave them. */
+/** *Kraków, Małopolskie, Polska*: the name, region and country, as the geocoding search gave them. */
 fun City.label(): String = listOfNotNull(name, region).joinToString(", ")
 
 fun SentValue.labelRes(): Int =

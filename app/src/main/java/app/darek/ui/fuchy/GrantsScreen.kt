@@ -1,5 +1,6 @@
 package app.darek.ui.fuchy
 
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,9 +23,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -45,6 +50,8 @@ fun GrantsScreen(
     viewModel: GrantsViewModel = viewModel(factory = GrantsViewModel.Factory, extras = appViewModelExtras()),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val afterTakeBack = remember { FocusRequester() }
+    LaunchedEffect(state.tookBack) { if (state.tookBack != null) afterTakeBack.requestFocus() }
 
     DetailScaffold(
         title = stringResource(R.string.grants_title),
@@ -82,15 +89,42 @@ fun GrantsScreen(
                                 bottom = Spacing.tight,
                             ).semantics { heading() },
                 )
+                val took = state.tookBack?.takeIf { it.permission == grants.permission }
+                took?.let {
+                    Text(
+                        stringResource(
+                            R.string.grants_took_back,
+                            it.fucha.name,
+                            stringResource(it.permission.labelRes()),
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier =
+                            Modifier
+                                .padding(start = Spacing.base, end = Spacing.base, bottom = Spacing.tight)
+                                .semantics { liveRegion = LiveRegionMode.Polite },
+                    )
+                }
+                val focusAt = took?.index?.coerceAtMost(grants.exceptions.lastIndex)
                 if (grants.exceptions.isEmpty()) {
                     Text(
                         stringResource(R.string.grants_no_exceptions),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(horizontal = Spacing.base),
+                        modifier =
+                            Modifier
+                                .padding(horizontal = Spacing.base)
+                                .then(
+                                    if (took !=
+                                        null
+                                    ) {
+                                        Modifier.focusRequester(afterTakeBack).focusable()
+                                    } else {
+                                        Modifier
+                                    },
+                                ),
                     )
                 }
-                grants.exceptions.forEach { fucha ->
+                grants.exceptions.forEachIndexed { index, fucha ->
                     Row(
                         modifier = Modifier.fillMaxWidth().padding(start = Spacing.base, end = Spacing.tight),
                         verticalAlignment = Alignment.CenterVertically,
@@ -99,7 +133,10 @@ fun GrantsScreen(
                             Text(fucha.name, style = MaterialTheme.typography.bodyLarge)
                             Approval(fucha.approved)
                         }
-                        TextButton(onClick = { viewModel.revoke(fucha, grants.permission) }) {
+                        TextButton(
+                            onClick = { viewModel.revoke(fucha, grants.permission) },
+                            modifier = if (index == focusAt) Modifier.focusRequester(afterTakeBack) else Modifier,
+                        ) {
                             Text(stringResource(R.string.grants_revoke))
                         }
                     }

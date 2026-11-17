@@ -270,4 +270,5 @@ private fun offText(because: OffBecause): String =
                 R.string.fuchy_off_not_granted,
                 stringResource(because.permission.labelRes()),
             )
+        is OffBecause.Never -> stringResource(R.string.fuchy_off_never, stringResource(because.permission.labelRes()))
     }
