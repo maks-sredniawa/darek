@@ -43,6 +43,8 @@ sealed interface InstallStep {
     /** The recogniser's model would not load, so the words cannot be checked and nothing installs. */
     data object CannotCheck : InstallStep
 
+    data object CannotSave : InstallStep
+
     /** [phrases] maps each Command's ID to its phrase, which is what the user knows it by. */
     data class Refused(
         val refusals: List<Refusal>,
@@ -87,8 +89,13 @@ class InstallViewModel(
         val bytes = file ?: return
         step.value = InstallStep.Checking
         viewModelScope.launch {
-            fuchy.install(bytes, ready.plan)
-            step.value = InstallStep.Installed
+            step.value =
+                try {
+                    fuchy.install(bytes, ready.plan)
+                    InstallStep.Installed
+                } catch (e: IOException) {
+                    InstallStep.CannotSave.also { Log.e(TAG, "could not save ${ready.plan.candidate.id}", e) }
+                }
         }
     }
 

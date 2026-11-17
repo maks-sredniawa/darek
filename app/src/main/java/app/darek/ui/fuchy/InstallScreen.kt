@@ -26,6 +26,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.paneTitle
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -63,14 +66,12 @@ fun InstallScreen(
         ) {
             when (val step = state.step) {
                 InstallStep.Checking, InstallStep.Installed -> Checking()
-                InstallStep.Unreadable, InstallStep.CannotCheck -> {
+                InstallStep.Unreadable, InstallStep.CannotCheck, InstallStep.CannotSave -> {
                     val reason =
-                        if (step ==
-                            InstallStep.Unreadable
-                        ) {
-                            R.string.install_unreadable
-                        } else {
-                            R.string.install_cannot_check
+                        when (step) {
+                            InstallStep.Unreadable -> R.string.install_unreadable
+                            InstallStep.CannotCheck -> R.string.install_cannot_check
+                            else -> R.string.install_cannot_save
                         }
                     Refusal(listOf(stringResource(reason)))
                     Buttons(onCancel = onDone, onInstall = null, approved = true)
@@ -98,8 +99,21 @@ private fun Checking() {
 
 @Composable
 private fun Refusal(lines: List<String>) {
-    Notice(NoticeTone.REFUSAL, stringResource(R.string.install_refused_title), lines, icon = Icons.Filled.Close)
+    val title = stringResource(R.string.install_refused_title)
+    Notice(
+        NoticeTone.REFUSAL,
+        title,
+        lines,
+        modifier = Modifier.announced((listOf(title) + lines).joinToString(" ")),
+        icon = Icons.Filled.Close,
+    )
 }
+
+/**
+ * Said by TalkBack when the check's outcome replaces *Checking*. A pane title, not a live region:
+ * Compose announces a live region only when an existing node changes, never when one first appears.
+ */
+private fun Modifier.announced(outcome: String) = semantics { paneTitle = outcome }
 
 @Composable
 private fun Plan(
@@ -108,7 +122,12 @@ private fun Plan(
     persona: Persona,
 ) {
     val fucha = plan.candidate
-    Text(fucha.name, style = MaterialTheme.typography.headlineSmall)
+    val verdict = stringResource(if (fucha.approved) R.string.fuchy_approved else R.string.install_unapproved_title)
+    Text(
+        fucha.name,
+        style = MaterialTheme.typography.headlineSmall,
+        modifier = Modifier.announced("${fucha.name}. $verdict").semantics { heading() },
+    )
     Text(
         stringResource(R.string.fuchy_author, fucha.author),
         style = MaterialTheme.typography.bodyMedium,
@@ -176,7 +195,7 @@ private fun Section(
         stringResource(title),
         style = MaterialTheme.typography.titleSmall,
         color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(top = Spacing.base),
+        modifier = Modifier.padding(top = Spacing.base).semantics { heading() },
     )
     (lines.ifEmpty { listOf(stringResource(R.string.install_nothing)) }).forEach {
         Text(
