@@ -23,7 +23,7 @@ internal inline fun <reified T : Enum<T>> named(wire: String): T? {
     return values.firstOrNull { it.name.lowercase() == wire }
 }
 
-/** A fucha that passed every install check (ADR-0015); [bundled] is Darek's own, [approved] by being inside the APK. */
+/** A fucha that passed every install check (ADR-0015); [bundled] is Darek's own, [approved] is signed with MaksForge's key or bundled. */
 data class Fucha(
     val id: String,
     val version: Int,

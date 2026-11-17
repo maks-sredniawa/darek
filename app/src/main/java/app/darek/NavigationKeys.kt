@@ -14,10 +14,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable data object Settings : NavKey
 
-/**
- * Help and feedback, and the licences below it — both pushed from Settings' *About* section.
- * Somewhere you go once, from the place you already go to look things up.
- */
 @Serializable data object FuchyList : NavKey
 
 /** A picked file's `content://` URI; after process death its grant may be gone, and the screen says it cannot read the file. */
@@ -26,6 +22,10 @@ data class FuchaInstall(
     val uri: String,
 ) : NavKey
 
+/**
+ * Help and feedback, and the licences below it — both pushed from Settings' *About* section.
+ * Somewhere you go once, from the place you already go to look things up.
+ */
 @Serializable data object Support : NavKey
 
 @Serializable data object Licences : NavKey
