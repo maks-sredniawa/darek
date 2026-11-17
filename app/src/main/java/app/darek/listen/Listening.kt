@@ -54,6 +54,8 @@ class Listening(
     scope: CoroutineScope,
     private val models: LoadedModel,
     private val volume: () -> Float,
+    /** What a Command whose action builds its own Reply says (`Action.speaksReply`), such as the weather. */
+    private val built: suspend (Command) -> Line,
 ) {
     enum class Phase { OFF, PREPARING, ON }
 
@@ -90,10 +92,12 @@ class Listening(
             mutableState.update { it.copy(phase = Phase.OFF, hearingName = false, hearing = Hearing.HEARS) }
         }
 
+    /** [text] is null for a Command whose Reply is built after the recording has ended. */
     private data class Answer(
         val label: String,
-        val text: String,
+        val text: String?,
         val calls: Boolean = false,
+        val builds: Command? = null,
     )
 
     /** True from [start] until Listening is stopped or fails. */
@@ -142,7 +146,7 @@ class Listening(
                 val loaded = models.get()
                 withContext(Dispatchers.Default) {
                     prepareVoice(persona)
-                    renderAhead(persona, enabled.map { it.reply })
+                    renderAhead(persona, enabled.mapNotNull { it.reply })
                 }
                 withContext(Dispatchers.Default) { renderAhead(persona, listOf(NAME_HEARD)) }
                 // An answer that cannot load or play costs the hint, never Listening.
@@ -188,11 +192,13 @@ class Listening(
                         }
                     if (answer == null) continue
                     Log.i(TAG, "reaction=${answer.label}")
-                    mutableState.update { it.copy(hearingName = false, lastReply = answer.text) }
+                    mutableState.update { it.copy(hearingName = false) }
+                    val text = answer.text ?: built(checkNotNull(answer.builds)).by(persona)
+                    mutableState.update { it.copy(lastReply = text) }
                     if (answer.calls) {
-                        callPlaced(loaded, grammar, persona, answer)
+                        callPlaced(loaded, grammar, persona, answer.label, text)
                     } else {
-                        Log.i(VOICE_TAG, "reply reaction=${answer.label} end=${speak(persona, answer.text)}")
+                        Log.i(VOICE_TAG, "reply reaction=${answer.label} end=${speak(persona, text)}")
                     }
                 }
             }
@@ -255,7 +261,17 @@ class Listening(
     ): Answer? {
         val reaction = reactionTo(tokens, enabled, persona)
         if (reaction is Reaction.Fires) {
-            return Answer(reaction.command.label, reaction.command.reply.by(persona), reaction.command.calls)
+            val command = reaction.command
+            return Answer(
+                command.label,
+                command.reply?.by(persona),
+                command.calls,
+                builds =
+                    command.takeIf {
+                        it.reply ==
+                            null
+                    },
+            )
         }
         ListeningExtras.reply(appContext, tokens, persona)?.let { return Answer("EXTRA", it) }
         return when (reaction) {
@@ -284,12 +300,13 @@ class Listening(
         model: Model,
         grammar: String,
         persona: Persona,
-        answer: Answer,
+        label: String,
+        text: String,
     ) {
         val window = CancelWindow().also { cancelWindow = it }
         val decision =
             try {
-                Log.i(VOICE_TAG, "reply reaction=${answer.label} end=${speak(persona, answer.text)}")
+                Log.i(VOICE_TAG, "reply reaction=$label end=${speak(persona, text)}")
                 val replyEnded = SystemClock.elapsedRealtime()
                 merge(
                     Recogniser(model)

@@ -63,7 +63,22 @@ class InstallCheckTest {
     }
 
     @Test
-    fun every_action_this_darek_has_needs_a_reply() {
+    fun the_weather_builds_its_own_reply_but_must_declare_its_permission_and_the_city() {
+        val asks = speak.copy(action = "weather", reply = null)
+        assertEquals(emptyList<Refusal>(), refused(weather.withCommand(asks)))
+        assertEquals(
+            listOf(Refusal.Undeclared("jaka-pogoda", Permission.INTERNET)),
+            refused(weather.copy(permissions = emptyList()).withCommand(asks)),
+        )
+        assertEquals(
+            listOf(Refusal.UndeclaredValue("jaka-pogoda", SentValue.CHOSEN_CITY)),
+            refused(weather.copy(sends = emptyList()).withCommand(asks)),
+        )
+        assertEquals(null, accepted(weather.withCommand(speak.copy(action = "weather"))).commands.single().reply)
+    }
+
+    @Test
+    fun every_action_that_speaks_the_fuchas_reply_needs_one() {
         listOf(null, "", "  ").forEach { reply ->
             assertEquals(
                 listOf(Refusal.NoReply("jaka-pogoda")),
@@ -203,15 +218,15 @@ class InstallCheckTest {
         val command = fucha.commands.single()
         assertEquals("jaka pogoda", command.phrase)
         assertEquals(listOf("jaka przygoda"), command.decoys)
-        assertEquals("Sprawdziłem.", command.reply.by(Persona.DAREK))
-        assertEquals("Sprawdziłam.", command.reply.by(Persona.DARIA))
+        assertEquals("Sprawdziłem.", command.reply?.by(Persona.DAREK))
+        assertEquals("Sprawdziłam.", command.reply?.by(Persona.DARIA))
         assertEquals(
             "Słonecznie.",
             accepted(weather)
                 .commands
                 .single()
                 .reply
-                .by(Persona.DARIA),
+                ?.by(Persona.DARIA),
         )
     }
 }

@@ -87,3 +87,14 @@ fun signedFileOf(
 }
 
 fun installed(vararg on: Pair<Fucha, Boolean>): List<Installed> = on.map { (fucha, isOn) -> Installed(fucha, isOn) }
+
+/** The weather as `darek-fuchy` ships it: the `weather` action, no Reply, both Open-Meteo addresses. */
+val weatherAction =
+    weather
+        .copy(
+            addresses =
+                listOf(
+                    "https://api.open-meteo.com/v1/forecast",
+                    "https://geocoding-api.open-meteo.com/v1/search",
+                ),
+        ).withCommand(CommandSource(id = "jaka-pogoda", phrase = "jaka pogoda", action = "weather"))

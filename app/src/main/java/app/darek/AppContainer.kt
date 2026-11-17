@@ -15,6 +15,7 @@ import app.darek.listen.hasMicrophone
 import app.darek.listen.listeningNotificationBlock
 import app.darek.speak.VoiceVolume
 import app.darek.tip.TipJar
+import app.darek.weather.Weather
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -80,8 +81,11 @@ class AppContainer(
             applicationScope.launch { it.load() }
         }
 
+    val weather = Weather(fuchy)
+
     /** Here so the voice stays loaded between one *Słuchaj* and the next. */
-    val listening = Listening(appContext, applicationScope, model) { VoiceVolume.get(appContext) }
+    val listening =
+        Listening(appContext, applicationScope, model, volume = { VoiceVolume.get(appContext) }, built = weather::reply)
 
     /** Stopped by the user, from Home, the notification or the tile, so no reboot asks again. */
     fun stopListening() {

@@ -26,11 +26,16 @@ object SupportConfig {
     const val SITE_URL = "https://maksforge.com/darek/"
 
     /**
-     * What the build ships that Licensee never sees — a model or a data set fetched as a file — shown
-     * on the Credits screen beside the dependencies. Here the recogniser's model (ADR-0009) and both
-     * voices, whose base voice's terms are named as ADR-0014 states them.
+     * What Credits lists that Licensee never sees, beside the dependencies: the [MODELS] the build
+     * ships and the [SERVICES] a fucha's data comes from.
      */
-    val BUNDLED_CREDITS: List<LicensedArtifact> =
+    val BUNDLED_CREDITS: List<LicensedArtifact> get() = MODELS + SERVICES
+
+    /**
+     * Fetched as files by the build: the recogniser's model (ADR-0009) and both voices, whose base
+     * voice's terms are named as ADR-0014 states them.
+     */
+    val MODELS: List<LicensedArtifact> =
         listOf(
             LicensedArtifact(
                 groupId = "com.alphacephei",
@@ -100,6 +105,26 @@ object SupportConfig {
                         UnknownLicence(
                             "Blizzard 2013 lessac recordings, the base voice it was fine-tuned from: research use only",
                             "https://www.cstr.ed.ac.uk/projects/blizzard/2013/lessac_blizzard2013/license.html",
+                        ),
+                    ),
+            ),
+        )
+
+    /** Weather data for the `pogoda` fucha, whose terms ask for this attribution (phase-F.md section 5). */
+    val SERVICES: List<LicensedArtifact> =
+        listOf(
+            LicensedArtifact(
+                groupId = "com.open-meteo",
+                artifactId = "weather-api",
+                version = "v1",
+                name = "Weather data: Open-Meteo.com",
+                source = "https://open-meteo.com/",
+                spdxLicenses =
+                    listOf(
+                        SpdxLicence(
+                            "CC-BY-4.0",
+                            "Creative Commons Attribution 4.0 International",
+                            "https://creativecommons.org/licenses/by/4.0/",
                         ),
                     ),
             ),

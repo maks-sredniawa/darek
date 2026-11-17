@@ -22,6 +22,15 @@ data class FuchaInstall(
     val uri: String,
 ) : NavKey
 
+/** [switchOn]: picked on the first switch-on, so picking a city also switches the fucha on. */
+@Serializable
+data class FuchaCity(
+    val fuchaId: String,
+    val switchOn: Boolean,
+) : NavKey
+
+@Serializable data object FuchyGrants : NavKey
+
 /**
  * Help and feedback, and the licences below it — both pushed from Settings' *About* section.
  * Somewhere you go once, from the place you already go to look things up.

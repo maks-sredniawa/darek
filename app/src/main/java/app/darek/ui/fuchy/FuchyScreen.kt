@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontFamily
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.darek.R
@@ -50,6 +51,7 @@ import app.darek.ui.common.SectionHeader
 fun FuchyScreen(
     onBack: () -> Unit,
     onInstall: (Uri) -> Unit,
+    onPickCity: (fuchaId: String, switchOn: Boolean) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FuchyViewModel = viewModel(factory = FuchyViewModel.Factory, extras = appViewModelExtras()),
 ) {
@@ -58,7 +60,19 @@ fun FuchyScreen(
     val resources = LocalResources.current
     LaunchedEffect(viewModel) {
         viewModel.events.collect {
-            snackbars.showSnackbar(resources.getString(R.string.fuchy_switched_off, it.off.name, it.by.name))
+            when (it) {
+                is FuchyEvent.SwitchedOff ->
+                    snackbars.showSnackbar(resources.getString(R.string.fuchy_switched_off, it.off.name, it.by.name))
+                is FuchyEvent.Blocked ->
+                    snackbars.showSnackbar(
+                        resources.getString(
+                            R.string.fuchy_blocked,
+                            it.fucha.name,
+                            resources.getString(it.permission.labelRes()),
+                        ),
+                    )
+                is FuchyEvent.PickCity -> onPickCity(it.fucha.id, true)
+            }
         }
     }
     val pick = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> uri?.let(onInstall) }
@@ -73,7 +87,7 @@ fun FuchyScreen(
             if (!state.loaded) return@Column
             state.own?.let {
                 SectionHeader(stringResource(R.string.fuchy_own))
-                FuchaRowView(it, onSwitch = viewModel::switch, onRemove = null)
+                FuchaRowView(it, onSwitch = viewModel::switch, onRemove = null, onPickCity = onPickCity)
             }
             SectionHeader(stringResource(R.string.fuchy_installed))
             if (state.installed.isEmpty()) {
@@ -84,7 +98,9 @@ fun FuchyScreen(
                     modifier = Modifier.padding(horizontal = Spacing.base),
                 )
             }
-            state.installed.forEach { FuchaRowView(it, onSwitch = viewModel::switch, onRemove = viewModel::askRemove) }
+            state.installed.forEach {
+                FuchaRowView(it, onSwitch = viewModel::switch, onRemove = viewModel::askRemove, onPickCity = onPickCity)
+            }
             SectionHeader(stringResource(R.string.fuchy_add))
             LinkRow(
                 title = stringResource(R.string.fuchy_from_file),
@@ -119,6 +135,37 @@ fun FuchyScreen(
         )
     }
 
+    state.grantAsk?.let { ask ->
+        val permissions = ask.permissions.map { stringResource(it.labelRes()) }.joinToString(", ")
+        AlertDialog(
+            onDismissRequest = viewModel::dismissGrant,
+            title = { Text(stringResource(R.string.grant_title, ask.fucha.name, permissions)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.tight)) {
+                    Text(stringResource(R.string.grant_addresses))
+                    ask.fucha.addresses.forEach {
+                        Text(it, style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace)
+                    }
+                    if (ask.fucha.sends.isNotEmpty()) {
+                        Text(
+                            stringResource(
+                                R.string.grant_sends,
+                                ask.fucha.sends
+                                    .map { stringResource(it.labelRes()) }
+                                    .joinToString(", "),
+                            ),
+                        )
+                    }
+                    Text(stringResource(R.string.grant_where_to_change))
+                }
+            },
+            confirmButton = { TextButton(onClick = viewModel::grant) { Text(stringResource(R.string.grant_allow)) } },
+            dismissButton = {
+                TextButton(onClick = viewModel::dismissGrant) { Text(stringResource(R.string.grant_deny)) }
+            },
+        )
+    }
+
     state.removing?.let { fucha ->
         AlertDialog(
             onDismissRequest = viewModel::dismissRemove,
@@ -142,6 +189,26 @@ fun FuchyScreen(
 /** The whole text and the switch are one toggleable, so TalkBack reads the reason a fucha is off with its switch. */
 @Composable
 private fun FuchaRowView(
+    row: FuchaRow,
+    onSwitch: (Fucha, Boolean) -> Unit,
+    onRemove: ((Fucha) -> Unit)?,
+    onPickCity: (fuchaId: String, switchOn: Boolean) -> Unit,
+) {
+    val fucha = row.installed.fucha
+    FuchaSwitchRow(row, onSwitch, onRemove)
+    row.installed.state?.city?.takeIf { fucha.needsCity }?.let { city ->
+        LinkRow(
+            title = stringResource(R.string.fuchy_city),
+            subtitle = city.label(),
+            target = LinkTarget.Inside,
+            onClick = { onPickCity(fucha.id, false) },
+            modifier = Modifier.padding(start = Spacing.base),
+        )
+    }
+}
+
+@Composable
+private fun FuchaSwitchRow(
     row: FuchaRow,
     onSwitch: (Fucha, Boolean) -> Unit,
     onRemove: ((Fucha) -> Unit)?,
@@ -198,4 +265,9 @@ private fun offText(because: OffBecause): String =
         is OffBecause.Holds -> stringResource(R.string.fuchy_off_holds, because.other.name)
         is OffBecause.SoundsLike -> stringResource(R.string.fuchy_off_sounds_like, because.other.name)
         OffBecause.NearName -> stringResource(R.string.fuchy_off_name)
+        is OffBecause.NotGranted ->
+            stringResource(
+                R.string.fuchy_off_not_granted,
+                stringResource(because.permission.labelRes()),
+            )
     }

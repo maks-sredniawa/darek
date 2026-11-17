@@ -1,8 +1,10 @@
 package app.darek.fuchy
 
+/** [on] is whether it counts as on (`isOn`), not only what the user switched; [state] is what is stored for it. */
 data class Installed(
     val fucha: Fucha,
     val on: Boolean,
+    val state: FuchaState? = null,
 )
 
 /** What *Zainstaluj* does, shown before the tap (phase-F.md section 3). */
@@ -15,11 +17,14 @@ data class InstallPlan(
     val fresh: Boolean get() = replaces == null || (replaces.fucha.approved && !candidate.approved)
 
     /**
-     * Any clash installs it off, behind its warning (ADR-0015); so does a permission, whose grant comes
-     * with the switch-on. An update keeps the switch it had.
+     * Any clash installs it off, behind its warning (ADR-0015); so does a fresh install with a
+     * permission, whose grant comes with the switch-on. An update keeps the switch it had, and its
+     * grants decide whether that counts (`isOn`).
      */
     val startsOn: Boolean
-        get() = clashes.isEmpty() && candidate.permissions.isEmpty() && (fresh || replaces?.on == true)
+        get() = clashes.isEmpty() && if (fresh) candidate.permissions.isEmpty() else switchedOn(replaces)
+
+    private fun switchedOn(old: Installed?): Boolean = old?.state?.on ?: old?.on ?: false
 }
 
 fun planInstall(

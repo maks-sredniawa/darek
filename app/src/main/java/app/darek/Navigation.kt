@@ -15,7 +15,9 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import app.darek.ui.fuchy.CityScreen
 import app.darek.ui.fuchy.FuchyScreen
+import app.darek.ui.fuchy.GrantsScreen
 import app.darek.ui.fuchy.InstallScreen
 import app.darek.ui.home.HomeScreen
 import app.darek.ui.settings.SettingsScreen
@@ -90,13 +92,25 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                             onOpenLicences = { backStack.add(Licences) },
                             onOpenSupport = { backStack.add(Support) },
                             onOpenFuchy = { backStack.add(FuchyList) },
+                            onOpenGrants = { backStack.add(FuchyGrants) },
                         )
                     }
                     entry<FuchyList> {
                         FuchyScreen(
                             onBack = { backStack.removeLastOrNull() },
                             onInstall = { backStack.add(FuchaInstall(it.toString())) },
+                            onPickCity = { id, switchOn -> backStack.add(FuchaCity(id, switchOn)) },
                         )
+                    }
+                    entry<FuchaCity> { key ->
+                        CityScreen(
+                            fuchaId = key.fuchaId,
+                            switchOn = key.switchOn,
+                            onDone = { backStack.removeLastOrNull() },
+                        )
+                    }
+                    entry<FuchyGrants> {
+                        GrantsScreen(onBack = { backStack.removeLastOrNull() })
                     }
                     entry<FuchaInstall> { key ->
                         InstallScreen(uri = key.uri.toUri(), onDone = { backStack.removeLastOrNull() })

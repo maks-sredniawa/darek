@@ -53,14 +53,14 @@ class FuchaFileTest {
                 sends = listOf("chosen_city", "approximate_location"),
                 commands =
                     weather.commands +
-                        weather.commands[0].copy(id = "pogoda-jutro", phrase = "pogoda jutro", action = "weather"),
+                        weather.commands[0].copy(id = "pogoda-jutro", phrase = "pogoda jutro", action = "navigate"),
             )
         val refusals = refusedFor(fileOf(source))
         assertEquals(
             setOf(
                 Refusal.UnknownName(NamedList.PERMISSION, "location"),
                 Refusal.UnknownName(NamedList.SENT_VALUE, "approximate_location"),
-                Refusal.UnknownName(NamedList.ACTION, "weather"),
+                Refusal.UnknownName(NamedList.ACTION, "navigate"),
             ),
             refusals.toSet(),
         )

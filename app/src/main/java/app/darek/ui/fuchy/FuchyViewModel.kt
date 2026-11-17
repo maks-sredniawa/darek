@@ -10,7 +10,11 @@ import app.darek.MainApplication
 import app.darek.fuchy.Clash
 import app.darek.fuchy.Fucha
 import app.darek.fuchy.Fuchy
+import app.darek.fuchy.GrantDefault
 import app.darek.fuchy.Installed
+import app.darek.fuchy.Permission
+import app.darek.fuchy.defaultFor
+import app.darek.fuchy.missingGrants
 import app.darek.fuchy.switchingOn
 import app.darek.listen.Persona
 import kotlinx.coroutines.channels.Channel
@@ -35,11 +39,22 @@ sealed interface OffBecause {
     ) : OffBecause
 
     data object NearName : OffBecause
+
+    /** Switched on, but a grant it needs was taken back, or never given before grants existed. */
+    data class NotGranted(
+        val permission: Permission,
+    ) : OffBecause
 }
 
 data class FuchaRow(
     val installed: Installed,
     val offBecause: OffBecause?,
+)
+
+/** A switch-on waiting for the user's grant (phase-F.md section 5). */
+data class GrantAsk(
+    val fucha: Fucha,
+    val permissions: List<Permission>,
 )
 
 /** A switch-on waiting for the user to override its clashes (ADR-0015, *Phrases that clash*). */
@@ -54,26 +69,40 @@ data class FuchyUiState(
     val installed: List<FuchaRow> = emptyList(),
     val persona: Persona = Persona.DAREK,
     val override: Override? = null,
+    val grantAsk: GrantAsk? = null,
     val removing: Fucha? = null,
 )
 
-/** One fucha switched off because it can never be on beside the one switched on. */
-data class SwitchedOff(
-    val off: Fucha,
-    val by: Fucha,
-)
+sealed interface FuchyEvent {
+    /** One fucha switched off because it can never be on beside the one switched on. */
+    data class SwitchedOff(
+        val off: Fucha,
+        val by: Fucha,
+    ) : FuchyEvent
+
+    /** *Uprawnienia fuch* says never for [permission], so nothing is asked. */
+    data class Blocked(
+        val fucha: Fucha,
+        val permission: Permission,
+    ) : FuchyEvent
+
+    /** Granted, it now needs its city before it can be on. */
+    data class PickCity(
+        val fucha: Fucha,
+    ) : FuchyEvent
+}
 
 class FuchyViewModel(
     private val fuchy: Fuchy,
     persona: Flow<Persona>,
 ) : ViewModel() {
     private val dialogs = MutableStateFlow(FuchyUiState())
-    private val switchedOff = Channel<SwitchedOff>(Channel.BUFFERED)
-    val events: Flow<SwitchedOff> = switchedOff.receiveAsFlow()
+    private val channel = Channel<FuchyEvent>(Channel.BUFFERED)
+    val events: Flow<FuchyEvent> = channel.receiveAsFlow()
 
     val state: StateFlow<FuchyUiState> =
-        combine(fuchy.installed, persona, dialogs) { all, persona, dialogs ->
-            val rows = all.map { FuchaRow(it, if (it.on) null else offBecause(it.fucha, all)) }
+        combine(fuchy.installed, fuchy.grantDefaults, persona, dialogs) { all, defaults, persona, dialogs ->
+            val rows = all.map { FuchaRow(it, if (it.on) null else offBecause(it, all, defaults)) }
             dialogs.copy(
                 loaded = true,
                 own = rows.firstOrNull { it.installed.fucha.bundled },
@@ -90,7 +119,7 @@ class FuchyViewModel(
             if (!on) return@launch fuchy.switch(mapOf(fucha.id to false))
             val plan = switchingOn(fucha, fuchy.installed.first())
             if (plan.warnings.isEmpty()) {
-                switchOn(fucha)
+                afterClashes(fucha)
             } else {
                 dialogs.value =
                     dialogs.value.copy(override = Override(fucha, plan.warnings))
@@ -101,7 +130,21 @@ class FuchyViewModel(
     fun override() {
         val fucha = dialogs.value.override?.fucha ?: return
         dialogs.value = dialogs.value.copy(override = null)
-        viewModelScope.launch { switchOn(fucha) }
+        viewModelScope.launch { afterClashes(fucha) }
+    }
+
+    fun grant() {
+        val ask = dialogs.value.grantAsk ?: return
+        dialogs.value = dialogs.value.copy(grantAsk = null)
+        viewModelScope.launch {
+            fuchy.grant(ask.fucha.id, ask.permissions)
+            afterClashes(ask.fucha)
+        }
+    }
+
+    /** Refused, the fucha stays off and no city is asked, so nothing goes out ungranted. */
+    fun dismissGrant() {
+        dialogs.value = dialogs.value.copy(grantAsk = null)
     }
 
     fun dismissOverride() {
@@ -122,16 +165,30 @@ class FuchyViewModel(
         viewModelScope.launch { fuchy.remove(fucha.id) }
     }
 
-    private suspend fun switchOn(fucha: Fucha) {
-        val turnsOff = switchingOn(fucha, fuchy.installed.first()).turnsOff
-        fuchy.switch(mapOf(fucha.id to true) + turnsOff.associate { it.id to false })
-        turnsOff.forEach { switchedOff.send(SwitchedOff(it, fucha)) }
+    /** The clashes are settled: then the grant, before the city, then the city (phase-F.md section 5). */
+    private suspend fun afterClashes(fucha: Fucha) {
+        val state = fuchy.find(fucha.id)?.state
+        val defaults = fuchy.grantDefaults.first()
+        val missing = missingGrants(fucha, state, defaults)
+        missing.firstOrNull { defaults.defaultFor(it) == GrantDefault.NEVER }?.let {
+            return channel.send(FuchyEvent.Blocked(fucha, it))
+        }
+        when {
+            missing.isNotEmpty() -> dialogs.value = dialogs.value.copy(grantAsk = GrantAsk(fucha, missing))
+            fucha.needsCity && state?.city == null -> channel.send(FuchyEvent.PickCity(fucha))
+            else -> fuchy.switchOn(fucha).forEach { channel.send(FuchyEvent.SwitchedOff(it, fucha)) }
+        }
     }
 
     private fun offBecause(
-        fucha: Fucha,
+        installed: Installed,
         all: List<Installed>,
+        defaults: Map<Permission, GrantDefault>,
     ): OffBecause? {
+        val fucha = installed.fucha
+        if (installed.state?.on == true) {
+            missingGrants(fucha, installed.state, defaults).firstOrNull()?.let { return OffBecause.NotGranted(it) }
+        }
         val plan = switchingOn(fucha, all)
         plan.turnsOff.firstOrNull()?.let { return OffBecause.Holds(it) }
         val warning = plan.warnings.firstOrNull() ?: return null

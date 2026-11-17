@@ -47,11 +47,17 @@ sealed interface Refusal {
         val permission: Permission,
     ) : Refusal
 
+    /** The action sends a value the fucha does not declare, so the install screen would not show it. */
+    data class UndeclaredValue(
+        val command: String,
+        val value: SentValue,
+    ) : Refusal
+
     data class BadAddress(
         val address: String,
     ) : Refusal
 
-    /** A Command with nothing to say: every action this Darek has speaks the fucha's Reply. */
+    /** A Command with nothing to say, for an action that speaks the fucha's Reply. */
     data class NoReply(
         val command: String,
     ) : Refusal
@@ -91,6 +97,7 @@ fun refusals(
         if (!ID.matches(source.id)) add(Refusal.BadId(source.id))
         if (source.id == OwnFucha.ID && !bundled) add(Refusal.ReservedId(source.id))
         val declared = source.permissions.mapNotNull { named<Permission>(it) }
+        val sent = source.sends.mapNotNull { named<SentValue>(it) }
         source.permissions
             .filter { named<Permission>(it) == null }
             .forEach { add(Refusal.UnknownName(NamedList.PERMISSION, it)) }
@@ -104,8 +111,10 @@ fun refusals(
                 add(Refusal.UnknownName(NamedList.ACTION, command.action))
             } else {
                 action.needs?.takeIf { it !in declared }?.let { add(Refusal.Undeclared(command.id, it)) }
+                action.sends?.takeIf { it !in sent }?.let { add(Refusal.UndeclaredValue(command.id, it)) }
                 if (action.ownOnly && !bundled) add(Refusal.OwnOnly(command.id, action))
-                if (command.reply.isNullOrBlank() || command.replyFeminine?.isBlank() == true) {
+                val replyMissing = command.reply.isNullOrBlank() || command.replyFeminine?.isBlank() == true
+                if (action.speaksReply && replyMissing) {
                     add(Refusal.NoReply(command.id))
                 }
             }
@@ -180,12 +189,16 @@ private fun FuchaSource.toFucha(
     sends = sends.mapNotNull { named<SentValue>(it) },
     commands =
         commands.map {
+            val action = checkNotNull(named<Action>(it.action))
             Command(
                 id = it.id,
                 fucha = id,
                 phrase = normalised(it.phrase),
-                action = checkNotNull(named<Action>(it.action)),
-                reply = Line(checkNotNull(it.reply), it.replyFeminine ?: it.reply),
+                action = action,
+                reply =
+                    it.reply?.takeIf { action.speaksReply }?.let { reply ->
+                        Line(reply, it.replyFeminine ?: reply)
+                    },
                 decoys = it.decoys.map(::normalised),
                 bundled = bundled,
             )

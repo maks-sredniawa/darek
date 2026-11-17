@@ -210,7 +210,8 @@ class ProbeViewModel(
             val started = SystemClock.elapsedRealtime()
             val loaded = voice ?: Voice.load(getApplication(), persona.voice, persona.voiceScales).also { voice = it }
             commands
-                .associateWith { loaded.synthesize(it.reply.by(persona)) }
+                .mapNotNull { command -> command.reply?.let { command to loaded.synthesize(it.by(persona)) } }
+                .toMap()
                 .also { rendered ->
                     val peaks =
                         rendered.entries.joinToString(
