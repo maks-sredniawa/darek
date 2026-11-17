@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.0](https://github.com/maks-sredniawa/darek/compare/v0.12.0...v0.13.0) (2026-11-17)
+
+
+### Features
+
+* install a fucha from a file, switch fuchy on and off, and remove them ([c711de1](https://github.com/maks-sredniawa/darek/commit/c711de13184fd3c9805225c5968bf81ffe36622f))
+
 ## [0.12.0](https://github.com/maks-sredniawa/darek/compare/v0.11.0...v0.12.0) (2026-11-17)
 
 
