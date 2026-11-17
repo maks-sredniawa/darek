@@ -200,7 +200,10 @@ Console matches. A new permission, foreground service or data type is a Console 
 - [ ] **`SupportHandoff.kt`'s KDoc** still says the app declares no `INTERNET`. It is synced from
       android-starter, so the wording changes there first, with the owner's look, then
       `sync-support.py` brings it here.
-- [ ] **E**, the weather (R3).
+- [x] **E**, the weather (R3). Done 2026-11-17, read on `urgent-api26` and `pixel-api36`: the
+      signed `pogoda` installs with the badge, asks its `internet` grant and its city before it can be
+      on, and *„Darek, jaka pogoda?"* answers with the forecast with the screen off and the device in
+      deep idle. *Uprawnienia fuch* holds the defaults and the grants given by hand.
 - [ ] **F**, the page, updates and *„Zgłoś fuchę"* (R4–R6), with the listing, policy, Data safety
       and content rating in the same release.
 
