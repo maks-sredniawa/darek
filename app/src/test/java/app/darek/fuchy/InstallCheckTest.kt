@@ -23,6 +23,14 @@ class InstallCheckTest {
     }
 
     @Test
+    fun an_id_that_could_leave_the_fuchy_folder_is_refused() {
+        listOf("../darek", "a/b", "", "Pogoda", "-x", "a".repeat(65)).forEach {
+            assertEquals(it, listOf(Refusal.BadId(it)), refused(weather.copy(id = it)))
+        }
+        assertEquals(emptyList<Refusal>(), refused(weather.copy(id = "pogoda-2")))
+    }
+
+    @Test
     fun only_polish_is_accepted() {
         assertEquals(listOf(Refusal.WrongLanguage("en")), refused(weather.copy(language = "en")))
         assertEquals(listOf(Refusal.WrongLanguage("PL")), refused(weather.copy(language = "PL")))

@@ -21,7 +21,7 @@ class OwnFuchaTest {
         val fucha = ownFucha
         assertEquals("darek", fucha.id)
         assertEquals(true, fucha.bundled)
-        assertEquals(null, fucha.signature)
+        assertEquals(true, fucha.approved)
         assertEquals(listOf(Permission.CALL), fucha.permissions)
         assertEquals(emptyList<String>(), fucha.addresses)
         assertEquals(emptyList<SentValue>(), fucha.sends)

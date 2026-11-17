@@ -52,7 +52,7 @@ import java.util.concurrent.ConcurrentHashMap
 class Listening(
     context: Context,
     scope: CoroutineScope,
-    private val commands: List<Command>,
+    private val models: LoadedModel,
     private val volume: () -> Float,
 ) {
     enum class Phase { OFF, PREPARING, ON }
@@ -70,8 +70,6 @@ class Listening(
     private val audio = appContext.getSystemService(AudioManager::class.java)
     private val mutableState = MutableStateFlow(State())
     val state: StateFlow<State> = mutableState.asStateFlow()
-
-    @Volatile private var model: Model? = null
 
     @Volatile private var voice: Pair<Persona, Voice>? = null
 
@@ -114,6 +112,12 @@ class Listening(
     /** A running Listening restarts under [persona]; a stopped one stays stopped (ADR-0016). */
     fun switchTo(persona: Persona) = runs.change { it.copy(persona = persona) }
 
+    /** A fucha switched on or off is a new grammar, like a Persona switch (phase-F.md section 0). */
+    fun switchTo(
+        enabled: Set<Command>,
+        decoys: List<String>,
+    ) = runs.change { it.copy(enabled = enabled, decoys = decoys) }
+
     fun stop() {
         if (cancelWindow?.listeningStopped() == CancelWindow.Decision.STOPPED) {
             Log.i(TAG, "cancel window=${CancelWindow.Decision.STOPPED}")
@@ -135,8 +139,11 @@ class Listening(
         var nameAnswer: LoadedLine? = null
         try {
             coroutineScope {
-                val loaded = withContext(Dispatchers.IO) { model ?: loadModel().also { model = it } }
-                withContext(Dispatchers.Default) { prepareVoice(persona) }
+                val loaded = models.get()
+                withContext(Dispatchers.Default) {
+                    prepareVoice(persona)
+                    renderAhead(persona, enabled.map { it.reply })
+                }
                 withContext(Dispatchers.Default) { renderAhead(persona, listOf(NAME_HEARD)) }
                 // An answer that cannot load or play costs the hint, never Listening.
                 nameAnswer =
@@ -367,7 +374,7 @@ class Listening(
                 .onFailure { Log.e(VOICE_TAG, "voice failed to load", it) }
                 .getOrNull()
                 ?.let { persona to it } ?: return
-        renderAhead(persona, commands.map { it.reply } + NOT_CONFIGURED + Line(persona.correction))
+        renderAhead(persona, listOf(NOT_CONFIGURED, Line(persona.correction)))
         Log.i(VOICE_TAG, "persona=$persona ready=${SystemClock.elapsedRealtime() - started}ms")
     }
 
@@ -393,18 +400,8 @@ class Listening(
             .onFailure { Log.e(VOICE_TAG, "synthesis failed", it) }
             .getOrNull()
 
-    private fun loadModel(): Model {
-        val started = SystemClock.elapsedRealtime()
-        val directory = RecogniserModel.unpack(appContext)
-        val unpacked = SystemClock.elapsedRealtime()
-        return Model(directory.path).also {
-            Log.i(MODEL_TAG, "unpack=${unpacked - started}ms load=${SystemClock.elapsedRealtime() - unpacked}ms")
-        }
-    }
-
     private companion object {
         const val TAG = "DarekListen"
-        const val MODEL_TAG = "DarekModel"
         const val VOICE_TAG = "DarekVoice"
         const val WINDOW_TICK_MS = 50L
         const val CALL_POLL_MS = 500L

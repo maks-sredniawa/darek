@@ -17,6 +17,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -26,6 +28,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,10 +52,12 @@ fun DetailScaffold(
     onBack: (() -> Unit)?,
     modifier: Modifier = Modifier,
     actions: @Composable () -> Unit = {},
+    snackbars: SnackbarHostState? = null,
     content: @Composable (Modifier) -> Unit,
 ) {
     Scaffold(
         modifier = modifier,
+        snackbarHost = { snackbars?.let { SnackbarHost(it) } },
         topBar = {
             TopAppBar(
                 title = { Text(title) },
@@ -100,24 +105,57 @@ fun WarningBanner(
     onAct: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    Notice(
+        tone = NoticeTone.WARNING,
+        title = title,
+        lines = listOf(body),
+        modifier = modifier.padding(start = Spacing.base, end = Spacing.base, top = Spacing.base),
+        action = actionLabel to onAct,
+    )
+}
+
+/** From the mildest: a note to read, a warning to weigh, a refusal that stops the user. */
+enum class NoticeTone { NOTE, WARNING, REFUSAL }
+
+/** A card that says something about what is on screen; [icon] carries the tone for anyone who cannot tell it by colour. */
+@Composable
+fun Notice(
+    tone: NoticeTone,
+    title: String,
+    lines: List<String>,
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+    action: Pair<String, () -> Unit>? = null,
+) {
+    val colors = MaterialTheme.colorScheme
+    val (container, content) =
+        when (tone) {
+            NoticeTone.NOTE -> colors.secondaryContainer to colors.onSecondaryContainer
+            NoticeTone.WARNING -> colors.errorContainer to colors.onErrorContainer
+            NoticeTone.REFUSAL -> colors.error to colors.onError
+        }
     Surface(
-        color = MaterialTheme.colorScheme.errorContainer,
-        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+        color = container,
+        contentColor = content,
         shape = MaterialTheme.shapes.medium,
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(start = Spacing.base, end = Spacing.base, top = Spacing.base),
+        modifier = modifier.fillMaxWidth(),
     ) {
-        Column(modifier = Modifier.padding(Spacing.base)) {
-            Text(text = title, style = MaterialTheme.typography.titleMedium)
-            Text(
-                text = body,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(top = Spacing.tight),
-            )
-            TextButton(onClick = onAct, modifier = Modifier.padding(top = Spacing.tight)) {
-                Text(actionLabel)
+        Row(modifier = Modifier.padding(Spacing.base), horizontalArrangement = Arrangement.spacedBy(Spacing.snug)) {
+            if (icon != null) Icon(icon, contentDescription = null)
+            Column {
+                Text(text = title, style = MaterialTheme.typography.titleMedium)
+                lines.forEach {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = Spacing.tight),
+                    )
+                }
+                if (action != null) {
+                    TextButton(onClick = action.second, modifier = Modifier.padding(top = Spacing.tight)) {
+                        Text(action.first)
+                    }
+                }
             }
         }
     }

@@ -2,6 +2,10 @@ package app.darek.fuchy
 
 import kotlinx.serialization.json.Json
 import java.io.File
+import java.security.KeyPair
+import java.security.KeyPairGenerator
+import java.security.Signature
+import java.security.spec.ECGenParameterSpec
 import java.util.Base64
 
 val ownFuchaFile: ByteArray get() = File("src/main/assets/${OwnFucha.ASSET}").readBytes()
@@ -57,3 +61,29 @@ fun accepted(
     source: FuchaSource,
     knows: (String) -> Boolean = knowsAll,
 ): Fucha = (checked(fileOf(source), knows) as Checked.Accepted).fucha
+
+fun keyPair(): KeyPair =
+    KeyPairGenerator.getInstance("EC").run {
+        initialize(ECGenParameterSpec("secp256r1"))
+        generateKeyPair()
+    }
+
+fun signature(
+    bytes: ByteArray,
+    by: KeyPair,
+): String =
+    Signature.getInstance("SHA256withECDSA").run {
+        initSign(by.private)
+        update(bytes)
+        Base64.getEncoder().encodeToString(sign())
+    }
+
+fun signedFileOf(
+    source: FuchaSource,
+    by: KeyPair,
+): ByteArray {
+    val inner = Json.encodeToString(source).toByteArray()
+    return envelope(inner, signature(inner, by))
+}
+
+fun installed(vararg on: Pair<Fucha, Boolean>): List<Installed> = on.map { (fucha, isOn) -> Installed(fucha, isOn) }

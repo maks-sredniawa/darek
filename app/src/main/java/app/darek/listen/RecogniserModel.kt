@@ -2,6 +2,13 @@ package app.darek.listen
 
 import android.content.Context
 import android.content.res.AssetManager
+import android.os.SystemClock
+import android.util.Log
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import org.vosk.Model
 import java.io.File
 
 /**
@@ -36,5 +43,31 @@ object RecogniserModel {
             into.mkdirs()
             children.forEach { copy(assets, "$path/$it", File(into, it)) }
         }
+    }
+}
+
+/** Loaded once per process, for Listening and for the install check's [Vocabulary] (ADR-0015). */
+class LoadedModel(
+    context: Context,
+) {
+    private val appContext = context.applicationContext
+    private val loading = Mutex()
+
+    @Volatile private var model: Model? = null
+
+    suspend fun get(): Model =
+        model ?: loading.withLock { model ?: withContext(Dispatchers.IO) { load() }.also { model = it } }
+
+    private fun load(): Model {
+        val started = SystemClock.elapsedRealtime()
+        val directory = RecogniserModel.unpack(appContext)
+        val unpacked = SystemClock.elapsedRealtime()
+        return Model(directory.path).also {
+            Log.i(TAG, "unpack=${unpacked - started}ms load=${SystemClock.elapsedRealtime() - unpacked}ms")
+        }
+    }
+
+    private companion object {
+        const val TAG = "DarekModel"
     }
 }

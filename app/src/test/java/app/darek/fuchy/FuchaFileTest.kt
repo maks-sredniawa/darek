@@ -15,10 +15,6 @@ class FuchaFileTest {
         assertEquals(weather, read.source)
         assertEquals("bm90IGEgc2lnbmF0dXJl", read.signature)
         assertNull((parse(fileOf(weather)) as Parsed.Read).signature)
-        assertEquals(
-            "bm90IGEgc2lnbmF0dXJl",
-            (checked(fileOf(weather, "bm90IGEgc2lnbmF0dXJl"), knowsAll) as Checked.Accepted).fucha.signature,
-        )
     }
 
     @Test

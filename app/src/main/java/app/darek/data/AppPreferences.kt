@@ -6,11 +6,15 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import app.darek.fuchy.FuchaState
 import app.darek.listen.Persona
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.Json
 import java.time.Instant
+
+private val fuchyJson = Json { ignoreUnknownKeys = true }
 
 /** Which colour scheme applies, regardless of what the phone is set to. */
 enum class ThemeMode {
@@ -53,6 +57,7 @@ class AppPreferences(
         val LISTENING_WANTED_UNDER = longPreferencesKey("listening_wanted_under")
         val BACKGROUND_DISCLOSED_UNDER = longPreferencesKey("background_disclosed_under")
         val SETUP_SHOWN_UNDER = longPreferencesKey("setup_shown_under")
+        val FUCHY = stringPreferencesKey("fuchy")
 
         /** What *Restore to default* removes: everything the user chose, so each reads its default again. */
         val SETTINGS: List<Preferences.Key<*>> =
@@ -74,6 +79,7 @@ class AppPreferences(
                 LISTENING_WANTED_UNDER,
                 BACKGROUND_DISCLOSED_UNDER,
                 SETUP_SHOWN_UNDER,
+                FUCHY,
             )
     }
 
@@ -144,6 +150,21 @@ class AppPreferences(
 
     /** The `firstInstallTime` under which the background setup sheet was shown, once. */
     val setupShownUnder: Flow<Instant?> = instantAt(Keys.SETUP_SHOWN_UNDER)
+
+    /**
+     * Each fucha's state by its ID (phase-F.md section 2); one with no entry reads its default. Kept by
+     * *Restore to default*, which would otherwise switch off what the user installed.
+     */
+    val fuchy: Flow<Map<String, FuchaState>> = store.data.map { fuchyIn(it) }
+
+    suspend fun editFuchy(transform: (Map<String, FuchaState>) -> Map<String, FuchaState>) {
+        store.edit { prefs -> prefs[Keys.FUCHY] = fuchyJson.encodeToString(transform(fuchyIn(prefs))) }
+    }
+
+    // Unreadable reads as nothing stored, as [themeMode] does, rather than a crash loop at startup.
+    private fun fuchyIn(prefs: Preferences): Map<String, FuchaState> =
+        prefs[Keys.FUCHY]?.let { runCatching { fuchyJson.decodeFromString<Map<String, FuchaState>>(it) }.getOrNull() }
+            ?: emptyMap()
 
     private fun instantAt(key: Preferences.Key<Long>): Flow<Instant?> =
         store.data.map { prefs -> prefs[key]?.let(Instant::ofEpochMilli) }

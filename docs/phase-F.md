@@ -189,7 +189,8 @@ refuses format 2 with *„Wymaga nowszej wersji Darka"*, and so for an `action`,
 **The checks at install**, every one a refusal with the reason on screen, and the same on every
 update: the format and every list value known; `language` is `pl`; every action's permission
 declared (`weather` needs `internet`); no action kept for Darek's own (`call`, `update_fuchy`) in any
-other fucha, refused as *„Wymaga nowszej wersji Darka"*; the ID `darek` only for Darek's own; every address HTTPS, an exact host, no query, no fragment;
+other fucha, refused as *„Wymaga nowszej wersji Darka"*; the ID `darek` only for Darek's own; the ID
+lower-case letters, digits and hyphens, since it names the fucha's file; every address HTTPS, an exact host, no query, no fragment;
 every Command word known to the model (section 1); no phrase holding a cancel word; the signature,
 when there is one (section 3).
 
@@ -235,6 +236,12 @@ does, one line per Command, as the user says it (*„Darek, jaka pogoda?"*); its
 exact addresses; each value it sends, by name; *Wulgaryzmy* if flagged; a clash or vocabulary refusal
 if any; and the line that even an approved fucha may contain a mistake and is installed at the
 user's own risk. Then *Zainstaluj* or *Anuluj*.
+
+Built in C with two departures, on the design review's advice: the fucha's description sits under its
+name, since nothing else says what it is for; and a refused file shows only its refusal and
+*Zamknij*, since nothing below it could be installed. An unapproved fucha's button is *Zainstaluj
+mimo to*, never the filled one. Any clash installs a fucha off, and so does a permission, whose grant
+comes with the switch-on in E; an update keeps the switch it had.
 
 ## 4. The network
 

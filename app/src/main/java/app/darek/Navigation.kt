@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntryDecorator
 import androidx.navigation3.runtime.NavKey
@@ -14,6 +15,8 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import app.darek.ui.fuchy.FuchyScreen
+import app.darek.ui.fuchy.InstallScreen
 import app.darek.ui.home.HomeScreen
 import app.darek.ui.settings.SettingsScreen
 import app.darek.ui.support.LicenceTextScreen
@@ -86,7 +89,17 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                             onBack = { backStack.removeLastOrNull() },
                             onOpenLicences = { backStack.add(Licences) },
                             onOpenSupport = { backStack.add(Support) },
+                            onOpenFuchy = { backStack.add(FuchyList) },
                         )
+                    }
+                    entry<FuchyList> {
+                        FuchyScreen(
+                            onBack = { backStack.removeLastOrNull() },
+                            onInstall = { backStack.add(FuchaInstall(it.toString())) },
+                        )
+                    }
+                    entry<FuchaInstall> { key ->
+                        InstallScreen(uri = key.uri.toUri(), onDone = { backStack.removeLastOrNull() })
                     }
                     entry<Support> {
                         SupportScreen(
