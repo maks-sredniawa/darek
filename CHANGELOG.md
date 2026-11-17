@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.12.0](https://github.com/maks-sredniawa/darek/compare/v0.11.0...v0.12.0) (2026-11-17)
+
+
+### Features
+
+* add the one HTTP client and its address allowlist ([e663c80](https://github.com/maks-sredniawa/darek/commit/e663c80153bd9d04fcc0de02c5d8e573df7f556a))
+* declare INTERNET under ADR-0008's rules ([680b5de](https://github.com/maks-sredniawa/darek/commit/680b5de4c19b4b49558a09128cc306fb84dd6cff))
+
+
+### Bug Fixes
+
+* let cancelling a request close its connection and bound timeouts to whole milliseconds ([4de0212](https://github.com/maks-sredniawa/darek/commit/4de02123a2ecfb6820faa6fa73a005ee2c9f6deb))
+
 ## [0.11.0](https://github.com/maks-sredniawa/darek/compare/v0.10.0...v0.11.0) (2026-11-13)
 
 
