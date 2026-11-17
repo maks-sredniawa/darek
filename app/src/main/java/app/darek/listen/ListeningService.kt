@@ -85,7 +85,7 @@ class ListeningService : Service() {
                         .distinctUntilChanged()
                 launch {
                     commands.collect { (enabled, decoys) ->
-                        if (enabled.isEmpty()) listening.stop() else listening.switchTo(enabled, decoys)
+                        if (enabled.isEmpty()) container.stopListening() else listening.switchTo(enabled, decoys)
                     }
                 }
                 launch {
