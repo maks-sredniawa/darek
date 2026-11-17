@@ -14,6 +14,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import java.io.File
+import java.io.IOException
 import java.security.PublicKey
 
 @Serializable
@@ -45,6 +46,7 @@ class Fuchy(
 
     suspend fun load() = writes.withLock { if (files.value == null) files.value = read() }
 
+    /** Throws [IOException] when the file cannot be saved, leaving no partial file and no state behind. */
     suspend fun install(
         file: ByteArray,
         plan: InstallPlan,
@@ -53,8 +55,13 @@ class Fuchy(
         withContext(Dispatchers.IO) {
             dir.mkdirs()
             val partial = File(dir, "$id.tmp")
-            partial.writeBytes(file)
-            check(partial.renameTo(fileOf(id))) { "could not rename $partial" }
+            try {
+                partial.writeBytes(file)
+                if (!partial.renameTo(fileOf(id))) throw IOException("could not rename $partial")
+            } catch (e: IOException) {
+                partial.delete()
+                throw e
+            }
         }
         preferences.editFuchy { it + (id to FuchaState(plan.startsOn)) }
         files.value = files.value.orEmpty().filter { it.id != id } + plan.candidate

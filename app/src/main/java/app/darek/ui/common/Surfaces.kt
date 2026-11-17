@@ -33,6 +33,8 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import app.darek.R
 import app.darek.theme.Spacing
 
@@ -143,7 +145,11 @@ fun Notice(
         Row(modifier = Modifier.padding(Spacing.base), horizontalArrangement = Arrangement.spacedBy(Spacing.snug)) {
             if (icon != null) Icon(icon, contentDescription = null)
             Column {
-                Text(text = title, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.semantics { heading() },
+                )
                 lines.forEach {
                     Text(
                         text = it,
@@ -306,11 +312,12 @@ fun SectionHeader(
         style = MaterialTheme.typography.titleSmall,
         color = MaterialTheme.colorScheme.primary,
         modifier =
-            modifier.padding(
-                start = Spacing.base,
-                end = Spacing.base,
-                top = Spacing.section,
-                bottom = Spacing.tight,
-            ),
+            modifier
+                .padding(
+                    start = Spacing.base,
+                    end = Spacing.base,
+                    top = Spacing.section,
+                    bottom = Spacing.tight,
+                ).semantics { heading() },
     )
 }

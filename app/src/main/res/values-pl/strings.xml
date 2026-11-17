@@ -97,6 +97,7 @@
     <string name="install_checking">Sprawdzam plik…</string>
     <string name="install_unreadable">Nie udało się odczytać tego pliku.</string>
     <string name="install_cannot_check">Rozpoznawanie mowy się nie uruchomiło, więc nie dało się sprawdzić słów fuchy. Spróbuj ponownie po ponownym uruchomieniu aplikacji.</string>
+    <string name="install_cannot_save">Nie udało się zapisać tej fuchy. Sprawdź, czy w telefonie jest wolne miejsce, i spróbuj ponownie.</string>
     <string name="install_does">Co robi</string>
     <string name="install_command">„%1$s”</string>
     <string name="install_permissions">Uprawnienia</string>

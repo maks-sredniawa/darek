@@ -116,6 +116,7 @@
     <string name="install_checking">Checking the file…</string>
     <string name="install_unreadable">This file could not be read.</string>
     <string name="install_cannot_check">Speech recognition would not start, so the gig\'s words could not be checked. Try again after restarting the app.</string>
+    <string name="install_cannot_save">This gig could not be saved. Check the phone has free space and try again.</string>
     <string name="install_does">What it does</string>
     <string name="install_command">“%1$s”</string>
     <string name="install_permissions">Permissions</string>
