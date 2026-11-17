@@ -5,16 +5,27 @@ import app.darek.listen.Command
 /**
  * ADR-0015's fixed lists. A `.darek` file writes each value as its name in lower case. [Action.ownOnly]:
  * only Darek's own fucha may use it; a fucha calling a Number waits for phase 3 (`docs/PLAN.md`).
+ * [Action.sends] must be declared by a fucha using it; an action that is not [Action.speaksReply]
+ * builds what Darek says, so its Command needs no Reply.
  */
 enum class Action(
     val needs: Permission?,
     val ownOnly: Boolean = false,
+    val sends: SentValue? = null,
+    val speaksReply: Boolean = true,
 ) {
     SPEAK(null),
     CALL(Permission.CALL, ownOnly = true),
+    WEATHER(Permission.INTERNET, sends = SentValue.CHOSEN_CITY, speaksReply = false),
 }
 
-enum class Permission { CALL, INTERNET }
+/** [forFuchy]: a fucha from outside may be granted it; calling stays Darek's own until phase 3. */
+enum class Permission(
+    val forFuchy: Boolean,
+) {
+    CALL(forFuchy = false),
+    INTERNET(forFuchy = true),
+}
 
 enum class SentValue { CHOSEN_CITY }
 
@@ -40,4 +51,6 @@ data class Fucha(
 ) {
     /** In the grammar while this fucha is on, even when its own Command cannot act (one that calls, with no Number). */
     val decoys: List<String> get() = commands.flatMap { it.decoys }.distinct()
+
+    val needsCity: Boolean get() = SentValue.CHOSEN_CITY in sends
 }

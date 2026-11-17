@@ -378,3 +378,17 @@ Darek can now take on gigs. In Settings, under Gigs, install one from a .darek f
 ```
 Darek może teraz brać fuchy. W Ustawieniach, w sekcji Fuchy, zainstalujesz fuchę z pliku .darek i przed zgodą zobaczysz, co robi, czego może używać i z czym się łączy. Fuchy włączysz, wyłączysz albo usuniesz. Fucha niezatwierdzona przez MaksForge instaluje się dopiero po wyraźnym ostrzeżeniu.
 ```
+
+### 0.14.0 — The weather
+
+**English** — 364/500:
+
+```
+Darek can now tell the weather. Install the Pogoda gig, allow it the internet and pick your city once; then say “Darek, jaka pogoda?” and he answers with the temperature now and today's low and high, even with the screen off. In Settings, Gig permissions sets what gigs may use without asking you, and lets you take a permission back. Weather data: Open-Meteo.com.
+```
+
+**Polish** — 376/500:
+
+```
+Darek mówi teraz, jaka jest pogoda. Zainstaluj fuchę Pogoda, pozwól jej na internet i raz wybierz swoje miasto, a potem powiedz „Darek, jaka pogoda?”: usłyszysz temperaturę teraz i dzisiejsze minimum i maksimum, także przy wyłączonym ekranie. W Ustawieniach, w Uprawnieniach fuch, ustawisz, czego fuchy mogą używać bez pytania, i cofniesz zgodę. Dane pogodowe: Open-Meteo.com.
+```

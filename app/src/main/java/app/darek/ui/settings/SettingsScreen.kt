@@ -49,6 +49,7 @@ fun SettingsScreen(
     onOpenLicences: () -> Unit,
     onOpenSupport: () -> Unit,
     onOpenFuchy: () -> Unit,
+    onOpenGrants: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel =
         viewModel(factory = SettingsViewModel.Factory, extras = appViewModelExtras()),
@@ -85,6 +86,12 @@ fun SettingsScreen(
                 subtitle = stringResource(R.string.settings_fuchy_hint),
                 target = LinkTarget.Inside,
                 onClick = onOpenFuchy,
+            )
+            LinkRow(
+                title = stringResource(R.string.grants_title),
+                subtitle = stringResource(R.string.settings_grants_hint),
+                target = LinkTarget.Inside,
+                onClick = onOpenGrants,
             )
 
             SectionHeader(stringResource(R.string.settings_appearance))

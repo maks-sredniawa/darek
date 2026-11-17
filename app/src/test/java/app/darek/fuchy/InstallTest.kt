@@ -71,6 +71,16 @@ class InstallTest {
     }
 
     @Test
+    fun an_update_keeps_what_the_user_switched_even_while_a_missing_grant_holds_it_off() {
+        val old = fucha(signed = true, permissions = listOf("internet"))
+        val newer = fucha(signed = true, version = 2, permissions = listOf("internet"))
+        val switchedButUngranted = Installed(old, on = false, state = FuchaState(on = true))
+        assertTrue(planInstall(newer, listOf(Installed(ownFucha, true), switchedButUngranted)).startsOn)
+        val switchedOff = Installed(old, on = false, state = FuchaState(on = false))
+        assertFalse(planInstall(newer, listOf(Installed(ownFucha, true), switchedOff)).startsOn)
+    }
+
+    @Test
     fun an_unsigned_file_over_an_approved_fucha_is_a_fresh_install() {
         val approved = fucha(signed = true)
         val unsigned = fucha(version = 2)

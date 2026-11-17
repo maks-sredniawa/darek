@@ -7,6 +7,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import app.darek.fuchy.FuchaState
+import app.darek.fuchy.GrantDefault
+import app.darek.fuchy.Permission
 import app.darek.listen.Persona
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -58,6 +60,7 @@ class AppPreferences(
         val BACKGROUND_DISCLOSED_UNDER = longPreferencesKey("background_disclosed_under")
         val SETUP_SHOWN_UNDER = longPreferencesKey("setup_shown_under")
         val FUCHY = stringPreferencesKey("fuchy")
+        val GRANT_DEFAULTS = stringPreferencesKey("fuchy_grant_defaults")
 
         /** What *Restore to default* removes: everything the user chose, so each reads its default again. */
         val SETTINGS: List<Preferences.Key<*>> =
@@ -65,6 +68,7 @@ class AppPreferences(
                 THEME_MODE,
                 MATERIAL_YOU,
                 PERSONA,
+                GRANT_DEFAULTS,
             )
 
         /**
@@ -159,6 +163,35 @@ class AppPreferences(
 
     suspend fun editFuchy(transform: (Map<String, FuchaState>) -> Map<String, FuchaState>) {
         store.edit { prefs -> prefs[Keys.FUCHY] = fuchyJson.encodeToString(transform(fuchyIn(prefs))) }
+    }
+
+    /** Per permission, what fuchy get without being asked; a permission with no entry asks (phase-F.md section 5). */
+    val grantDefaults: Flow<Map<Permission, GrantDefault>> =
+        store.data.map { prefs ->
+            val stored =
+                prefs[Keys.GRANT_DEFAULTS]
+                    ?.let { runCatching { fuchyJson.decodeFromString<Map<String, String>>(it) }.getOrNull() }
+                    .orEmpty()
+            // By name, and an unknown name on either side is dropped rather than failing the rest.
+            stored.entries
+                .mapNotNull { (permission, default) ->
+                    val p = runCatching { enumValueOf<Permission>(permission) }.getOrNull()
+                    val d = runCatching { enumValueOf<GrantDefault>(default) }.getOrNull()
+                    if (p != null && d != null) p to d else null
+                }.toMap()
+        }
+
+    suspend fun setGrantDefault(
+        permission: Permission,
+        default: GrantDefault,
+    ) {
+        store.edit { prefs ->
+            val stored =
+                prefs[Keys.GRANT_DEFAULTS]
+                    ?.let { runCatching { fuchyJson.decodeFromString<Map<String, String>>(it) }.getOrNull() }
+                    .orEmpty()
+            prefs[Keys.GRANT_DEFAULTS] = fuchyJson.encodeToString(stored + (permission.name to default.name))
+        }
     }
 
     // Unreadable reads as nothing stored, as [themeMode] does, rather than a crash loop at startup.

@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import app.darek.R
+import app.darek.fuchy.City
 import app.darek.fuchy.Clash
 import app.darek.fuchy.Permission
 import app.darek.fuchy.Refusal
@@ -90,6 +91,12 @@ fun refusalText(
                 phraseOf(refusal.command),
                 stringResource(refusal.permission.labelRes()),
             )
+        is Refusal.UndeclaredValue ->
+            stringResource(
+                R.string.refusal_undeclared_value,
+                phraseOf(refusal.command),
+                stringResource(refusal.value.labelRes()),
+            )
         is Refusal.BadAddress -> stringResource(R.string.refusal_bad_address, refusal.address)
         is Refusal.NoReply -> stringResource(R.string.refusal_no_reply, phraseOf(refusal.command))
         is Refusal.EmptyPhrase -> stringResource(R.string.refusal_empty_phrase, refusal.command)
@@ -102,6 +109,9 @@ fun Permission.labelRes(): Int =
         Permission.CALL -> R.string.permission_call
         Permission.INTERNET -> R.string.permission_internet
     }
+
+/** *Kraków, Małopolskie*: the name and where it is, as the geocoding search gave them. */
+fun City.label(): String = listOfNotNull(name, region).joinToString(", ")
 
 fun SentValue.labelRes(): Int =
     when (this) {

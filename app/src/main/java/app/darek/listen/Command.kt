@@ -7,13 +7,14 @@ import java.util.Locale
 /**
  * A Command from a fucha (ADR-0015), its phrase written without the name: the chosen Persona's goes
  * in front (ADR-0016). Words are lower-case, as the recogniser emits them. [bundled] is Darek's own.
+ * [reply] is null when the action builds what is said (`Action.speaksReply`).
  */
 data class Command(
     val id: String,
     val fucha: String,
     val phrase: String,
     val action: Action,
-    val reply: Line,
+    val reply: Line?,
     val decoys: List<String> = emptyList(),
     val bundled: Boolean = false,
 ) {

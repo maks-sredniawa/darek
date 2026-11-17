@@ -20,11 +20,12 @@ class BundledCreditsTest {
         assertEquals(3, groups.single { it.spdxId == "MIT" }.artifacts.size)
         val apache = groups.single { it.spdxId == "Apache-2.0" }
         assertTrue(apache.artifacts.any { it.artifactId == "vosk-model-small-pl" })
+        assertTrue(groups.single { it.spdxId == "CC-BY-4.0" }.artifacts.any { it.artifactId == "weather-api" })
     }
 
     @Test
     fun `each bundled model lists its source and SHA-256 under its coordinates`() {
-        SupportConfig.BUNDLED_CREDITS.forEach { model ->
+        SupportConfig.MODELS.forEach { model ->
             assertTrue(model.listing.startsWith("${model.coordinates}\nhttps://"))
             assertTrue(Regex("SHA-256 [0-9a-f]{64}$").containsMatchIn(model.listing))
         }

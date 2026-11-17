@@ -191,7 +191,7 @@ class CommandMatchTest {
     fun every_line_has_a_form_for_each_persona() {
         assertEquals("Sorry, nie załapałam.", NOT_UNDERSTOOD[2].by(Persona.DARIA))
         assertEquals("Sorry, nie załapałem.", NOT_UNDERSTOOD[2].by(Persona.DAREK))
-        assertEquals(saySomething.reply.by(Persona.DAREK), saySomething.reply.by(Persona.DARIA))
+        assertEquals(saySomething.reply?.by(Persona.DAREK), saySomething.reply?.by(Persona.DARIA))
     }
 
     @Test
