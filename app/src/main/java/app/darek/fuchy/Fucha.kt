@@ -23,7 +23,7 @@ internal inline fun <reified T : Enum<T>> named(wire: String): T? {
     return values.firstOrNull { it.name.lowercase() == wire }
 }
 
-/** A fucha that passed every install check (ADR-0015); [bundled] is Darek's own, approved by being inside the APK. */
+/** A fucha that passed every install check (ADR-0015); [bundled] is Darek's own, [approved] by being inside the APK. */
 data class Fucha(
     val id: String,
     val version: Int,
@@ -36,7 +36,7 @@ data class Fucha(
     val sends: List<SentValue>,
     val commands: List<Command>,
     val bundled: Boolean,
-    val signature: String?,
+    val approved: Boolean,
 ) {
     /** In the grammar while this fucha is on, even when its own Command cannot act (one that calls, with no Number). */
     val decoys: List<String> get() = commands.flatMap { it.decoys }.distinct()

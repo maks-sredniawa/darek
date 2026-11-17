@@ -51,8 +51,10 @@ data class CommandSource(
 )
 
 sealed interface Parsed {
-    data class Read(
+    /** [bytes] are what [signature] covers. */
+    class Read(
         val source: FuchaSource,
+        val bytes: ByteArray,
         val signature: String?,
     ) : Parsed
 
@@ -67,12 +69,13 @@ private val json = Json
 fun parse(file: ByteArray): Parsed =
     try {
         val envelope = json.decodeFromString<Envelope>(file.utf8())
-        val tree = json.parseToJsonElement(Base64.getDecoder().decode(envelope.fucha).utf8()) as? JsonObject
+        val bytes = Base64.getDecoder().decode(envelope.fucha)
+        val tree = json.parseToJsonElement(bytes.utf8()) as? JsonObject
         val format = (tree?.get("format") as? JsonPrimitive)?.intOrNull
         when {
             tree == null || format == null || format < FORMAT -> Parsed.Refused(Refusal.Unreadable)
             format > FORMAT -> Parsed.Refused(Refusal.NewerFormat(format))
-            else -> Parsed.Read(json.decodeFromJsonElement<FuchaSource>(tree), envelope.signature)
+            else -> Parsed.Read(json.decodeFromJsonElement<FuchaSource>(tree), bytes, envelope.signature)
         }
     } catch (e: IllegalArgumentException) {
         Parsed.Refused(Refusal.Unreadable)

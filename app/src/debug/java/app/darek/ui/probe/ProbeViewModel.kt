@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import app.darek.MainApplication
+import app.darek.fuchy.Fucha
 import app.darek.listen.Command
 import app.darek.listen.Grammar
 import app.darek.listen.Heard
@@ -68,8 +69,9 @@ class ProbeViewModel(
 
     @Volatile private var replies: Map<Command, ShortArray>? = null
 
-    private val fuchyOn = getApplication<MainApplication>().container.fuchyOn
-    private val commands = fuchyOn.flatMap { it.commands }
+    @Volatile private var fuchyOn: List<Fucha> = emptyList()
+
+    private val commands get() = fuchyOn.flatMap { it.commands }
 
     @Volatile private var persona: Persona = Persona.DAREK
     private var job: Job? = null
@@ -93,6 +95,12 @@ class ProbeViewModel(
             viewModelScope.launch {
                 mutableState.update { it.copy(phase = ProbePhase.PREPARING, error = null) }
                 try {
+                    val on =
+                        getApplication<MainApplication>()
+                            .container.fuchy.on
+                            .first()
+                    if (on != fuchyOn) replies = null
+                    fuchyOn = on
                     val chosen =
                         getApplication<MainApplication>()
                             .container.preferences.persona

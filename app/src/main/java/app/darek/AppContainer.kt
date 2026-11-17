@@ -7,9 +7,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import app.darek.data.AppPreferences
-import app.darek.fuchy.Fucha
+import app.darek.fuchy.Fuchy
 import app.darek.fuchy.OwnFucha
 import app.darek.listen.Listening
+import app.darek.listen.LoadedModel
 import app.darek.listen.hasMicrophone
 import app.darek.listen.listeningNotificationBlock
 import app.darek.speak.VoiceVolume
@@ -17,6 +18,7 @@ import app.darek.tip.TipJar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.io.File
 import java.time.Instant
 
 /**
@@ -70,14 +72,16 @@ class AppContainer(
      */
     val tipJar = TipJar(appContext, applicationScope)
 
-    val ownFucha: Fucha = OwnFucha.load(appContext)
+    /** Here so the recogniser's model stays loaded between one *Słuchaj* and the next, and for the install check. */
+    val model = LoadedModel(appContext)
 
-    /** Every fucha switched on: until fuchy can be installed or switched off, only Darek's own. */
-    val fuchyOn: List<Fucha> = listOf(ownFucha)
+    val fuchy =
+        Fuchy(File(appContext.filesDir, "fuchy"), OwnFucha.load(appContext), preferences).also {
+            applicationScope.launch { it.load() }
+        }
 
-    /** Here so the recogniser's model and the voice stay loaded between one *Słuchaj* and the next. */
-    val listening =
-        Listening(appContext, applicationScope, fuchyOn.flatMap { it.commands }) { VoiceVolume.get(appContext) }
+    /** Here so the voice stays loaded between one *Słuchaj* and the next. */
+    val listening = Listening(appContext, applicationScope, model) { VoiceVolume.get(appContext) }
 
     /** Stopped by the user, from Home, the notification or the tile, so no reboot asks again. */
     fun stopListening() {

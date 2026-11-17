@@ -5,6 +5,7 @@ import app.darek.listen.Grammar
 import app.darek.listen.Line
 import java.net.URI
 import java.net.URISyntaxException
+import java.security.PublicKey
 
 /** Why a fucha is not installed (ADR-0015, phase-F.md section 2). The install screen words each one. */
 sealed interface Refusal {
@@ -29,6 +30,11 @@ sealed interface Refusal {
 
     /** Only Darek's own, inside the APK, is `darek`: any other would read as an update of it. */
     data class ReservedId(
+        val id: String,
+    ) : Refusal
+
+    /** The ID names the fucha's file, so it is lower-case letters, digits and hyphens only. */
+    data class BadId(
         val id: String,
     ) : Refusal
 
@@ -71,6 +77,8 @@ enum class NamedList { ACTION, PERMISSION, SENT_VALUE }
 
 const val LANGUAGE = "pl"
 
+private val ID = Regex("[a-z0-9][a-z0-9-]{0,63}")
+
 /** Every reason to refuse [source]; [knows] says whether the recogniser's model has a word (`listen/Vocabulary`). */
 fun refusals(
     source: FuchaSource,
@@ -80,6 +88,7 @@ fun refusals(
     buildList {
         if (source.format != FORMAT) add(Refusal.NewerFormat(source.format))
         if (source.language != LANGUAGE) add(Refusal.WrongLanguage(source.language))
+        if (!ID.matches(source.id)) add(Refusal.BadId(source.id))
         if (source.id == OwnFucha.ID && !bundled) add(Refusal.ReservedId(source.id))
         val declared = source.permissions.mapNotNull { named<Permission>(it) }
         source.permissions
@@ -138,10 +147,12 @@ sealed interface Checked {
     ) : Checked
 }
 
+/** Approved is [bundled], or signed by [key]; anything else is accepted unapproved, behind the warning (ADR-0015). */
 fun checked(
     file: ByteArray,
     knows: (String) -> Boolean,
     bundled: Boolean = false,
+    key: PublicKey = FuchyKey.maksForge,
 ): Checked =
     when (val parsed = parse(file)) {
         is Parsed.Refused -> Checked.Refused(listOf(parsed.refusal))
@@ -149,11 +160,13 @@ fun checked(
             refusals(parsed.source, knows, bundled)
                 .takeIf { it.isNotEmpty() }
                 ?.let(Checked::Refused)
-                ?: Checked.Accepted(parsed.source.toFucha(parsed.signature, bundled))
+                ?: Checked.Accepted(
+                    parsed.source.toFucha(approved = bundled || signedBy(parsed.bytes, parsed.signature, key), bundled),
+                )
     }
 
 private fun FuchaSource.toFucha(
-    signature: String?,
+    approved: Boolean,
     bundled: Boolean,
 ) = Fucha(
     id = id,
@@ -178,5 +191,5 @@ private fun FuchaSource.toFucha(
             )
         },
     bundled = bundled,
-    signature = signature,
+    approved = approved,
 )

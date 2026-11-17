@@ -61,13 +61,13 @@ class ListeningService : Service() {
             container.stopListening()
             return START_NOT_STICKY
         }
-        // startForeground must come before this call returns; both reads are small files.
-        val persona =
+        // startForeground must come before this call returns; all three reads are small files.
+        val (persona, on) =
             runBlocking(Dispatchers.IO) {
                 strings = inAppLanguage()
-                preferences.persona.first()
+                preferences.persona.first() to container.fuchy.on.first()
             }
-        val enabled = enabledCommands(container.fuchyOn, GateNumber.get(this))
+        val enabled = enabledCommands(on, GateNumber.get(this))
         if (!goForeground(persona, enabled)) {
             stopSelf()
             return START_NOT_STICKY
@@ -76,13 +76,26 @@ class ListeningService : Service() {
         run?.cancel()
         run =
             scope.launch {
-                listening.start(enabled, commandDecoys(container.fuchyOn), persona)
+                listening.start(enabled, commandDecoys(on), persona)
                 launch(Dispatchers.IO) { preferences.setListeningWanted(container.installedAt) }
                 launch { preferences.persona.distinctUntilChanged().collect { listening.switchTo(it) } }
-                launch {
-                    combine(preferences.persona, listening.state.map { it.hearing }, ::Pair)
+                val commands =
+                    container.fuchy.on
+                        .map { enabledCommands(it, GateNumber.get(this@ListeningService)) to commandDecoys(it) }
                         .distinctUntilChanged()
-                        .collect { (persona, hearing) -> renotify(persona, enabled, hearing) }
+                launch {
+                    commands.collect { (enabled, decoys) ->
+                        if (enabled.isEmpty()) listening.stop() else listening.switchTo(enabled, decoys)
+                    }
+                }
+                launch {
+                    combine(
+                        preferences.persona,
+                        commands.map { it.first },
+                        listening.state.map { it.hearing },
+                        ::Triple,
+                    ).distinctUntilChanged()
+                        .collect { (persona, enabled, hearing) -> renotify(persona, enabled, hearing) }
                 }
                 listening.running.first { !it }
                 stopSelf()

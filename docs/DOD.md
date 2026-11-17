@@ -185,10 +185,14 @@ Console matches. A new permission, foreground service or data type is a Console 
 
 - [x] **A**, the gate: Vosk's vocabulary check through JNA (R1). Verdict 1, 2026-11-13.
 - [x] **B**, fuchy as data, Darek's own bundled. Done 2026-11-13; no reading, it is a refactor.
-- [ ] **`maks-sredniawa/darek-fuchy`** with its signing key and workflow, before C: C ships the
-      public half. Its `docs/_config.yml` has `remote_theme: maks-sredniawa/pages-theme`, and the
+- [x] **`maks-sredniawa/darek-fuchy`** with its signing key and workflow, before C: C ships the
+      public half. Done 2026-11-17, with `pogoda` signed by CI. Its `docs/_config.yml` has `remote_theme: maks-sredniawa/pages-theme`, and the
       workflow writes the signed files and `fuchy.json` under `docs/`.
-- [ ] **C**, install from a file.
+- [x] **C**, install from a file. Done 2026-11-17, read on `urgent-api26` and `pixel-api36`: an
+      unsigned file installs behind the strong warning, a clash installs off and switching it on
+      switches the other off, a cancel word is refused, a removal holds, and all of it survives a
+      force-stop. `FuchyKey` holds `darek-fuchy`'s key, and a test verifies its signed `pogoda.darek`
+      with it; the badge on an installed signed fucha is read with E, the first one Darek can install.
 - [x] **D**, the network (R2), with `README.md`, `docs/index.md`, `docs/_config.yml`'s description,
       `CLAUDE.md`'s Stack row, ADR-0007 and `ManifestWiringTest` rewritten to ADR-0008 the same day
       ([`phase-F.md`](phase-F.md), *Documents this phase amends*). Done 2026-11-13: nothing connects on

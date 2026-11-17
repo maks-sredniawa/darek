@@ -48,6 +48,7 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onOpenLicences: () -> Unit,
     onOpenSupport: () -> Unit,
+    onOpenFuchy: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel =
         viewModel(factory = SettingsViewModel.Factory, extras = appViewModelExtras()),
@@ -76,6 +77,14 @@ fun SettingsScreen(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = Spacing.base),
+            )
+
+            SectionHeader(stringResource(R.string.settings_fuchy))
+            LinkRow(
+                title = stringResource(R.string.settings_fuchy_open),
+                subtitle = stringResource(R.string.settings_fuchy_hint),
+                target = LinkTarget.Inside,
+                onClick = onOpenFuchy,
             )
 
             SectionHeader(stringResource(R.string.settings_appearance))
