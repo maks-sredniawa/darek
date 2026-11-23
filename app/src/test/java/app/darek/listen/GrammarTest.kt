@@ -10,7 +10,7 @@ import org.junit.Test
 
 /** A grammar Vosk cannot read drops its words without a sound, and the Command never fires. */
 class GrammarTest {
-    private val sayOnly = setOf(ownCommand("say-something"))
+    private val sayOnly = setOf(ownCommand("say-something"), ownCommand("update-fuchy"))
     private val all = ownFucha.commands
     private val decoys = ownFucha.decoys
     private val callOff = Grammar.json(sayOnly, decoys, Persona.DAREK)

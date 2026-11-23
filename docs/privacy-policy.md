@@ -5,24 +5,42 @@ title: Privacy Policy
 
 # Privacy Policy
 
-_Effective date: 2 November 2026_
+_Effective date: 23 November 2026_
 
 Darek is a Polish voice assistant for Android. While you have him listening, he waits for one of a
 few fixed spoken Commands, such as *"Darek, otwórz bramę"*, answers out loud, and then calls the
-phone number you gave that Command, which is how a GSM gate opener is driven. This policy describes
+phone number you gave that Command, which is how a GSM gate opener is driven. More Commands come as
+*fuchy* (gigs) you install, such as the weather. This policy describes
 what the app does with information about you. It is short because the app does very little.
 
 ## The app collects nothing
 
-Darek has no account, no sign-in and no server. **The app has no permission to use the internet and
-never opens a network connection**, so nothing it hears ever leaves your phone. The one thing that
-does, at its request, is the call a Command places: to the number you typed for it, through your own
-mobile operator, from your own number, as described below.
+Darek has no account, no sign-in and no server of his own, and **nothing he hears ever leaves your
+phone**: no audio, and no text of what you said. He connects to the internet only in the two ways
+below, and only over HTTPS:
+
+- **The fuchy page.** When you open *Strona z fuchami* (the gig page) or say *„Darek, zaktualizuj
+  fuchy"*, and at most once a day when a fucha from the page is installed and automatic updates are
+  on, Darek downloads the list of fuchy MaksForge approved, and the fuchy themselves, from
+  maksforge.com. The request carries nothing about you. Like any request on the internet it reaches
+  the site with your IP address, which the site's host, Cloudflare, may keep in its logs. A fresh
+  install connects nowhere until you open the page.
+- **A fucha's own addresses, only after you allow it.** A fucha may use the internet only once you
+  have allowed it, only to the addresses its install screen showed you, and it may send only the
+  values that screen named. The weather fucha (*Pogoda*) sends the city name you type, when you
+  choose your city, to Open-Meteo's place search, and then the coordinates of the city you picked to
+  Open-Meteo's forecast each time you ask *„Darek, jaka pogoda?"*. [Open-Meteo](https://open-meteo.com)
+  receives those requests with your IP address, under its own terms. You can take the permission back
+  in the app at any time, which switches the fucha off.
+
+The one other thing that leaves your phone, at the app's request, is the call a Command places: to
+the number you typed for it, through your own mobile operator, from your own number, as described
+below.
 
 There is no advertising, no analytics, no crash reporting of its own, and no third-party SDK that
 phones home. The Google Play Billing library, which handles the optional tip, carries usage logging
-of its own; without the internet permission it has no way to send it, and Android's backup leaves it
-out.
+of its own; the part that would upload it is left out of the app, so it sends nothing, and Android's
+backup leaves it out.
 
 ## What the app can access, and why
 
@@ -41,6 +59,7 @@ out.
   for one thing: placing the call that Command asks for, after Darek has said his reply and given you
   a moment to cancel. The call goes through your phone's own calling service on your own SIM, like a
   call you dial yourself: it appears in your phone's call log, and your mobile operator carries it.
+- **The internet**, for the fuchy page and for a fucha you allowed it to, as described above.
 - **Notifications**, for the Listening notification, and after a restart for the one that offers to
   start Listening again.
 - **Google Play billing**, which lets the app ask the Google Play app for the price of a tip and open
@@ -54,13 +73,15 @@ On some phones, Xiaomi's among them, the app may also send you to two of your ph
 screens, so that the phone does not stop Listening in the background: **battery use** and
 **autostart**. It asks for neither as a permission and keeps nothing from either.
 
-The app stores its settings on your phone: the numbers you entered, which Commands are on, and your
-theme and language choices.
+The app stores its settings on your phone: the numbers you entered, the fuchy you installed and which
+are on, what you allowed each of them, the city you chose for the weather, and your theme and
+language choices.
 
 ## When you write to the developer
 
 **Help and feedback** in the app has a row to report a problem and one to suggest a feature, and the
-language settings have **Something read wrong?**. Each opens **your own email app** with a draft
+language settings have **Something read wrong?**, and every installed fucha has **Zgłoś fuchę**
+(report the gig), whose draft also names that fucha and its version. Each opens **your own email app** with a draft
 addressed to **darek.support@maksforge.com**. The draft carries the app's version, your Android
 version, your phone's make and model, and the language you are reading the app in, so a report can be
 acted on. You see every line before sending, can change or delete any of it, and nothing is sent
@@ -73,7 +94,7 @@ These are done by the operating system or by Google, not by Darek, but they are 
 "where could my data be":
 
 1. **Android's automatic backup.** If it is enabled on your phone, Android backs up the app's
-   settings, including the numbers you entered, to your own Google account, in a space that does not
+   settings, including the numbers you entered and the city you chose, to your own Google account, in a space that does not
    count against your storage quota and that Google states apps cannot read; Android's own
    phone-to-phone transfer carries them to a new phone the same way. Databases are excluded from
    both. You can turn backup off in your phone's settings.
@@ -95,8 +116,8 @@ Darek is meant for adults. It is not directed at children, and it collects nothi
 
 ## Deleting your data
 
-Uninstalling the app removes everything it stored on the phone, including the numbers you entered. A
-copy can be in two other places:
+Uninstalling the app removes everything it stored on the phone, including the numbers you entered
+and the city you chose. A copy can be in two other places:
 
 - **Android's backup in your Google account**, if backup is on. It outlives an uninstall, which is how
   a reinstall gets your settings back. To remove it at once, turn backup off in your phone's

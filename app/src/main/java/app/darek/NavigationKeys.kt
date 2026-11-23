@@ -1,6 +1,7 @@
 package app.darek
 
 import androidx.navigation3.runtime.NavKey
+import app.darek.fuchy.Listing
 import kotlinx.serialization.Serializable
 
 /**
@@ -21,6 +22,14 @@ import kotlinx.serialization.Serializable
 data class FuchaInstall(
     val uri: String,
 ) : NavKey
+
+/** A fucha from the fuchy page, downloaded again if the process died, as the list is what the user tapped. */
+@Serializable
+data class FuchaFromPage(
+    val listing: Listing,
+) : NavKey
+
+@Serializable data object FuchyPageList : NavKey
 
 /** [switchOn]: picked on the first switch-on, so picking a city also switches the fucha on. */
 @Serializable

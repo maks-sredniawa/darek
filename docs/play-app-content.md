@@ -36,21 +36,22 @@ without a microphone cannot use Darek, so Play filtering it out is correct.
 | Permission | Whose | What it is for | Console consequence |
 | --- | --- | --- | --- |
 | `RECORD_AUDIO` | Darek | *Słuchaj*: the bundled recogniser hears the Commands, only while Listening is on ([ADR-0009](adr/0009-commands-are-recognised-offline-against-a-grammar-with-decoys.md)) | a runtime permission, asked after the in-app disclosure; Data safety still *no data collected* (point 2). Not on Play's declaration list |
-| `ACCESS_NETWORK_STATE` | Play Billing's `datatransport` | read before its (blocked) log upload; opens nothing ([ADR-0008](adr/0008-darek-connects-only-where-the-user-can-see.md) allows it as this merge only) | none, but a reviewer may ask why an app with no network reads it — this row is the answer |
+| `INTERNET` | Darek | the fuchy page on maksforge.com, and the addresses a fucha declares once the user allows it, every request through `net/HttpClient` ([ADR-0008](adr/0008-darek-connects-only-where-the-user-can-see.md)); from phase F's checkpoint D | not on Play's declaration list; *Data safety* re-answered with checkpoint F (below) |
+| `ACCESS_NETWORK_STATE` | Play Billing's `datatransport` | read before its log upload, whose backend is removed, so it uploads nothing (ADR-0008) | none |
 | `com.android.vending.BILLING` | Play Billing Library | the tip ([ADR-0007](adr/0007-the-tip-is-a-play-billing-consumable-that-unlocks-nothing.md)): IPC to the Play app's billing service | none: not on Play's declaration list. The listing shows *Contains in-app purchases* once products exist |
 | `…DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` | AndroidX | its own non-exported receivers, signature-level | none: not user-visible |
 | `FOREGROUND_SERVICE`, `FOREGROUND_SERVICE_MICROPHONE` | Darek | the Listening service, type `microphone` ([ADR-0010](adr/0010-listening-is-a-microphone-service-the-user-starts.md)) | the foreground-service declaration with its video (*Foreground service permissions*, below) |
 | `POST_NOTIFICATIONS` | Darek | Listening's notification, and the one after a reboot; without it Darek does not listen (ADR-0010) | a runtime permission on Android 13+, asked at the first start of Listening; not on Play's declaration list |
 | `RECEIVE_BOOT_COMPLETED` | Darek | after a reboot, a notification whose *Słuchaj* starts Listening, only if it was on (ADR-0010) | none: not on Play's declaration list. The listing names it, *Run at startup* |
 
-The billing library's `datatransport` dependency merges `INTERNET`; the manifest removes it with
-`tools:node="remove"`, and the gate is what proves it stayed out. Its usage log sits in a database,
+The billing library's `datatransport` dependency would upload a usage log; its upload backend is left
+out of the app (phase F's checkpoint D, reading R2: nothing connects on a fresh install). The log sits in a database,
 which `backup_rules.xml` and `data_extraction_rules.xml` keep out of Auto Backup
 ([ADR-0005](adr/0005-backup-is-automatic-for-the-database-and-manual-for-media.md)'s amendment).
 
-**Forbidden, and asserted absent**: `INTERNET`, `AD_ID`, `QUERY_ALL_PACKAGES`,
-`REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`, `CAMERA`, `USE_EXACT_ALARM`. `INTERNET` and `AD_ID` are what
-the Data safety and advertising-ID answers rest on. `ACCESS_WIFI_STATE` is not listed but fails all
+**Forbidden, and asserted absent**: `AD_ID`, `QUERY_ALL_PACKAGES`,
+`REQUEST_IGNORE_BATTERY_OPTIMIZATIONS`, `CAMERA`, `USE_EXACT_ALARM`. `AD_ID` is what the
+advertising-ID answer rests on. `ACCESS_WIFI_STATE` is not listed but fails all
 the same, as any permission missing from `EXPECTED` does (ADR-0008).
 
 **Not in the artifact yet, and owed a row here the day they arrive.** The privacy policy already
@@ -104,6 +105,17 @@ the tip is the only answer that brings Brazil back to L.
 In the Console the questionnaire shows one section at a time, and *Next* stays disabled until *Save*
 has been pressed.
 
+**Owed with phase F's checkpoint F (0.15.0), in the Console sitting before that release leaves
+internal testing.** Re-read the questionnaire for two things F brings, and record the answers here:
+
+- **Fuchy from outside the page.** Anyone can write a `.darek` file and the user can install it from
+  a file, behind the strong warning (ADR-0015). It holds Commands and fixed Replies, not messages
+  between users, and nothing is shared from the app; **assumed** *No* to user interaction and
+  user-generated sharing, to be checked against IARC's own wording.
+- **Profanity.** A fucha flagged *Wulgaryzmy* can make Darek swear. The page hides those until the
+  user turns them on in Settings, and on 2026-11-23 the page lists none. **Assumed** unchanged while
+  none is listed; the first approved fucha with the flag re-answers the language question first.
+
 Would change: user-generated content, communication between users, or a link out to anything that
 has either. A support `mailto:` hand-off is not user-to-user communication — it opens the user's own
 mail app, addressed to the developer — and the rate row opens Play's own listing, whose reviews are
@@ -148,6 +160,19 @@ the listing.
 preview reads *"No data collection declared"* and *"No data shared with third parties"*, with the
 privacy policy URL.
 
+**To re-answer with phase F's checkpoint F (0.15.0)**, before that release leaves internal testing
+(`DOD.md`, *Before the next upload*), in the same commit as the privacy policy's rewrite:
+
+- **Location → Approximate location: collected, not shared.** The weather fucha sends the city name
+  the user types to Open-Meteo's place search, then the chosen city's coordinates to its forecast
+  (point 7). **Optional**: only a user who installs the weather fucha and picks a city sends it.
+  **Purpose:** App functionality. **Encrypted in transit:** yes, HTTPS only (ADR-0008). **Not shared**:
+  Open-Meteo answers the request for the app, which Play's help page counts as a service provider.
+  **Processed ephemerally** and **deletion**: **assumed** — read Open-Meteo's terms and Play's
+  wording in the sitting, and record the answer given.
+- Everything else stays *not collected*: the fuchy page's requests carry nothing about the user
+  (point 1).
+
 Play's definitions, from its Data safety help page (support.google.com, answer 10787469) — re-read
 them at each re-declaration rather than trusting this quote:
 
@@ -161,10 +186,12 @@ them at each re-declaration rather than trusting this quote:
 
 The answer rests on one fact per route data could take:
 
-1. **The app opens no network connection.** `INTERNET` is absent from the artifact (ADR-0008), and
-   `aab-permissions.py` fails the upload if it ever appears. This one fact is most of the answer. From
-   phase 3, when `CALL_PHONE` reaches the release, one thing does leave the phone at the app's
-   request: the Gate call of point 4.
+1. **The app connects only where the user can see** (ADR-0008). Until phase F's checkpoint D,
+   `INTERNET` was absent from the artifact and this one fact was most of the answer. Since then every
+   request goes through `net/HttpClient`: to the fuchy page on maksforge.com, which carries nothing
+   about the user, and to the addresses a fucha declared, only once the user allowed it, carrying only
+   the values its install screen named (point 7). From phase 3, when `CALL_PHONE` reaches the release,
+   one thing more leaves the phone at the app's request: the Gate call of point 4.
 2. **Audio is processed on the device, and that is not collection.** The bundled recogniser consumes
    the microphone frame by frame; only the text of a matched Command is kept, in memory, and audio is
    never stored or sent (ADR-0008, ADR-0009). `RECORD_AUDIO` is in the artifact from 0.3.0; re-read
@@ -203,11 +230,16 @@ The answer rests on one fact per route data could take:
    and the app never sees them. What the app receives back is a purchase token and a product id,
    which it hands straight back to Play to consume, never stores and never sends anywhere else. The
    developer's order report comes from Google, not from the app.
+7. **The city is the one value a fucha sends today.** The weather fucha sends the typed city name to
+   Open-Meteo's geocoding search and the chosen city's coordinates to its forecast, after the user
+   allowed it the internet and picked the city; the user can take the grant back, which switches the
+   fucha off (phase-F.md section 5). That is approximate location leaving the device, so it is
+   declared, though it goes to Open-Meteo rather than the developer.
 
 Would change any of it:
 
-- **`INTERNET` on the artifact**, from our code or a dependency. Every answer here becomes a question,
-  and ADR-0008 with them.
+- **A new value a fucha may send, or a new address Darek reaches for himself.** Each is a new row in
+  this form, and ADR-0008 with it.
 - **Anything the app sends by itself**, such as an analytics or crash-reporting SDK. There is none.
 - **Saving audio or transcripts**, even only on the device: the policy says never stored.
 - **The app keeping a purchase**, such as a tip history or a supporter badge: that is *Purchase

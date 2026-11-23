@@ -61,6 +61,9 @@ class AppPreferences(
         val SETUP_SHOWN_UNDER = longPreferencesKey("setup_shown_under")
         val FUCHY = stringPreferencesKey("fuchy")
         val GRANT_DEFAULTS = stringPreferencesKey("fuchy_grant_defaults")
+        val SHOW_PROFANITY = booleanPreferencesKey("fuchy_show_profanity")
+        val AUTO_UPDATE = booleanPreferencesKey("fuchy_auto_update")
+        val PAGE_CHECKED_AT = longPreferencesKey("fuchy_page_checked_at")
 
         /** What *Restore to default* removes: everything the user chose, so each reads its default again. */
         val SETTINGS: List<Preferences.Key<*>> =
@@ -69,6 +72,8 @@ class AppPreferences(
                 MATERIAL_YOU,
                 PERSONA,
                 GRANT_DEFAULTS,
+                SHOW_PROFANITY,
+                AUTO_UPDATE,
             )
 
         /**
@@ -84,6 +89,7 @@ class AppPreferences(
                 BACKGROUND_DISCLOSED_UNDER,
                 SETUP_SHOWN_UNDER,
                 FUCHY,
+                PAGE_CHECKED_AT,
             )
     }
 
@@ -193,6 +199,25 @@ class AppPreferences(
             prefs[Keys.GRANT_DEFAULTS] = fuchyJson.encodeToString(stored + (permission.name to default.name))
         }
     }
+
+    /** *Pokazuj fuchy z wulgaryzmami*, off until the user turns it on (phase-F.md section 7). */
+    val showProfanity: Flow<Boolean> = store.data.map { it[Keys.SHOW_PROFANITY] ?: false }
+
+    suspend fun setShowProfanity(show: Boolean) {
+        store.edit { it[Keys.SHOW_PROFANITY] = show }
+    }
+
+    /** *Aktualizuj fuchy automatycznie*, on until the user turns it off; off, the page offers *Zaktualizuj*. */
+    val autoUpdate: Flow<Boolean> = store.data.map { it[Keys.AUTO_UPDATE] ?: true }
+
+    suspend fun setAutoUpdate(auto: Boolean) {
+        store.edit { it[Keys.AUTO_UPDATE] = auto }
+    }
+
+    /** When the fuchy page was last read for updates, so a process start reads it at most once a day. */
+    val pageCheckedAt: Flow<Instant?> = instantAt(Keys.PAGE_CHECKED_AT)
+
+    suspend fun markPageChecked(at: Instant) = setInstant(Keys.PAGE_CHECKED_AT, at)
 
     // Unreadable reads as nothing stored, as [themeMode] does, rather than a crash loop at startup.
     private fun fuchyIn(prefs: Preferences): Map<String, FuchaState> =

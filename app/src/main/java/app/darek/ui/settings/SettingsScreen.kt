@@ -50,6 +50,7 @@ fun SettingsScreen(
     onOpenSupport: () -> Unit,
     onOpenFuchy: () -> Unit,
     onOpenGrants: () -> Unit,
+    onOpenPage: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel =
         viewModel(factory = SettingsViewModel.Factory, extras = appViewModelExtras()),
@@ -88,10 +89,28 @@ fun SettingsScreen(
                 onClick = onOpenFuchy,
             )
             LinkRow(
+                title = stringResource(R.string.page_title),
+                subtitle = stringResource(R.string.page_hint),
+                target = LinkTarget.Inside,
+                onClick = onOpenPage,
+            )
+            LinkRow(
                 title = stringResource(R.string.grants_title),
                 subtitle = stringResource(R.string.settings_grants_hint),
                 target = LinkTarget.Inside,
                 onClick = onOpenGrants,
+            )
+            SwitchRow(
+                title = stringResource(R.string.settings_auto_update),
+                subtitle = stringResource(R.string.settings_auto_update_hint),
+                checked = state.autoUpdate,
+                onChange = viewModel::setAutoUpdate,
+            )
+            SwitchRow(
+                title = stringResource(R.string.settings_show_profanity),
+                subtitle = stringResource(R.string.settings_show_profanity_hint),
+                checked = state.showProfanity,
+                onChange = viewModel::setShowProfanity,
             )
 
             SectionHeader(stringResource(R.string.settings_appearance))
