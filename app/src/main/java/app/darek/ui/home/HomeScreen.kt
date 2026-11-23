@@ -147,63 +147,65 @@ fun HomeScreen(
             )
         },
     ) { insets ->
-        Column(modifier = Modifier.fillMaxSize().padding(insets).padding(Spacing.base)) {
-            if (state.showTipAsk) {
-                TipAskCard(
-                    onTip = {
-                        viewModel.answerTipAsk()
-                        onOpenSupport()
-                    },
-                    onDecline = viewModel::answerTipAsk,
-                )
-            }
-            Box(
-                modifier = Modifier.weight(1f).fillMaxWidth(),
-                contentAlignment = Alignment.Center,
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(Spacing.base),
-                ) {
-                    ListenControl(
-                        phase = state.listening,
-                        persona = state.persona,
-                        hearingName = state.hearingName,
-                        hearing = state.hearing,
-                        failed = state.listenFailed,
-                        onListen = {
-                            if (state.disclosed) startAfterDisclosure() else disclosing = true
+        Column(modifier = Modifier.fillMaxSize().padding(insets)) {
+            Column(modifier = Modifier.weight(1f).fillMaxWidth().padding(Spacing.base)) {
+                if (state.showTipAsk) {
+                    TipAskCard(
+                        onTip = {
+                            viewModel.answerTipAsk()
+                            onOpenSupport()
                         },
-                        onStop = viewModel::stopListening,
+                        onDecline = viewModel::answerTipAsk,
                     )
-                    state.lastReply?.let { reply ->
-                        Text(
-                            text = "„$reply”",
-                            style = MaterialTheme.typography.titleLarge,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                    val block = notificationBlock
-                    if (granted && state.disclosed && block != null) {
-                        NotificationsOff(
+                }
+                Box(
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(Spacing.base),
+                    ) {
+                        ListenControl(
+                            phase = state.listening,
                             persona = state.persona,
-                            onFix = {
-                                when {
-                                    block == NotificationBlock.CHANNEL ->
-                                        context.openChannelNotificationSettings(LISTENING_CHANNEL_ID)
-                                    notificationsForGood -> context.openAppNotificationSettings()
-                                    else -> askNotifications()
-                                }
+                            hearingName = state.hearingName,
+                            hearing = state.hearing,
+                            failed = state.listenFailed,
+                            onListen = {
+                                if (state.disclosed) startAfterDisclosure() else disclosing = true
                             },
+                            onStop = viewModel::stopListening,
                         )
-                    }
-                    if (!granted && (deniedNow || state.micDeniedForGood)) {
-                        MicDenied(
-                            persona = state.persona,
-                            forGood = state.micDeniedForGood,
-                            onAllow = request,
-                            onOpenSettings = context::openAppSettings,
-                        )
+                        state.lastReply?.let { reply ->
+                            Text(
+                                text = "„$reply”",
+                                style = MaterialTheme.typography.titleLarge,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                        val block = notificationBlock
+                        if (granted && state.disclosed && block != null) {
+                            NotificationsOff(
+                                persona = state.persona,
+                                onFix = {
+                                    when {
+                                        block == NotificationBlock.CHANNEL ->
+                                            context.openChannelNotificationSettings(LISTENING_CHANNEL_ID)
+                                        notificationsForGood -> context.openAppNotificationSettings()
+                                        else -> askNotifications()
+                                    }
+                                },
+                            )
+                        }
+                        if (!granted && (deniedNow || state.micDeniedForGood)) {
+                            MicDenied(
+                                persona = state.persona,
+                                forGood = state.micDeniedForGood,
+                                onAllow = request,
+                                onOpenSettings = context::openAppSettings,
+                            )
+                        }
                     }
                 }
             }
