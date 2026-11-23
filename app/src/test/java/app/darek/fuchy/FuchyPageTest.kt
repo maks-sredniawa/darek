@@ -132,6 +132,22 @@ class FuchyPageTest {
         }
 
     @Test
+    fun an_update_clashing_with_a_fucha_on_waits_and_stays_on() =
+        runBlocking {
+            installV1()
+            val clashing =
+                weatherAction
+                    .copy(version = 2)
+                    .withCommand(CommandSource(id = "jaka-pogoda", phrase = "otwórz bramy", action = "weather"))
+            publish(2, signedFileOf(clashing, key))
+            val check = page.checkForUpdates() as UpdateCheck.Done
+            assertEquals(listOf("pogoda"), check.updated.waiting.map { it.id })
+            assertEquals(emptyList<Fucha>(), check.updated.updated)
+            assertEquals(1, version())
+            assertTrue(checkNotNull(fuchy.find("pogoda")).switchedOn)
+        }
+
+    @Test
     fun an_unsigned_file_never_updates_an_approved_fucha() =
         runBlocking {
             installV1()
