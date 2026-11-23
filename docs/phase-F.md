@@ -343,6 +343,16 @@ says so and connects nowhere. It needs no grant: it talks only to `maksforge.com
 Darek reach for fuchy themselves, so his own fucha never needs the `internet` grant and stays on by
 default. An update adding a permission, an address or a value sent waits for the user on the page.
 
+Built in F as follows, to the design review's advice. The page is its own screen, *Fuchy do pobrania*
+(*Gigs to download*), so the installed list keeps connecting nowhere; it opens from the bottom of
+Home, from Settings' *Fuchy* section and from *Dodaj fuchę*, each with *Łączy się z maksforge.com*
+under it. A download opens the same install screen as a picked file. An update installs by itself only
+when it declares no new permission, address or value sent, clashes with nothing and is signed
+(`fuchy/Catalogue.kt`, `updateDecision`); anything else waits for *Zaktualizuj*. *„Zaktualizuj fuchy"*
+updates even with automatic updates off, since the user asked. An installed unsigned copy of a fucha on
+the page shows its warning there and *Zainstaluj zatwierdzoną*. Fuchy hidden for profanity are
+counted under the list, with the way to Settings.
+
 **„Zgłoś fuchę"** on every installed fucha: the support hand-off with the fucha's ID and version in
 the mail's tag.
 
@@ -408,9 +418,9 @@ setup.
 | # | Reading | Command | Result |
 | --- | --- | --- | --- |
 | R1 | The gate, section 1: *pogoda*, *jaka*, *darek*, *zaktualizuj*, *fuchy*, and a made-up word | the debug row, plain and release-shaped, API 26 and 36; the host's `vosk` for F's words | **Verdict 1**: every real word known, *pogodzisko* and *zażółć* unknown, plain and R8, API 26 and 36; *zaktualizuj*, *fuchy* on the host (2026-11-13) |
-| R2 | A fresh install connects nowhere until the page opens; `datatransport` uploads nothing | emulator started with `-tcpdump`, the app opened, Listening started, a Command fired, 10 minutes; then the page opened | **Nothing connects**: on `pixel-api36` with `-tcpdump`, launch, Settings, the disclosure, Listening 10 minutes, stop; `dumpsys netstats detail` holds no byte rows for Darek's uid before or after; DNS only the emulator's own (`time.android.com`, `connectivitycheck.gstatic.com`, `www.google.com`); `TransportRuntime` logs *backend 'cct' is not registered* (2026-11-13). The page half waits for F |
+| R2 | A fresh install connects nowhere until the page opens; `datatransport` uploads nothing | emulator started with `-tcpdump`, the app opened, Listening started, a Command fired, 10 minutes; then the page opened | **Nothing connects**: on `pixel-api36` with `-tcpdump`, launch, Settings, the disclosure, Listening 10 minutes, stop; `dumpsys netstats detail` holds no byte rows for Darek's uid before or after; DNS only the emulator's own (`time.android.com`, `connectivitycheck.gstatic.com`, `www.google.com`); `TransportRuntime` logs *backend 'cct' is not registered* (2026-11-13). Page half, 2026-11-23: on `pixel-api36` the app's uid had no `netstats` row until the page opened, then 5 kB in; on `urgent-api26` *„Darek, zaktualizuj fuchy"* with only Darek's own fucha answered *„Nie mam żadnej fuchy do aktualizowania."* with no row for the uid |
 | R3 | The weather answers with the screen off, the app swiped away and the device forced idle | `adb shell dumpsys deviceidle force-idle`, then *„Darek, jaka pogoda?"* injected | **Answers**: on `urgent-api26` and `pixel-api36`, the task swiped from recents, battery unplugged, screen off, `get deep` IDLE before and after; one injected clip gave `reaction=pogoda/jaka-pogoda`, `DarekWeather forecast=ok` 0.2–0.6 s later and the Reply *„Teraz 6°, pochmurno. Dziś od 4 do 9°."* (2026-11-17). The same run read the signed `pogoda` installed from a file with the badge, the grant refused then given, the city found and picked, and a grant taken back switching it off |
-| R4 | Installing from the page: the install screen shows the addresses and the value sent, the badge is there, the grant is asked once | the page on a fresh install | *(to read)* |
-| R5 | An unsigned copy of the weather fucha from a file: the strong warning, every grant asked | the picker with a hand-edited file | *(to read)* |
-| R6 | An update adding an address waits for the user | a version 2 in a test `fuchy.json` | *(to read)* |
+| R4 | Installing from the page: the install screen shows the addresses and the value sent, the badge is there, the grant is asked once | the page on a fresh install | **Holds**: on `urgent-api26` and `pixel-api36`, the page listed `pogoda` with the badge; *Zainstaluj* opened the install screen with both Open-Meteo addresses and *the city you chose*; switching it on asked the grant once, then the city (2026-11-23) |
+| R5 | An unsigned copy of the weather fucha from a file: the strong warning, every grant asked | the picker with a hand-edited file | **Holds**: on `pixel-api36`, `pogoda` with its signature removed showed the warning, that it replaces an approved gig and so installs as new, and *Zainstaluj mimo to*; it installed off and unapproved, and switching it on asked the grant again (2026-11-23) |
+| R6 | An update adding an address waits for the user | a version 2 in a test `fuchy.json` | **Read by tests only**: `UpdatesTest` and `CatalogueTest` serve a version 2 with a new address or permission, and it waits uninstalled; a device reading would need a test `fuchy.json` on maksforge.com, the only host the allowlist admits for Darek (2026-11-23) |
 | R7 | Owed to a Xiaomi phone: R3 on MIUI and HyperOS | as R3 | *(owed)* |
