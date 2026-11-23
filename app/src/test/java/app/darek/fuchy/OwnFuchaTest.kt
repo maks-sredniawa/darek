@@ -26,8 +26,8 @@ class OwnFuchaTest {
         assertEquals(emptyList<String>(), fucha.addresses)
         assertEquals(emptyList<SentValue>(), fucha.sends)
         assertEquals(false, fucha.profanity)
-        assertEquals(listOf("say-something", "gate"), fucha.commands.map { it.id })
-        val (say, gate) = fucha.commands
+        assertEquals(listOf("say-something", "gate", "update-fuchy"), fucha.commands.map { it.id })
+        val (say, gate, update) = fucha.commands
         assertEquals("powiedz coś", say.phrase)
         assertEquals(Action.SPEAK, say.action)
         assertEquals(Line("Co tam, mordo?"), say.reply)
@@ -36,6 +36,9 @@ class OwnFuchaTest {
         assertEquals(Action.CALL, gate.action)
         assertEquals(Line("Otwieram bramę."), gate.reply)
         assertEquals(listOf("otwórz", "zamknij", "brama"), gate.decoys)
+        assertEquals("zaktualizuj fuchy", update.phrase)
+        assertEquals(Action.UPDATE_FUCHY, update.action)
+        assertEquals(null, update.reply)
         assertEquals(true, fucha.commands.all { it.bundled && it.fucha == "darek" })
     }
 
@@ -51,7 +54,7 @@ class OwnFuchaTest {
 
     @Test
     fun the_grammar_is_byte_for_byte_what_the_enum_built() {
-        val on = listOf(ownFucha)
+        val on = listOf(ownFucha.copy(commands = ownFucha.commands.filter { it.id != "update-fuchy" }))
         before.forEach { (persona, number, json) ->
             assertEquals(
                 "$persona $number",
@@ -63,8 +66,11 @@ class OwnFuchaTest {
 
     @Test
     fun a_command_that_calls_is_enabled_only_with_a_number() {
-        assertEquals(listOf("say-something"), enabledCommands(listOf(ownFucha), null).map { it.id })
-        assertEquals(listOf("say-something", "gate"), enabledCommands(listOf(ownFucha), "123").map { it.id })
+        assertEquals(listOf("say-something", "update-fuchy"), enabledCommands(listOf(ownFucha), null).map { it.id })
+        assertEquals(
+            listOf("say-something", "gate", "update-fuchy"),
+            enabledCommands(listOf(ownFucha), "123").map { it.id },
+        )
     }
 
     /** `Grammar.json` for each Persona, without and with a Number, captured from the enum before it went. */

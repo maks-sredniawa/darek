@@ -52,6 +52,7 @@ fun FuchyScreen(
     onBack: () -> Unit,
     onInstall: (Uri) -> Unit,
     onPickCity: (fuchaId: String, switchOn: Boolean) -> Unit,
+    onOpenPage: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FuchyViewModel = viewModel(factory = FuchyViewModel.Factory, extras = appViewModelExtras()),
 ) {
@@ -102,6 +103,12 @@ fun FuchyScreen(
                 FuchaRowView(it, onSwitch = viewModel::switch, onRemove = viewModel::askRemove, onPickCity = onPickCity)
             }
             SectionHeader(stringResource(R.string.fuchy_add))
+            LinkRow(
+                title = stringResource(R.string.page_title),
+                subtitle = stringResource(R.string.page_connects),
+                target = LinkTarget.Inside,
+                onClick = onOpenPage,
+            )
             LinkRow(
                 title = stringResource(R.string.fuchy_from_file),
                 subtitle = stringResource(R.string.fuchy_from_file_hint),

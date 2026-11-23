@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -58,6 +59,8 @@ import app.darek.listen.listeningNotificationBlock
 import app.darek.listen.listeningRes
 import app.darek.theme.Spacing
 import app.darek.ui.appViewModelExtras
+import app.darek.ui.common.LinkRow
+import app.darek.ui.common.LinkTarget
 import app.darek.ui.common.startActivitySafely
 import app.darek.work.NotificationPermissionOutcome
 import app.darek.work.hasAutostartSettings
@@ -74,6 +77,7 @@ import app.darek.work.rememberNotificationPermissionAsk
 fun HomeScreen(
     onOpenSettings: () -> Unit,
     onOpenSupport: () -> Unit,
+    onOpenPage: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel =
         viewModel(factory = HomeViewModel.Factory, extras = appViewModelExtras()),
@@ -203,6 +207,13 @@ fun HomeScreen(
                     }
                 }
             }
+            HorizontalDivider()
+            LinkRow(
+                title = stringResource(R.string.page_title),
+                subtitle = stringResource(R.string.page_connects),
+                target = LinkTarget.Inside,
+                onClick = onOpenPage,
+            )
         }
     }
 

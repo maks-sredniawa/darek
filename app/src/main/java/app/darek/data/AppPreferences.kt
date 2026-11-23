@@ -61,6 +61,9 @@ class AppPreferences(
         val SETUP_SHOWN_UNDER = longPreferencesKey("setup_shown_under")
         val FUCHY = stringPreferencesKey("fuchy")
         val GRANT_DEFAULTS = stringPreferencesKey("fuchy_grant_defaults")
+        val FUCHY_AUTO_UPDATE = booleanPreferencesKey("fuchy_auto_update")
+        val SHOW_PROFANITY = booleanPreferencesKey("show_profanity")
+        val FUCHY_CHECKED_AT = longPreferencesKey("fuchy_checked_at")
 
         /** What *Restore to default* removes: everything the user chose, so each reads its default again. */
         val SETTINGS: List<Preferences.Key<*>> =
@@ -69,6 +72,8 @@ class AppPreferences(
                 MATERIAL_YOU,
                 PERSONA,
                 GRANT_DEFAULTS,
+                FUCHY_AUTO_UPDATE,
+                SHOW_PROFANITY,
             )
 
         /**
@@ -84,6 +89,7 @@ class AppPreferences(
                 BACKGROUND_DISCLOSED_UNDER,
                 SETUP_SHOWN_UNDER,
                 FUCHY,
+                FUCHY_CHECKED_AT,
             )
     }
 
@@ -192,6 +198,27 @@ class AppPreferences(
                     .orEmpty()
             prefs[Keys.GRANT_DEFAULTS] = fuchyJson.encodeToString(stored + (permission.name to default.name))
         }
+    }
+
+    /** *Aktualizuj fuchy automatycznie*, on by default (phase-F.md section 7). */
+    val fuchyAutoUpdate: Flow<Boolean> = store.data.map { it[Keys.FUCHY_AUTO_UPDATE] ?: true }
+
+    suspend fun setFuchyAutoUpdate(enabled: Boolean) {
+        store.edit { it[Keys.FUCHY_AUTO_UPDATE] = enabled }
+    }
+
+    /** *Pokazuj fuchy z wulgaryzmami*, off by default: flagged fuchy stay off the page until it is on. */
+    val showProfanity: Flow<Boolean> = store.data.map { it[Keys.SHOW_PROFANITY] ?: false }
+
+    suspend fun setShowProfanity(enabled: Boolean) {
+        store.edit { it[Keys.SHOW_PROFANITY] = enabled }
+    }
+
+    /** When `fuchy.json` was last read for updates, so a process start reads it at most once a day. */
+    val fuchyCheckedAt: Flow<Instant?> = instantAt(Keys.FUCHY_CHECKED_AT)
+
+    suspend fun markFuchyChecked(at: Instant) {
+        store.edit { it[Keys.FUCHY_CHECKED_AT] = at.toEpochMilli() }
     }
 
     // Unreadable reads as nothing stored, as [themeMode] does, rather than a crash loop at startup.

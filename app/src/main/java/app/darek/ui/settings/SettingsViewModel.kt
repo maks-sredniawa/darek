@@ -21,14 +21,22 @@ data class SettingsUiState(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val materialYou: Boolean = false,
     val persona: Persona = Persona.DAREK,
+    val fuchyAutoUpdate: Boolean = true,
+    val showProfanity: Boolean = false,
 )
 
 class SettingsViewModel(
     private val preferences: AppPreferences,
 ) : ViewModel() {
     val state: StateFlow<SettingsUiState> =
-        combine(preferences.themeMode, preferences.materialYou, preferences.persona) { theme, materialYou, persona ->
-            SettingsUiState(theme, materialYou, persona)
+        combine(
+            preferences.themeMode,
+            preferences.materialYou,
+            preferences.persona,
+            preferences.fuchyAutoUpdate,
+            preferences.showProfanity,
+        ) { theme, materialYou, persona, autoUpdate, profanity ->
+            SettingsUiState(theme, materialYou, persona, autoUpdate, profanity)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), SettingsUiState())
 
     /**
@@ -46,6 +54,14 @@ class SettingsViewModel(
 
     fun setPersona(persona: Persona) {
         viewModelScope.launch { preferences.setPersona(persona) }
+    }
+
+    fun setFuchyAutoUpdate(enabled: Boolean) {
+        viewModelScope.launch { preferences.setFuchyAutoUpdate(enabled) }
+    }
+
+    fun setShowProfanity(enabled: Boolean) {
+        viewModelScope.launch { preferences.setShowProfanity(enabled) }
     }
 
     fun setMaterialYou(enabled: Boolean) {

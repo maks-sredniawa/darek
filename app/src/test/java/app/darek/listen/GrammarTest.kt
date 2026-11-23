@@ -46,7 +46,7 @@ class GrammarTest {
     @Test
     fun without_a_number_the_gate_is_not_enabled_and_not_in_the_grammar() {
         val enabled = enabledCommands(listOf(ownFucha), number = null)
-        assertEquals(sayOnly, enabled)
+        assertEquals(all.filterNot { it.calls }.toSet(), enabled)
         assertFalse(phrases(Grammar.json(enabled, decoys, Persona.DAREK)).any { "bramę" in it })
     }
 

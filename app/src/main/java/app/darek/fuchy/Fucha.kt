@@ -17,6 +17,9 @@ enum class Action(
     SPEAK(null),
     CALL(Permission.CALL, ownOnly = true),
     WEATHER(Permission.INTERNET, sends = SentValue.CHOSEN_CITY, speaksReply = false),
+
+    /** Talks only to maksforge.com, which needs no grant (ADR-0008, phase-F.md section 7). */
+    UPDATE_FUCHY(null, ownOnly = true, speaksReply = false),
 }
 
 /** [forFuchy]: a fucha from outside may be granted it; calling stays Darek's own until phase 3. */

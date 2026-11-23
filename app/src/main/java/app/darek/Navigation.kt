@@ -19,6 +19,7 @@ import app.darek.ui.fuchy.CityScreen
 import app.darek.ui.fuchy.FuchyScreen
 import app.darek.ui.fuchy.GrantsScreen
 import app.darek.ui.fuchy.InstallScreen
+import app.darek.ui.fuchy.PageScreen
 import app.darek.ui.home.HomeScreen
 import app.darek.ui.settings.SettingsScreen
 import app.darek.ui.support.LicenceTextScreen
@@ -84,6 +85,7 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                         HomeScreen(
                             onOpenSettings = { backStack.add(Settings) },
                             onOpenSupport = { backStack.add(Support) },
+                            onOpenPage = { backStack.add(FuchyPage) },
                         )
                     }
                     entry<Settings> {
@@ -93,6 +95,7 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                             onOpenSupport = { backStack.add(Support) },
                             onOpenFuchy = { backStack.add(FuchyList) },
                             onOpenGrants = { backStack.add(FuchyGrants) },
+                            onOpenPage = { backStack.add(FuchyPage) },
                         )
                     }
                     entry<FuchyList> {
@@ -100,6 +103,7 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                             onBack = { backStack.removeLastOrNull() },
                             onInstall = { backStack.add(FuchaInstall(it.toString())) },
                             onPickCity = { id, switchOn -> backStack.add(FuchaCity(id, switchOn)) },
+                            onOpenPage = { backStack.add(FuchyPage) },
                         )
                     }
                     entry<FuchaCity> { key ->
@@ -107,6 +111,13 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                             fuchaId = key.fuchaId,
                             switchOn = key.switchOn,
                             onDone = { backStack.removeLastOrNull() },
+                        )
+                    }
+                    entry<FuchyPage> {
+                        PageScreen(
+                            onBack = { backStack.removeLastOrNull() },
+                            onInstall = { backStack.add(FuchaInstall(it.toString())) },
+                            onOpenSettings = { backStack.add(Settings) },
                         )
                     }
                     entry<FuchyGrants> {

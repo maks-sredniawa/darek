@@ -7,10 +7,16 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import app.darek.data.AppPreferences
+import app.darek.fuchy.Action
 import app.darek.fuchy.Fuchy
+import app.darek.fuchy.FuchyUpdates
 import app.darek.fuchy.OwnFucha
+import app.darek.fuchy.updateLine
+import app.darek.listen.Command
+import app.darek.listen.Line
 import app.darek.listen.Listening
 import app.darek.listen.LoadedModel
+import app.darek.listen.Vocabulary
 import app.darek.listen.hasMicrophone
 import app.darek.listen.listeningNotificationBlock
 import app.darek.speak.VoiceVolume
@@ -77,15 +83,34 @@ class AppContainer(
     val model = LoadedModel(appContext)
 
     val fuchy =
-        Fuchy(File(appContext.filesDir, "fuchy"), OwnFucha.load(appContext), preferences).also {
-            applicationScope.launch { it.load() }
-        }
+        Fuchy(File(appContext.filesDir, "fuchy"), OwnFucha.load(appContext), preferences)
 
     val weather = Weather(fuchy)
 
+    val updates =
+        FuchyUpdates(fuchy, words = {
+            model.get().let { loaded ->
+                { word: String -> Vocabulary.knows(loaded, word) }
+            }
+        }, preferences)
+
     /** Here so the voice stays loaded between one *Słuchaj* and the next. */
     val listening =
-        Listening(appContext, applicationScope, model, volume = { VoiceVolume.get(appContext) }, built = weather::reply)
+        Listening(appContext, applicationScope, model, volume = { VoiceVolume.get(appContext) }, built = ::builtReply)
+
+    init {
+        applicationScope.launch {
+            fuchy.load()
+            updates.daily()
+        }
+    }
+
+    private suspend fun builtReply(command: Command): Line =
+        when (command.action) {
+            Action.WEATHER -> weather.reply(command)
+            Action.UPDATE_FUCHY -> updateLine(updates.run(asked = true))
+            Action.SPEAK, Action.CALL -> error("${command.label} speaks its own Reply")
+        }
 
     /** Stopped by the user, from Home, the notification or the tile, so no reboot asks again. */
     fun stopListening() {
