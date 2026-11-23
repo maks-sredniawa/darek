@@ -35,6 +35,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -235,12 +237,14 @@ private fun FuchaRowView(
             modifier = Modifier.padding(start = Spacing.base),
         )
     }
+    val hint = stringResource(R.string.report_fucha_hint)
+    val named = stringResource(R.string.report_fucha_named, fucha.name)
     LinkRow(
         title = stringResource(R.string.report_fucha),
-        subtitle = stringResource(R.string.report_fucha_hint),
+        subtitle = hint,
         target = LinkTarget.Outside,
         onClick = { onReport(fucha) },
-        modifier = Modifier.padding(start = Spacing.base),
+        modifier = Modifier.padding(start = Spacing.base).semantics { contentDescription = "$named. $hint" },
     )
 }
 

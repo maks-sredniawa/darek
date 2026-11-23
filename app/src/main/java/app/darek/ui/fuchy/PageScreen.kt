@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -42,6 +43,7 @@ import app.darek.ui.common.SectionHeader
 fun PageScreen(
     onBack: () -> Unit,
     onInstall: (Listing) -> Unit,
+    onOpenFuchy: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PageViewModel = viewModel(factory = PageViewModel.Factory, extras = appViewModelExtras()),
 ) {
@@ -57,35 +59,43 @@ fun PageScreen(
             when (state.load) {
                 PageLoad.Loading -> Loading()
                 PageLoad.NoInternet ->
-                    Notice(
+                    LoadNotice(
                         NoticeTone.NOTE,
                         stringResource(R.string.page_no_internet_title),
                         listOf(stringResource(R.string.page_no_internet_body)),
-                        modifier = Modifier.padding(Spacing.base),
-                        icon = Icons.Filled.Info,
-                        action = retry,
+                        Icons.Filled.Info,
+                        retry,
                     )
                 PageLoad.Failed ->
-                    Notice(
+                    LoadNotice(
                         NoticeTone.WARNING,
                         stringResource(R.string.page_failed_title),
                         listOf(stringResource(R.string.page_failed_body)),
-                        modifier = Modifier.padding(Spacing.base),
-                        icon = Icons.Filled.Warning,
-                        action = retry,
+                        Icons.Filled.Warning,
+                        retry,
                     )
                 PageLoad.NewerFormat ->
-                    Notice(
+                    LoadNotice(
                         NoticeTone.NOTE,
                         stringResource(R.string.refusal_newer_darek),
                         emptyList(),
-                        modifier = Modifier.padding(Spacing.base),
-                        icon = Icons.Filled.Info,
+                        Icons.Filled.Info,
                     )
-                is PageLoad.Listed -> Listed(state, onInstall)
+                is PageLoad.Listed -> Listed(state, onInstall, onOpenFuchy)
             }
         }
     }
+}
+
+@Composable
+private fun LoadNotice(
+    tone: NoticeTone,
+    title: String,
+    lines: List<String>,
+    icon: ImageVector,
+    action: Pair<String, () -> Unit>? = null,
+) {
+    Notice(tone, title, lines, Modifier.announced(title).padding(Spacing.base), icon, action)
 }
 
 @Composable
@@ -104,31 +114,45 @@ private fun Loading() {
 private fun Listed(
     state: PageUiState,
     onInstall: (Listing) -> Unit,
+    onOpenFuchy: () -> Unit,
 ) {
+    val (installed, available) = state.rows.partition { it.installed != null }
+    val firstHeader =
+        stringResource(if (installed.isNotEmpty()) R.string.fuchy_installed else R.string.page_available)
     if (state.autoUpdated.isNotEmpty()) {
+        val updated = stringResource(R.string.page_auto_updated, state.autoUpdated.joinToString(", "))
         Notice(
             NoticeTone.NOTE,
-            stringResource(R.string.page_auto_updated, state.autoUpdated.joinToString(", ")),
+            updated,
             emptyList(),
-            modifier = Modifier.padding(Spacing.base),
+            modifier = Modifier.announced(updated).padding(Spacing.base),
             icon = Icons.Filled.Check,
         )
     }
+    val announceFirst = state.autoUpdated.isEmpty()
     if (state.rows.isEmpty()) {
+        val empty = stringResource(R.string.page_empty)
         Text(
-            stringResource(R.string.page_empty),
+            empty,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = Spacing.base),
+            modifier = Modifier.announcedIf(announceFirst, empty).padding(horizontal = Spacing.base),
         )
         return
     }
-    val (installed, available) = state.rows.partition { it.installed != null }
-    if (installed.isNotEmpty()) SectionHeader(stringResource(R.string.fuchy_installed))
-    installed.forEach { PageRowView(it, it.listing.id in state.waiting, onInstall) }
-    if (available.isNotEmpty()) SectionHeader(stringResource(R.string.page_available))
-    available.forEach { PageRowView(it, waits = false, onInstall) }
+    val firstModifier = Modifier.announcedIf(announceFirst, firstHeader)
+    if (installed.isNotEmpty()) SectionHeader(stringResource(R.string.fuchy_installed), firstModifier)
+    installed.forEach { PageRowView(it, it.listing.id in state.waiting, onInstall, onOpenFuchy) }
+    if (available.isNotEmpty()) {
+        SectionHeader(stringResource(R.string.page_available), if (installed.isEmpty()) firstModifier else Modifier)
+    }
+    available.forEach { PageRowView(it, waits = false, onInstall, onOpenFuchy) }
 }
+
+private fun Modifier.announcedIf(
+    first: Boolean,
+    outcome: String,
+) = if (first) announced(outcome) else this
 
 /** Not clickable as a whole: the button is the only target, and the text above it is one TalkBack stop. */
 @Composable
@@ -136,6 +160,7 @@ private fun PageRowView(
     row: PageRow,
     waits: Boolean,
     onInstall: (Listing) -> Unit,
+    onOpenFuchy: () -> Unit,
 ) {
     val listing = row.listing
     Column(
@@ -188,6 +213,12 @@ private fun PageRowView(
                 }
             }
             Offer.UpToDate, Offer.NeedsNewerDarek -> Unit
+        }
+        if (row.installed?.on == false) {
+            val label = stringResource(R.string.page_switch_on_named, listing.name)
+            OutlinedButton(onClick = onOpenFuchy, modifier = Modifier.semantics { contentDescription = label }) {
+                Text(stringResource(R.string.page_switch_on))
+            }
         }
     }
 }
