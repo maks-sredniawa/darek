@@ -42,7 +42,6 @@ sealed interface InstallStep {
 
     data object Unreadable : InstallStep
 
-    /** The fucha's file on the page could not be reached. */
     data object NoInternet : InstallStep
 
     /** The recogniser's model would not load, so the words cannot be checked and nothing installs. */
@@ -72,7 +71,7 @@ data class InstallUiState(
 
 /**
  * Checks a picked file, or one from the fuchy page, as an install does (phase-F.md section 2) and
- * installs it only on *Zainstaluj*. [source] reads the file.
+ * installs it only on *Zainstaluj*.
  */
 class InstallViewModel(
     private val source: suspend () -> Download,
