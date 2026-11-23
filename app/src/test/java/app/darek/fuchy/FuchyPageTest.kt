@@ -142,6 +142,19 @@ class FuchyPageTest {
         }
 
     @Test
+    fun a_file_that_is_not_what_its_listing_names_is_refused() =
+        runBlocking {
+            installV1()
+            publish(1, signedFileOf(weatherAction.copy(id = "inna"), key))
+            val listing = (page.read() as PageFetch.Listed).listings.single()
+            assertEquals(Download.Failed, page.download(listing))
+            publish(2, signedFileOf(weatherAction, key))
+            assertEquals(Download.Failed, page.download((page.read() as PageFetch.Listed).listings.single()))
+            publish(1, signedFileOf(weatherAction, key))
+            assertTrue(page.download((page.read() as PageFetch.Listed).listings.single()) is Download.Got)
+        }
+
+    @Test
     fun a_file_no_newer_than_the_installed_one_is_not_installed() =
         runBlocking {
             installV1()

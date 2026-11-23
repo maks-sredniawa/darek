@@ -89,9 +89,15 @@ class FuchyPage(
             else -> PageFetch.Failed.also { log("page failed $result") }
         }
 
+    /** A file that is not the fucha and version its listing names is refused, so the page cannot swap or downgrade one. */
     suspend fun download(listing: Listing): Download =
         when (val result = client.get(listing.url)) {
-            is HttpResult.Response -> Download.Got(result.body)
+            is HttpResult.Response ->
+                if (matches(result.body, listing)) {
+                    Download.Got(result.body)
+                } else {
+                    Download.Failed.also { log("${listing.id} file does not match its listing") }
+                }
             HttpResult.TimedOut, is HttpResult.Network -> Download.NoInternet
             else -> Download.Failed.also { log("${listing.id} failed $result") }
         }
@@ -211,4 +217,14 @@ fun lineFor(check: UpdateCheck): Line =
                 )
             if (parts.isEmpty()) ALL_UP_TO_DATE else parts.reduce { a, b -> a + b }
         }
+    }
+
+/** A file Darek cannot read yet passes, so the install screen can say it needs a newer Darek. */
+internal fun matches(
+    file: ByteArray,
+    listing: Listing,
+): Boolean =
+    when (val parsed = parse(file)) {
+        is Parsed.Read -> parsed.source.id == listing.id && parsed.source.version == listing.version
+        is Parsed.Refused -> true
     }
