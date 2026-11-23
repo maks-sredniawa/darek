@@ -41,7 +41,7 @@ sealed interface Download {
     data object Failed : Download
 }
 
-/** What one round of updates did: [waiting] widen what their fucha may do and wait for the user (phase-F.md section 7). */
+/** What one round of updates did: [waiting] widen what their fucha may do, or clash with one on, and wait for the user (phase-F.md section 7). */
 data class Updated(
     val updated: List<Fucha> = emptyList(),
     val waiting: List<Listing> = emptyList(),
@@ -153,14 +153,16 @@ class FuchyPage(
         val new = (checked as? Checked.Accepted)?.fucha?.takeIf { it.id == listing.id }
         val installed = fuchy.installed.first()
         val old = installed.firstOrNull { it.fucha.id == listing.id }?.fucha
+        val plan = new?.let { planInstall(it, installed) }
         return when {
-            new == null || old == null || new.version <= old.version ->
+            new == null || plan == null || old == null || new.version <= old.version ->
                 Updated(failed = listOf(listing)).also { log("${listing.id} not newer, or refused: $checked") }
-            updateWaits(old, new) -> Updated(waiting = listOf(listing))
+            // A clash would install it off; only the install screen shows the user why.
+            updateWaits(old, new) || plan.clashes.isNotEmpty() -> Updated(waiting = listOf(listing))
             else ->
                 try {
                     // An update cut short between the file and its state would come back off after a restart.
-                    withContext(NonCancellable) { fuchy.install(bytes, planInstall(new, installed)) }
+                    withContext(NonCancellable) { fuchy.install(bytes, plan) }
                     Updated(updated = listOf(new))
                 } catch (e: IOException) {
                     Updated(failed = listOf(listing)).also { Log.e(TAG, "could not save ${listing.id}", e) }
