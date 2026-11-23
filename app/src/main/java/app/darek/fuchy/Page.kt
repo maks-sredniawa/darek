@@ -34,7 +34,6 @@ sealed interface PageRead {
         val listings: List<Listing>,
     ) : PageRead
 
-    /** A `fuchy.json` of a later format than this Darek reads. */
     data object NewerFormat : PageRead
 
     data object Unreadable : PageRead
@@ -65,7 +64,6 @@ fun readPage(body: ByteArray): PageRead =
         PageRead.Unreadable
     }
 
-/** What a row on the page offers. */
 sealed interface Offer {
     data object Install : Offer
 
