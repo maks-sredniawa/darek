@@ -1,6 +1,5 @@
 package app.darek.ui.fuchy
 
-import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -31,12 +30,10 @@ import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import app.darek.R
 import app.darek.fuchy.InstallPlan
 import app.darek.listen.Persona
 import app.darek.theme.Spacing
-import app.darek.ui.appViewModelExtras
 import app.darek.ui.common.DetailScaffold
 import app.darek.ui.common.Notice
 import app.darek.ui.common.NoticeTone
@@ -47,10 +44,9 @@ import app.darek.ui.common.NoticeTone
  */
 @Composable
 fun InstallScreen(
-    uri: Uri,
+    viewModel: InstallViewModel,
     onDone: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: InstallViewModel = viewModel(factory = InstallViewModel.factory(uri), extras = appViewModelExtras()),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(state.step) { if (state.step == InstallStep.Installed) onDone() }
@@ -66,10 +62,11 @@ fun InstallScreen(
         ) {
             when (val step = state.step) {
                 InstallStep.Checking, InstallStep.Installed -> Checking()
-                InstallStep.Unreadable, InstallStep.CannotCheck, InstallStep.CannotSave -> {
+                InstallStep.Unreadable, InstallStep.NoInternet, InstallStep.CannotCheck, InstallStep.CannotSave -> {
                     val reason =
                         when (step) {
                             InstallStep.Unreadable -> R.string.install_unreadable
+                            InstallStep.NoInternet -> R.string.install_no_internet
                             InstallStep.CannotCheck -> R.string.install_cannot_check
                             else -> R.string.install_cannot_save
                         }

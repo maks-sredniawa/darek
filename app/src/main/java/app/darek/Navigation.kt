@@ -8,6 +8,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.net.toUri
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavEntryDecorator
 import androidx.navigation3.runtime.NavKey
@@ -15,10 +16,13 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import app.darek.ui.appViewModelExtras
 import app.darek.ui.fuchy.CityScreen
 import app.darek.ui.fuchy.FuchyScreen
 import app.darek.ui.fuchy.GrantsScreen
 import app.darek.ui.fuchy.InstallScreen
+import app.darek.ui.fuchy.InstallViewModel
+import app.darek.ui.fuchy.PageScreen
 import app.darek.ui.home.HomeScreen
 import app.darek.ui.settings.SettingsScreen
 import app.darek.ui.support.LicenceTextScreen
@@ -84,6 +88,7 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                         HomeScreen(
                             onOpenSettings = { backStack.add(Settings) },
                             onOpenSupport = { backStack.add(Support) },
+                            onOpenPage = { backStack.add(FuchyPageList) },
                         )
                     }
                     entry<Settings> {
@@ -93,6 +98,7 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                             onOpenSupport = { backStack.add(Support) },
                             onOpenFuchy = { backStack.add(FuchyList) },
                             onOpenGrants = { backStack.add(FuchyGrants) },
+                            onOpenPage = { backStack.add(FuchyPageList) },
                         )
                     }
                     entry<FuchyList> {
@@ -100,6 +106,19 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                             onBack = { backStack.removeLastOrNull() },
                             onInstall = { backStack.add(FuchaInstall(it.toString())) },
                             onPickCity = { id, switchOn -> backStack.add(FuchaCity(id, switchOn)) },
+                            onOpenPage = { backStack.add(FuchyPageList) },
+                        )
+                    }
+                    entry<FuchyPageList> {
+                        PageScreen(
+                            onBack = { backStack.removeLastOrNull() },
+                            onInstall = { backStack.add(FuchaFromPage(it)) },
+                        )
+                    }
+                    entry<FuchaFromPage> { key ->
+                        InstallScreen(
+                            viewModel(factory = InstallViewModel.factory(key.listing), extras = appViewModelExtras()),
+                            onDone = { backStack.removeLastOrNull() },
                         )
                     }
                     entry<FuchaCity> { key ->
@@ -113,7 +132,13 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                         GrantsScreen(onBack = { backStack.removeLastOrNull() })
                     }
                     entry<FuchaInstall> { key ->
-                        InstallScreen(uri = key.uri.toUri(), onDone = { backStack.removeLastOrNull() })
+                        InstallScreen(
+                            viewModel(
+                                factory = InstallViewModel.factory(key.uri.toUri()),
+                                extras = appViewModelExtras(),
+                            ),
+                            onDone = { backStack.removeLastOrNull() },
+                        )
                     }
                     entry<Support> {
                         SupportScreen(

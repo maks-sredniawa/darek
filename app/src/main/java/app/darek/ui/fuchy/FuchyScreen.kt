@@ -28,8 +28,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -45,6 +47,8 @@ import app.darek.ui.common.DetailScaffold
 import app.darek.ui.common.LinkRow
 import app.darek.ui.common.LinkTarget
 import app.darek.ui.common.SectionHeader
+import app.darek.ui.support.SupportConfig
+import kotlinx.coroutines.launch
 
 /** Darek's own fucha, then the installed ones, then the way to add one (phase-F.md, checkpoint C). */
 @Composable
@@ -52,12 +56,19 @@ fun FuchyScreen(
     onBack: () -> Unit,
     onInstall: (Uri) -> Unit,
     onPickCity: (fuchaId: String, switchOn: Boolean) -> Unit,
+    onOpenPage: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FuchyViewModel = viewModel(factory = FuchyViewModel.Factory, extras = appViewModelExtras()),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbars = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     val resources = LocalResources.current
+    val context = LocalContext.current
+    val noMailApp = stringResource(R.string.support_no_mail_app_write_to, SupportConfig.SUPPORT_ADDRESS)
+    val report: (Fucha) -> Unit = { fucha ->
+        if (!context.reportFucha(fucha)) scope.launch { snackbars.showSnackbar(noMailApp) }
+    }
     LaunchedEffect(viewModel) {
         viewModel.events.collect {
             when (it) {
@@ -87,7 +98,13 @@ fun FuchyScreen(
             if (!state.loaded) return@Column
             state.own?.let {
                 SectionHeader(stringResource(R.string.fuchy_own))
-                FuchaRowView(it, onSwitch = viewModel::switch, onRemove = null, onPickCity = onPickCity)
+                FuchaRowView(
+                    it,
+                    onSwitch = viewModel::switch,
+                    onRemove = null,
+                    onPickCity = onPickCity,
+                    onReport = report,
+                )
             }
             SectionHeader(stringResource(R.string.fuchy_installed))
             if (state.installed.isEmpty()) {
@@ -99,9 +116,21 @@ fun FuchyScreen(
                 )
             }
             state.installed.forEach {
-                FuchaRowView(it, onSwitch = viewModel::switch, onRemove = viewModel::askRemove, onPickCity = onPickCity)
+                FuchaRowView(
+                    it,
+                    onSwitch = viewModel::switch,
+                    onRemove = viewModel::askRemove,
+                    onPickCity = onPickCity,
+                    onReport = report,
+                )
             }
             SectionHeader(stringResource(R.string.fuchy_add))
+            LinkRow(
+                title = stringResource(R.string.page_title),
+                subtitle = stringResource(R.string.page_hint),
+                target = LinkTarget.Inside,
+                onClick = onOpenPage,
+            )
             LinkRow(
                 title = stringResource(R.string.fuchy_from_file),
                 subtitle = stringResource(R.string.fuchy_from_file_hint),
@@ -193,6 +222,7 @@ private fun FuchaRowView(
     onSwitch: (Fucha, Boolean) -> Unit,
     onRemove: ((Fucha) -> Unit)?,
     onPickCity: (fuchaId: String, switchOn: Boolean) -> Unit,
+    onReport: (Fucha) -> Unit,
 ) {
     val fucha = row.installed.fucha
     FuchaSwitchRow(row, onSwitch, onRemove)
@@ -205,6 +235,13 @@ private fun FuchaRowView(
             modifier = Modifier.padding(start = Spacing.base),
         )
     }
+    LinkRow(
+        title = stringResource(R.string.report_fucha),
+        subtitle = stringResource(R.string.report_fucha_hint),
+        target = LinkTarget.Outside,
+        onClick = { onReport(fucha) },
+        modifier = Modifier.padding(start = Spacing.base),
+    )
 }
 
 @Composable

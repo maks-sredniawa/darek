@@ -11,8 +11,10 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import app.darek.MainApplication
 import app.darek.fuchy.Checked
+import app.darek.fuchy.Download
 import app.darek.fuchy.Fuchy
 import app.darek.fuchy.InstallPlan
+import app.darek.fuchy.Listing
 import app.darek.fuchy.Parsed
 import app.darek.fuchy.Refusal
 import app.darek.fuchy.checked
@@ -40,6 +42,9 @@ sealed interface InstallStep {
 
     data object Unreadable : InstallStep
 
+    /** The fucha's file on the page could not be reached. */
+    data object NoInternet : InstallStep
+
     /** The recogniser's model would not load, so the words cannot be checked and nothing installs. */
     data object CannotCheck : InstallStep
 
@@ -65,10 +70,12 @@ data class InstallUiState(
     val persona: Persona = Persona.DAREK,
 )
 
-/** Checks a picked file as an install does (phase-F.md section 2) and installs it only on *Zainstaluj*. */
+/**
+ * Checks a picked file, or one from the fuchy page, as an install does (phase-F.md section 2) and
+ * installs it only on *Zainstaluj*. [source] reads the file.
+ */
 class InstallViewModel(
-    private val uri: Uri,
-    private val resolver: ContentResolver,
+    private val source: suspend () -> Download,
     private val model: LoadedModel,
     private val fuchy: Fuchy,
     persona: Flow<Persona>,
@@ -100,7 +107,12 @@ class InstallViewModel(
     }
 
     private suspend fun check(): InstallStep {
-        val bytes = read() ?: return InstallStep.Unreadable
+        val bytes =
+            when (val download = source()) {
+                is Download.Got -> download.bytes
+                Download.NoInternet -> return InstallStep.NoInternet
+                Download.Failed -> return InstallStep.Unreadable
+            }
         file = bytes
         val loaded =
             try {
@@ -132,49 +144,48 @@ class InstallViewModel(
         }
     }
 
-    // Capped, so a huge file picked by mistake cannot exhaust memory; every real fucha is a few kilobytes.
-    private suspend fun read(): ByteArray? =
-        withContext(Dispatchers.IO) {
-            try {
-                resolver.openInputStream(uri)?.use { input ->
-                    val bytes = input.readAtMost(MAX_BYTES + 1)
-                    bytes.takeIf { it.size <= MAX_BYTES }
-                }
-            } catch (e: IOException) {
-                null.also { Log.w(TAG, "could not read $uri", e) }
-            } catch (e: SecurityException) {
-                null.also { Log.w(TAG, "lost the grant to $uri", e) }
-            }
-        }
-
-    // InputStream.readNBytes arrives only at API 33.
-    private fun InputStream.readAtMost(limit: Int): ByteArray {
-        val out = ByteArrayOutputStream()
-        val buffer = ByteArray(8 * 1024)
-        while (out.size() < limit) {
-            val read = read(buffer, 0, minOf(buffer.size, limit - out.size()))
-            if (read < 0) break
-            out.write(buffer, 0, read)
-        }
-        return out.toByteArray()
-    }
-
     companion object {
         private const val TAG = "DarekFuchy"
         private const val MAX_BYTES = 256 * 1024
 
-        fun factory(uri: Uri): ViewModelProvider.Factory =
+        fun factory(uri: Uri): ViewModelProvider.Factory = factory { app -> { app.contentResolver.readPicked(uri) } }
+
+        fun factory(listing: Listing): ViewModelProvider.Factory =
+            factory { app -> { app.container.page.download(listing) } }
+
+        private fun factory(source: (MainApplication) -> suspend () -> Download): ViewModelProvider.Factory =
             viewModelFactory {
                 initializer {
                     val app = this[APPLICATION_KEY] as MainApplication
-                    InstallViewModel(
-                        uri,
-                        app.contentResolver,
-                        app.container.model,
-                        app.container.fuchy,
-                        app.preferences.persona,
-                    )
+                    InstallViewModel(source(app), app.container.model, app.container.fuchy, app.preferences.persona)
                 }
             }
+
+        // Capped, so a huge file picked by mistake cannot exhaust memory; every real fucha is a few kilobytes.
+        private suspend fun ContentResolver.readPicked(uri: Uri): Download =
+            withContext(Dispatchers.IO) {
+                try {
+                    openInputStream(uri)
+                        ?.use { input -> input.readAtMost(MAX_BYTES + 1).takeIf { it.size <= MAX_BYTES } }
+                        ?.let(Download::Got)
+                        ?: Download.Failed
+                } catch (e: IOException) {
+                    Download.Failed.also { Log.w(TAG, "could not read $uri", e) }
+                } catch (e: SecurityException) {
+                    Download.Failed.also { Log.w(TAG, "lost the grant to $uri", e) }
+                }
+            }
+
+        // InputStream.readNBytes arrives only at API 33.
+        private fun InputStream.readAtMost(limit: Int): ByteArray {
+            val out = ByteArrayOutputStream()
+            val buffer = ByteArray(8 * 1024)
+            while (out.size() < limit) {
+                val read = read(buffer, 0, minOf(buffer.size, limit - out.size()))
+                if (read < 0) break
+                out.write(buffer, 0, read)
+            }
+            return out.toByteArray()
+        }
     }
 }

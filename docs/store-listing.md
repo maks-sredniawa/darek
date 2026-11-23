@@ -44,15 +44,15 @@ reason, so every listing carries the same name.
 Darek
 ```
 
-### Short description — 76/80
+### Short description — 78/80
 
 The line that appears under the name in search results, and the most-read text in the listing.
 
 ```
-Say "Darek, otwórz bramę" and he calls your gate opener. Offline, in Polish.
+Say "Darek, otwórz bramę" and he calls your gate opener. In Polish, on-device.
 ```
 
-### Full description — 3108/4000
+### Full description — 3735/4000
 
 **No health or safety claims**, here or on any page the listing links to — Play's enforcement reads a
 linked page as part of the listing. Say what the app cannot do instead.
@@ -62,8 +62,8 @@ renders no markup. The block below is what `play-metadata.py` uploads, so the ou
 
 1. One or two sentences: the problem, and what the app does about it.
 2. `HOW IT WORKS` — what happens, in the order the user meets it.
-3. `FREE, AND NOTHING LEAVES YOUR PHONE` — no ads, no account, no server; "it does not request the
-   internet permission" only while `aab-permissions.py` forbids `INTERNET`; what it stores.
+3. `FREE, AND NOTHING HE HEARS LEAVES YOUR PHONE` — no ads, no account, no server; the only places it
+   connects to (ADR-0008); what it stores.
 4. `WHAT IT CANNOT DO` — the honest limits, and what a phone or the platform can stop.
 5. `PERMISSIONS` — one line each, in the user's words.
 6. A last line pointing at the source: `github.com/maks-sredniawa/darek`.
@@ -72,9 +72,9 @@ The second paragraph says what the current test build can do. Each test build re
 release that ships the call (phase 3) deletes it, in both languages.
 
 ```
-Darek is a Polish voice assistant for your gate. Say "Darek, otwórz bramę" and he answers out loud and calls your gate's GSM opener, so you do not have to reach for your phone. Recognition, speech and the call all happen on your phone, with no internet at all.
+Darek is a Polish voice assistant for your gate. Say "Darek, otwórz bramę" and he answers out loud and calls your gate's GSM opener, so you do not have to reach for your phone. Recognition, speech and the call all happen on your phone, and nothing he hears ever leaves it.
 
-This test build answers one Command, "Darek, powiedz coś", with the screen off and the app closed too. Say "Hej, Darek" with anything else, "otwórz bramę" included, and he answers "nie mam żadnej fuchy" (he has no gigs yet). Setting him up and the call arrive in the next test builds.
+This test build answers "Darek, powiedz coś" and, with the Pogoda gig from the gig page, "Darek, jaka pogoda?", with the screen off and the app closed too. Setting up the gate and the call arrive in the next test builds.
 
 HOW IT WORKS
 
@@ -86,15 +86,17 @@ When he hears a Command, Darek says what he is about to do ("Otwieram bramę") a
 
 He acts only on a whole Command. His name in ordinary conversation can get a spoken answer, but never a call, and "Marek, otwórz bramę" does nothing.
 
-FREE, AND NOTHING LEAVES YOUR PHONE
+More Commands come as gigs (fuchy). Open the gig page from the home screen or from Settings to see the gigs MaksForge approved, such as the weather: "Darek, jaka pogoda?" answers with the temperature for the city you chose. Each gig shows what it does, what it may use and where it connects before you install it, and one that needs the internet asks you first. Darek keeps them up to date, and an update that asks for more waits for you.
 
-No ads. No account. No server. No subscription. Darek does not request the internet permission, so nothing he hears can leave your phone. Speech is recognised on the phone by an offline recogniser that comes with the app, and the sound is processed as it is heard: never recorded, never stored, never sent. Darek keeps only his settings: the numbers you entered, which Commands are on, your theme and your language. An optional tip through Google Play unlocks nothing.
+FREE, AND NOTHING HE HEARS LEAVES YOUR PHONE
+
+No ads. No account. No server. No subscription. Speech is recognised on the phone by an offline recogniser that comes with the app, and the sound is processed as it is heard: never recorded, never stored, never sent. Darek connects to the internet only to read the gig page on maksforge.com, and for a gig you allowed it to, only to the addresses it showed you: the weather gig sends the city you chose to Open-Meteo.com. Darek keeps only his settings: the numbers you entered, your gigs and the city you chose, your theme and your language. An optional tip through Google Play unlocks nothing.
 
 WHAT IT CANNOT DO
 
 Darek calls your gate opener; he does not control the gate. Whether it opens is up to the opener, which has to accept calls from your number. The call goes through your own SIM and mobile operator like any call you make, so it needs signal.
 
-He understands only his fixed Polish Commands, not free speech, and you cannot add phrases of your own. In a noisy place he can miss a Command; say it again.
+He understands only the Polish Commands of his gigs, not free speech, and you cannot make up phrases of your own. In a noisy place he can miss a Command; say it again.
 
 He answers in his own Polish voice, which comes with the app and sounds the same on every phone; he needs no text-to-speech engine and no voice download.
 
@@ -103,6 +105,7 @@ Listening keeps the microphone on and uses battery while it runs. Some phones, X
 PERMISSIONS
 
 - Microphone. Hears the Commands, only while Listening is on.
+- Internet. Reads the gig page, and lets a gig you allowed reach the addresses it showed you.
 - Phone. Calls the number you entered for a Command, after Darek's reply.
 - Notifications. Shows that Darek is listening, with a button to stop him.
 - Foreground service. Keeps Listening running while the app is closed.
@@ -122,18 +125,18 @@ himself is male: *usłyszy*, *odpowie*, *zadzwoni*.
 Darek
 ```
 
-### Short description — 79/80
+### Short description — 75/80
 
 ```
-Powiedz „Darek, otwórz bramę”, a on odpowie i zadzwoni do bramy. Bez internetu.
+Powiedz „Darek, otwórz bramę”, a on odpowie i zadzwoni do bramy. Po polsku.
 ```
 
-### Full description — 3196/4000
+### Full description — 3905/4000
 
 ```
-Darek to głosowy asystent do twojej bramy. Powiedz „Darek, otwórz bramę”, a on odpowie na głos i zadzwoni do sterownika GSM bramy, więc nie musisz sięgać po telefon. Rozpoznawanie mowy, odpowiedź i połączenie odbywają się w telefonie, zupełnie bez internetu.
+Darek to głosowy asystent do twojej bramy. Powiedz „Darek, otwórz bramę”, a on odpowie na głos i zadzwoni do sterownika GSM bramy, więc nie musisz sięgać po telefon. Rozpoznawanie mowy, odpowiedź i połączenie odbywają się w telefonie, a nic, co Darek usłyszy, nie opuszcza telefonu.
 
-Ta wersja testowa odpowiada na jedną komendę, „Darek, powiedz coś”, także przy wyłączonym ekranie i zamkniętej aplikacji. Gdy powiesz „Hej, Darek” z czymkolwiek innym, także „otwórz bramę”, odpowie „nie mam żadnej fuchy”. Konfiguracja i dzwonienie pojawią się w kolejnych wersjach testowych.
+Ta wersja testowa odpowiada na „Darek, powiedz coś”, a z fuchą Pogoda ze strony z fuchami także na „Darek, jaka pogoda?”, również przy wyłączonym ekranie i zamkniętej aplikacji. Ustawienie bramy i dzwonienie pojawią się w kolejnych wersjach testowych.
 
 JAK TO DZIAŁA
 
@@ -145,15 +148,17 @@ Gdy usłyszy komendę, Darek mówi, co zrobi („Otwieram bramę”), i daje ci 
 
 Darek wykonuje tylko całą komendę. Gdy usłyszy swoje imię w zwykłej rozmowie, może odpowiedzieć na głos, ale nigdy nie zadzwoni, a „Marek, otwórz bramę” nic nie robi.
 
-ZA DARMO I NIC NIE OPUSZCZA TELEFONU
+Kolejne komendy przychodzą jako fuchy. Otwórz stronę z fuchami z ekranu głównego albo z Ustawień, a zobaczysz fuchy zatwierdzone przez MaksForge, na przykład pogodę: „Darek, jaka pogoda?” poda temperaturę w wybranym przez ciebie mieście. Każda fucha przed instalacją pokazuje, co robi, czego może używać i z czym się łączy, a ta, która potrzebuje internetu, najpierw pyta. Darek sam aktualizuje fuchy, a aktualizacja, która chce więcej, czeka na ciebie.
 
-Bez reklam, bez konta, bez serwera, bez subskrypcji. Darek nie prosi o uprawnienie do internetu, więc nic, co usłyszy, nie może opuścić telefonu. Mowę rozpoznaje w telefonie dołączony do aplikacji moduł działający offline, a dźwięk jest przetwarzany na bieżąco: nigdy nie jest nagrywany, zapisywany ani wysyłany. Darek przechowuje tylko swoje ustawienia: wpisane numery, włączone komendy, motyw i język. Opcjonalny napiwek przez Google Play niczego nie odblokowuje.
+ZA DARMO I NIC, CO DAREK USŁYSZY, NIE OPUSZCZA TELEFONU
+
+Bez reklam, bez konta, bez serwera, bez subskrypcji. Mowę rozpoznaje w telefonie dołączony do aplikacji moduł działający offline, a dźwięk jest przetwarzany na bieżąco: nigdy nie jest nagrywany, zapisywany ani wysyłany. Darek łączy się z internetem tylko po to, żeby odczytać stronę z fuchami na maksforge.com, a fucha, której na to pozwolisz, tylko z adresami, które ci pokazała: fucha pogody wysyła wybrane miasto do Open-Meteo.com. Darek przechowuje tylko swoje ustawienia: wpisane numery, twoje fuchy i wybrane miasto, motyw i język. Opcjonalny napiwek przez Google Play niczego nie odblokowuje.
 
 CZEGO NIE POTRAFI
 
 Darek dzwoni do sterownika bramy, ale nie steruje samą bramą. To, czy się otworzy, zależy od sterownika, który musi przyjmować połączenia z twojego numeru. Połączenie idzie przez twoją kartę SIM i twojego operatora, jak każde inne, więc wymaga zasięgu.
 
-Rozumie tylko swoje stałe polskie komendy, nie swobodną mowę, i nie da się dodać własnych zwrotów. W hałasie może nie usłyszeć komendy; wtedy ją powtórz.
+Rozumie tylko polskie komendy swoich fuch, nie swobodną mowę, i nie da się wymyślić własnych zwrotów. W hałasie może nie usłyszeć komendy; wtedy ją powtórz.
 
 Odpowiada własnym polskim głosem, który jest częścią aplikacji i na każdym telefonie brzmi tak samo; nie potrzebuje syntezatora mowy w telefonie ani pobierania głosu.
 
@@ -162,6 +167,7 @@ Gdy Darek słucha, mikrofon jest włączony, co zużywa baterię. Niektóre tele
 UPRAWNIENIA
 
 - Mikrofon. Darek słyszy przez niego komendy, tylko gdy słuchanie jest włączone.
+- Internet. Odczytuje stronę z fuchami i pozwala fusze, której na to pozwolisz, łączyć się z pokazanymi adresami.
 - Telefon. Darek dzwoni pod numer wpisany dla komendy, po swojej odpowiedzi.
 - Powiadomienia. Pokazują, że Darek słucha, z przyciskiem, który go zatrzymuje.
 - Usługa na pierwszym planie. Utrzymuje słuchanie, gdy aplikacja jest zamknięta.
@@ -391,4 +397,18 @@ Darek can now tell the weather. Install the Pogoda gig, allow it the internet an
 
 ```
 Darek mówi teraz, jaka jest pogoda. Zainstaluj fuchę Pogoda, pozwól jej na internet i raz wybierz swoje miasto, a potem powiedz „Darek, jaka pogoda?”: usłyszysz temperaturę teraz i dzisiejsze minimum i maksimum, także przy wyłączonym ekranie. W Ustawieniach, w Uprawnieniach fuch, ustawisz, czego fuchy mogą używać bez pytania, i cofniesz zgodę. Dane pogodowe: Open-Meteo.com.
+```
+
+### 0.15.0 — The gig page
+
+**English** — 382/500:
+
+```
+Gigs now come from the gig page: open it from Home or from Settings to see the gigs MaksForge approved and install one in a tap. Darek keeps them up to date by himself, and an update that asks for more waits for you. Say “Darek, zaktualizuj fuchy” to check now. Gigs with swearing stay hidden until you turn them on in Settings. Something wrong with a gig? Report it from Your gigs.
+```
+
+**Polish** — 429/500:
+
+```
+Fuchy są teraz na stronie z fuchami: otworzysz ją z ekranu głównego albo z Ustawień, zobaczysz fuchy zatwierdzone przez MaksForge i zainstalujesz jedną jednym dotknięciem. Darek sam je aktualizuje, a aktualizacja, która chce więcej, czeka na ciebie. Powiedz „Darek, zaktualizuj fuchy”, żeby sprawdzić od razu. Fuchy z wulgaryzmami są ukryte, dopóki ich nie włączysz w Ustawieniach. Coś nie tak z fuchą? Zgłoś ją w Twoich fuchach.
 ```

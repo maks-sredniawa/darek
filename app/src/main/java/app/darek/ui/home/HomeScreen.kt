@@ -74,6 +74,7 @@ import app.darek.work.rememberNotificationPermissionAsk
 fun HomeScreen(
     onOpenSettings: () -> Unit,
     onOpenSupport: () -> Unit,
+    onOpenPage: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel =
         viewModel(factory = HomeViewModel.Factory, extras = appViewModelExtras()),
@@ -202,6 +203,9 @@ fun HomeScreen(
                         )
                     }
                 }
+            }
+            TextButton(onClick = onOpenPage, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                Text(stringResource(R.string.page_title))
             }
         }
     }

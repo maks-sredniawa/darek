@@ -25,4 +25,6 @@ data class Line(
     private val daria: String = darek,
 ) {
     fun by(persona: Persona): String = if (persona == Persona.DAREK) darek else daria
+
+    operator fun plus(next: Line): Line = Line("$darek ${next.darek}", "$daria ${next.daria}")
 }

@@ -1,10 +1,10 @@
 {
   "format": 1,
   "id": "darek",
-  "version": 1,
+  "version": 2,
   "language": "pl",
   "name": "Darek",
-  "description": "Fuchy Darka od początku: powiedz coś i otwórz bramę.",
+  "description": "Fuchy Darka od początku: powiedz coś, otwórz bramę i zaktualizuj fuchy.",
   "author": "MaksForge",
   "profanity": false,
   "permissions": [
@@ -30,6 +30,12 @@
         "zamknij",
         "brama"
       ]
+    },
+    {
+      "id": "update-fuchy",
+      "phrase": "zaktualizuj fuchy",
+      "action": "update_fuchy",
+      "decoys": []
     }
   ]
 }
