@@ -107,10 +107,10 @@ private fun Refusal(lines: List<String>) {
 }
 
 /**
- * Said by TalkBack when the check's outcome replaces *Checking*. A pane title, not a live region:
+ * Said by TalkBack when an outcome replaces a loading state. A pane title, not a live region:
  * Compose announces a live region only when an existing node changes, never when one first appears.
  */
-private fun Modifier.announced(outcome: String) = semantics { paneTitle = outcome }
+internal fun Modifier.announced(outcome: String) = semantics { paneTitle = outcome }
 
 @Composable
 private fun Plan(

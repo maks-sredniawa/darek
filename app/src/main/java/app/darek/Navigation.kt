@@ -113,6 +113,7 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                         PageScreen(
                             onBack = { backStack.removeLastOrNull() },
                             onInstall = { backStack.add(FuchaFromPage(it)) },
+                            onOpenFuchy = { backStack.add(FuchyList) },
                         )
                     }
                     entry<FuchaFromPage> { key ->
