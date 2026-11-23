@@ -392,3 +392,17 @@ Darek can now tell the weather. Install the Pogoda gig, allow it the internet an
 ```
 Darek mówi teraz, jaka jest pogoda. Zainstaluj fuchę Pogoda, pozwól jej na internet i raz wybierz swoje miasto, a potem powiedz „Darek, jaka pogoda?”: usłyszysz temperaturę teraz i dzisiejsze minimum i maksimum, także przy wyłączonym ekranie. W Ustawieniach, w Uprawnieniach fuch, ustawisz, czego fuchy mogą używać bez pytania, i cofniesz zgodę. Dane pogodowe: Open-Meteo.com.
 ```
+
+### 0.15.0 — Gigs to download
+
+**English** — 401/500:
+
+```
+Gigs to download: a new page lists the gigs MaksForge has approved, and installs or updates one in a tap, showing first what it does, as before. Gigs from it update themselves once a day, unless an update asks for something new; then it waits for you. Say “Darek, zaktualizuj fuchy” to update them now. Settings can turn automatic updates off and show gigs with profanity, which are hidden by default.
+```
+
+**Polish** — 446/500:
+
+```
+Fuchy do pobrania: nowa strona pokazuje fuchy zatwierdzone przez MaksForge i jednym dotknięciem instaluje albo aktualizuje fuchę, najpierw pokazując, co robi, jak dotąd. Fuchy z niej aktualizują się raz dziennie, chyba że aktualizacja prosi o coś nowego: wtedy czeka na ciebie. Powiedz „Darek, zaktualizuj fuchy”, żeby zaktualizować je od razu. W Ustawieniach wyłączysz automatyczne aktualizacje i włączysz fuchy z wulgaryzmami, domyślnie ukryte.
+```
