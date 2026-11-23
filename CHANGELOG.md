@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.15.0](https://github.com/maks-sredniawa/darek/compare/v0.14.0...v0.15.0) (2026-11-23)
+
+
+### Features
+
+* install and update fuchy from the fuchy page, with zaktualizuj fuchy and Zgłoś fuchę ([af12b5e](https://github.com/maks-sredniawa/darek/commit/af12b5e4c5f139f3501562b566168777852b9e47))
+
+
+### Bug Fixes
+
+* drop KDocs that only restate the name they sit on ([1afbb18](https://github.com/maks-sredniawa/darek/commit/1afbb18e5b1bc7d795b2e90a610891f15499f406))
+* hold back an automatic update that clashes with a fucha already on ([ae371c3](https://github.com/maks-sredniawa/darek/commit/ae371c3fe58fcab5679457e084ffb1119f0759fe))
+* offer switch-on from the fuchy page and announce its outcomes and report links to TalkBack ([135a7d5](https://github.com/maks-sredniawa/darek/commit/135a7d5a6bc56cdf3f9fd2c9fcc4fcd14b6967f7))
+* refuse a page download that is not the fucha and version its listing names ([0dd7187](https://github.com/maks-sredniawa/darek/commit/0dd718709bbc5e7341f52119c2beacd576ec852d))
+
 ## [0.14.0](https://github.com/maks-sredniawa/darek/compare/v0.13.0...v0.14.0) (2026-11-17)
 
 
