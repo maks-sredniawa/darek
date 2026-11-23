@@ -121,7 +121,7 @@ private fun PageRowView(
             Text(entry.name, style = MaterialTheme.typography.bodyLarge)
             Secondary(entry.description)
             Secondary(stringResource(R.string.fuchy_author, entry.author))
-            Approval(approved = true)
+            Approval(approved = row.installed?.fucha?.approved ?: true)
         }
         val status =
             when {
@@ -129,6 +129,7 @@ private fun PageRowView(
                 row.action == RowAction.UP_TO_DATE ->
                     stringResource(R.string.page_up_to_date, row.installed?.fucha?.version ?: entry.version)
                 row.action == RowAction.UPDATE -> stringResource(R.string.page_newer_version, entry.version)
+                row.action == RowAction.REPLACE -> stringResource(R.string.page_unapproved_copy)
                 row.action == RowAction.NEEDS_NEWER -> stringResource(R.string.refusal_newer_darek)
                 else -> null
             }
@@ -144,12 +145,17 @@ private fun PageRowView(
             when (row.action) {
                 RowAction.INSTALL -> R.string.page_install
                 RowAction.UPDATE -> R.string.page_update
+                RowAction.REPLACE -> R.string.page_replace
                 RowAction.UP_TO_DATE, RowAction.NEEDS_NEWER -> null
             }
         if (label != null) {
             val described =
                 stringResource(
-                    if (row.action == RowAction.INSTALL) R.string.page_install_named else R.string.page_update_named,
+                    when (row.action) {
+                        RowAction.UPDATE -> R.string.page_update_named
+                        RowAction.REPLACE -> R.string.page_replace_named
+                        else -> R.string.page_install_named
+                    },
                     entry.name,
                 )
             FilledTonalButton(

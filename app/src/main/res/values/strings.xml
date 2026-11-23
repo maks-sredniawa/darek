@@ -163,6 +163,9 @@
     <string name="page_update_named">Update %1$s</string>
     <string name="page_up_to_date">Installed, version %1$d</string>
     <string name="page_newer_version">A newer version is available: %1$d</string>
+    <string name="page_unapproved_copy">Your copy is not the approved one.</string>
+    <string name="page_replace">Install the approved one</string>
+    <string name="page_replace_named">Install the approved %1$s</string>
     <string name="page_downloading">Downloading…</string>
     <string name="page_download_failed">Couldn\'t download. Try again.</string>
     <string name="page_loading">Getting the list of gigs…</string>

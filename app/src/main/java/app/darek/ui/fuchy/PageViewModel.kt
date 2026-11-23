@@ -44,7 +44,8 @@ sealed interface PageLoad {
     ) : PageLoad
 }
 
-enum class RowAction { INSTALL, UPDATE, UP_TO_DATE, NEEDS_NEWER }
+/** [REPLACE]: the installed copy is not the approved one, so the page offers the approved file in its place. */
+enum class RowAction { INSTALL, UPDATE, REPLACE, UP_TO_DATE, NEEDS_NEWER }
 
 data class PageRow(
     val entry: CatalogueEntry,
@@ -98,7 +99,7 @@ class PageViewModel(
             val shown = rest.filter { profanity || !it.entry.profanity }
             PageUiState(
                 load = load,
-                installed = mine.sortedBy { it.action != RowAction.UPDATE },
+                installed = mine.sortedBy { it.action == RowAction.UP_TO_DATE },
                 available = shown,
                 hiddenProfanity = rest.size - shown.size,
             )
@@ -159,8 +160,9 @@ class PageViewModel(
         installed: Installed?,
     ): RowAction =
         when {
-            installed != null && entry.version <= installed.fucha.version -> RowAction.UP_TO_DATE
             entry.needsNewerDarek -> RowAction.NEEDS_NEWER
+            installed != null && !installed.fucha.approved -> RowAction.REPLACE
+            installed != null && entry.version <= installed.fucha.version -> RowAction.UP_TO_DATE
             installed != null -> RowAction.UPDATE
             else -> RowAction.INSTALL
         }
