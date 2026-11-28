@@ -48,7 +48,7 @@ close. Whenever `APP_SCHEMA_VERSION` changes, all five hold before the release g
       it is discovered late.
 - [x] **Replace the placeholder domain.** `data/ItemEntity.kt` and `ui/items/` — or delete them
       (above). Done 2026-10-31: deleted, with Darek's Home screen in their place.
-- [x] **Rewrite `scripts/edge-to-edge.py`'s SCENES** against your screens. Until then the nightly
+- [x] **Rewrite `scripts/edge-to-edge.py`'s SCENES** against your screens. Until then edge-to-edge
       walks screens that do not exist, and `screenshots.py` cannot shoot a listing.
       Done 2026-10-31: Home, Settings, Help and the Licences.
 - [ ] **Make the artifact allowlists yours.** `aab-permissions.py`'s EXPECTED, FORBIDDEN and
@@ -249,6 +249,9 @@ voice at every setting tried (D2). A better voice or a line of her own fixes it.
 
 ## After the closed test
 
+- [ ] **Turn on the weekly CI run once the app is live on Play.** Add
+      `schedule: - cron: '47 1 * * 0'` under `on:` in `.github/workflows/ci.yml`. Until then
+      edge-to-edge runs only from the Run workflow button.
 - [ ] **The production-access application is in, with its answers recorded verbatim** in
       [`play-app-content.md`](play-app-content.md). Until it is granted the production track does not
       exist. The app this template was extracted from waited one day; that is one datapoint, not a
