@@ -162,7 +162,7 @@ are marked.
   point 5 and its *Would change* bullet; and *The tip*. **Edit** the `ACCESS_NETWORK_STATE` row back
   to WorkManager alone. Keep *A payment-link tip*: an app that drops the billing tip is the one most
   likely to try a link next.
-- The privacy policy's billing-library sentence under *The app collects nothing*, its billing bullet
+- The privacy policy's billing-library sentence under *What leaves your phone*, its billing bullet
   and its tip paragraph
 - `CLAUDE.md`'s Play Billing row in Stack and `tip/` line in Layout; `CONTEXT.md`'s **Tip** row
 - `RELEASING.md`'s *Selling the tip*; the tip section of `DOD.md`

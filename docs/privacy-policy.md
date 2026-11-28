@@ -13,7 +13,7 @@ phone number you gave that Command, which is how a GSM gate opener is driven. Mo
 *fuchy* (gigs) you install, such as the weather. This policy describes
 what the app does with information about you. It is short because the app does very little.
 
-## The app collects nothing
+## What leaves your phone
 
 Darek has no account, no sign-in and no server of his own, and **nothing he hears ever leaves your
 phone**: no audio, and no text of what you said. He connects to the internet only in the two ways
@@ -118,7 +118,7 @@ Darek is meant for adults. It is not directed at children.
 ## Deleting your data
 
 Uninstalling the app removes everything it stored on the phone, including the numbers you entered
-and the city you chose. A copy can be in two other places:
+and the city you chose. A copy can be in three other places:
 
 - **Android's backup in your Google account**, if backup is on. It outlives an uninstall, which is how
   a reinstall gets your settings back. To remove it at once, turn backup off in your phone's
@@ -129,6 +129,10 @@ and the city you chose. A copy can be in two other places:
 - **An email you sent the developer.** It is kept in the support mailbox, with your email address and
   what the draft carried, until you ask for it to be deleted. Write to the address below and it will
   be.
+- **Open-Meteo's server logs**, if you used the weather fucha. They may hold the coordinates of your
+  city, and Open-Meteo says it deletes them after 90 days. The developer never receives the city or
+  its coordinates, so cannot delete them for you; to ask Open-Meteo sooner, write to
+  info@open-meteo.com, the address its terms give.
 
 ## Changes
 
