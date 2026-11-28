@@ -177,7 +177,9 @@ Console matches. A new permission, foreground service or data type is a Console 
       rewritten the privacy policy, the listing, the Data safety and
       [`play-app-content.md`](play-app-content.md): until then they still say Darek has no network
       ([`phase-F.md`](phase-F.md), *With F*). `aab-permissions.py` no longer stops such a build, so
-      this line is the only gate. Tick when F's release carries all four.
+      this line is the only gate. Tick when F's release carries all four. The policy, the listing
+      and `play-app-content.md` are rewritten; the Data safety was re-answered and saved on
+      2026-11-28 but still waits for *Submit for review* on Publishing overview.
 
 ## Phase F — the weather fucha from the fuchy page
 
@@ -206,6 +208,9 @@ Console matches. A new permission, foreground service or data type is a Console 
       deep idle. *Uprawnienia fuch* holds the defaults and the grants given by hand.
 - [ ] **F**, the page, updates and *„Zgłoś fuchę"* (R4–R6), with the listing, policy, Data safety
       and content rating in the same release.
+      R2's page half and R4–R6 are read (`phase-F.md`, *Readings*). Still owed: the Data safety's
+      submission, the content rating's re-read (`play-app-content.md`), and the listing's
+      screenshots with the page in both languages.
 
 ## Owed to the owner's phone
 

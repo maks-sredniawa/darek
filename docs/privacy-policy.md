@@ -5,7 +5,7 @@ title: Privacy Policy
 
 # Privacy Policy
 
-_Effective date: 23 November 2026_
+_Effective date: 28 November 2026_
 
 Darek is a Polish voice assistant for Android. While you have him listening, he waits for one of a
 few fixed spoken Commands, such as *"Darek, otwórz bramę"*, answers out loud, and then calls the
@@ -30,8 +30,9 @@ below, and only over HTTPS:
   values that screen named. The weather fucha (*Pogoda*) sends the city name you type, when you
   choose your city, to Open-Meteo's place search, and then the coordinates of the city you picked to
   Open-Meteo's forecast each time you ask *„Darek, jaka pogoda?"*. [Open-Meteo](https://open-meteo.com)
-  receives those requests with your IP address, under its own terms. You can take the permission back
-  in the app at any time, which switches the fucha off.
+  receives those requests with your IP address, under its own terms, and says it deletes its server
+  logs, which may hold the coordinates, after 90 days. You can take the permission back in the app at
+  any time, which switches the fucha off.
 
 The one other thing that leaves your phone, at the app's request, is the call a Command places: to
 the number you typed for it, through your own mobile operator, from your own number, as described
@@ -112,7 +113,7 @@ These are done by the operating system or by Google, not by Darek, but they are 
 
 ## Children
 
-Darek is meant for adults. It is not directed at children, and it collects nothing from anyone.
+Darek is meant for adults. It is not directed at children.
 
 ## Deleting your data
 
