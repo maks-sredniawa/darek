@@ -1367,6 +1367,8 @@ SCENES = [
     Scene("support", "detail", [("tap", "Settings"), ("tap", "Help and feedback")]),
     Scene("licences", "detail", [("tap", "Settings"), ("tap", "Open-source licences")]),
     Scene("licences-bottom", "detail", [("tap", "Settings"), ("tap", "Open-source licences"), ("swipe_end", "")]),
+    # The list is fetched from maksforge.com when the page opens, so the phone needs the internet.
+    Scene("fuchy-page", "detail", [("tap", "Gig page"), ("wait", "4")]),
 ]
 
 
