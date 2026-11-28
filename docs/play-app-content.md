@@ -106,7 +106,11 @@ In the Console the questionnaire shows one section at a time, and *Next* stays d
 has been pressed.
 
 **Owed with phase F's checkpoint F (0.15.0), in the Console sitting before that release leaves
-internal testing.** Re-read the questionnaire for two things F brings, and record the answers here:
+internal testing.** Not yet re-read: on 2026-11-28 a new questionnaire through the Playwright MCP
+closed the tab as soon as the email field took focus (another extension's frame on email fields
+detaches Chrome's debugger), so the questionnaire's wording was not reached and nothing was
+submitted. The 2026-10-31 rating stands until then. Re-read it for two things F brings, and record
+the answers here:
 
 - **Fuchy from outside the page.** Anyone can write a `.darek` file and the user can install it from
   a file, behind the strong warning (ADR-0015). It holds Commands and fixed Replies, not messages
@@ -156,20 +160,38 @@ the listing.
 
 ## Data safety
 
-**No data collected. No data shared.** Answered 2026-10-31 against the artifact above. The Console's
-preview reads *"No data collection declared"* and *"No data shared with third parties"*, with the
-privacy policy URL.
+**Approximate location collected, no data shared**, since 2026-11-28 (below). Until then, from
+2026-10-31, *"No data collection declared"* and *"No data shared with third parties"*.
 
-**To re-answer with phase F's checkpoint F (0.15.0)**, before that release leaves internal testing
-(`DOD.md`, *Before the next upload*), in the same commit as the privacy policy's rewrite:
+**Re-answered 2026-11-28 for phase F's checkpoint F (0.15.0)** and saved; *Submit 1 change for
+review* on Publishing overview (managed publishing off) is still owed — see *Before the next upload*
+in `DOD.md`. The answers given:
 
-- **Location → Approximate location: collected, not shared.** The weather fucha sends the city name
-  the user types to Open-Meteo's place search, then the chosen city's coordinates to its forecast
-  (point 7). **Optional**: only a user who installs the weather fucha and picks a city sends it.
-  **Purpose:** App functionality. **Encrypted in transit:** yes, HTTPS only (ADR-0008). **Not shared**:
-  Open-Meteo answers the request for the app, which Play's help page counts as a service provider.
-  **Processed ephemerally** and **deletion**: **assumed** — read Open-Meteo's terms and Play's
-  wording in the sitting, and record the answer given.
+- *Does your app collect or share any of the required user data types?* **Yes.**
+- *Is all of the user data collected by your app encrypted in transit?* **Yes**, HTTPS only
+  (ADR-0008).
+- *Account creation:* **My app does not allow users to create an account**; *log in with accounts
+  created outside the app:* **No**.
+- *Do you provide a way for users to request that their data is deleted?* **No, but user data is
+  automatically deleted within 90 days.** The developer never receives it; Open-Meteo's terms
+  (open-meteo.com/en/terms, *Privacy*, read 2026-11-28) say its webserver logs "may contain
+  sensitive information such as geographical coordinates" and "will be deleted after a period of 90
+  days".
+- **Data types: Location → Approximate location**, nothing else. The weather fucha sends the city
+  name the user types to Open-Meteo's place search, then the chosen city's coordinates to its
+  forecast (point 7).
+  - **Collected**, not **Shared**: the transfer follows the user's own request for the weather, to
+    the address the install screen showed, which is the user-initiated exemption quoted below; and
+    Open-Meteo answers it for the app.
+  - *Processed ephemerally?* **No**: Open-Meteo keeps the logs above, so "retained for no longer than
+    necessary to service the specific request" cannot be claimed.
+  - **Users can choose whether this data is collected**: only a user who installs the weather fucha,
+    allows it the internet and picks a city sends it.
+  - *Why:* **App functionality** only.
+- The preview read: *No data shared with third parties*; *Data collected: Location*; *Developer
+  hasn't provided a way to request data deletion — Data may be automatically deleted over time*;
+  *Data is encrypted in transit*; the policy URL. The policy names Open-Meteo's 90 days for that
+  reason.
 - Everything else stays *not collected*: the fuchy page's requests carry nothing about the user
   (point 1).
 
