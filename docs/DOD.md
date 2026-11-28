@@ -249,9 +249,6 @@ voice at every setting tried (D2). A better voice or a line of her own fixes it.
 
 ## After the closed test
 
-- [ ] **Turn on the weekly CI run once the app is live on Play.** Add
-      `schedule: - cron: '47 1 * * 0'` under `on:` in `.github/workflows/ci.yml`. Until then
-      edge-to-edge runs only from the Run workflow button.
 - [ ] **The production-access application is in, with its answers recorded verbatim** in
       [`play-app-content.md`](play-app-content.md). Until it is granted the production track does not
       exist. The app this template was extracted from waited one day; that is one datapoint, not a
@@ -265,6 +262,10 @@ voice at every setting tried (D2). A better voice or a line of her own fixes it.
       ([`RELEASING.md`](RELEASING.md)), or a deliberate decision to stay on 0.x. In order: production
       access granted, *then* that version's release notes in every locale on an ordinary branch (never
       on release-please's own, which it force-pushes), *then* the AAB and the listing go up together.
+- [ ] **Turn on the weekly CI run once the app is live on Play.** Add
+      `schedule: [{cron: '47 1 * * 0'}]` under `on:` in `.github/workflows/ci.yml`. Until then
+      edge-to-edge runs only from the Run workflow button. GitHub's schedule is best-effort, so a
+      week with no run is not a green week: read the run list.
 
 ## Standing checks that never close
 
