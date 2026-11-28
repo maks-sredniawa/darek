@@ -209,8 +209,9 @@ Console matches. A new permission, foreground service or data type is a Console 
 - [ ] **F**, the page, updates and *„Zgłoś fuchę"* (R4–R6), with the listing, policy, Data safety
       and content rating in the same release.
       R2's page half and R4–R6 are read (`phase-F.md`, *Readings*). Still owed: the Data safety's
-      submission, the content rating's re-read (`play-app-content.md`), and the listing's
-      screenshots with the page in both languages.
+      submission, the content rating's re-read (`play-app-content.md`), and uploading the
+      listing's screenshots: `art/play-screenshots/6_fuchy-page-{pl,en}.png` show the page, and go
+      up with the next publish run that has `update_listing` on (`RELEASING.md`).
 
 ## Owed to the owner's phone
 
