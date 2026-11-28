@@ -8,7 +8,8 @@ memory a year from now is how a true answer turns false.
 **Status:** answered 2026-10-31 with managed publishing on. The content rating was submitted the same
 evening and IARC's ratings are in (below). **Sent for review 2026-10-31**, together with the listing
 and the first closed release, Alpha 0.2.0 (versionCode 31). Still owed: the re-read of *Target
-audience and content* (below).
+audience and content* (below). Managed publishing is off as of 2026-11-28, as the Console's
+Publishing overview read then.
 
 Two rules keep this file honest:
 
@@ -360,9 +361,11 @@ first, under a dated *Drafted, not submitted* line; every claim must trace to a 
 them:**
 
 1. **The audience answer agrees with *Target audience* above.** A reviewer reads the two side by side.
-2. **Engagement is answered from what the app can know.** With no `INTERNET` permission there is no
-   telemetry, so *"I cannot see how often testers used it"* is the true answer. A guessed figure would
-   contradict *Data safety* in this same file.
+2. **Engagement is answered from what the app can know.** Darek has `INTERNET` since phase F's
+   checkpoint D, but every request goes through `net/HttpClient` to the fuchy page and a fucha's
+   declared addresses only, with no analytics (ADR-0008), so there is no telemetry and *"I cannot
+   see how often testers used it"* is the true answer. A guessed figure would contradict *Data
+   safety* in this same file.
 3. **The changes answer says where the changes came from.** If the testers reported nothing, say so
    and name what came from your own use instead.
 

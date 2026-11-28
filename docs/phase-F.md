@@ -387,9 +387,10 @@ the mail's tag.
   it changes there first (`DOD.md`).
 - **With F**: the privacy policy (the network, Open-Meteo, the city), the listing in both languages
   naming the fuchy page and the weather, `play-app-content.md` and the Data safety re-answered (the
-  city is approximate location, sent to Open-Meteo, optional, for app functionality: **assumed**
-  category, read it in the Console sitting), the content rating re-answered for user-generated
-  content and the profanity a fucha can carry, and the screenshots with the page.
+  city is approximate location, sent to Open-Meteo, optional, for app functionality: answered in
+  the Console 2026-11-28, see *Data safety* in `play-app-content.md`), the content rating
+  re-answered for user-generated content and the profanity a fucha can carry, and the screenshots
+  with the page.
 
 ## Known gaps, deliberately
 
